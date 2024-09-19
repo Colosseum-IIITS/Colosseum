@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const tournamentSchema = new mongoose.Schema({
+  tid: { type: String, required: true},
   name: { type: String, required: true }, 
   date: { type: Date, required: true },
   entryFee: { type: Number, default: 0 },

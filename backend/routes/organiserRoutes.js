@@ -5,6 +5,6 @@ const teamController = require('../controllers/teamControllers');
 
 // Route to create a new organiser
 router.post('/create', organiserController.createOrganiser);
-router.get('/fetchTeams',teamController.fetchTeam);
+router.get('/search', organiserController.getOrganiserByUsername);
 
 module.exports = router;

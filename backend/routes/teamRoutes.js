@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const teamController = require('../controllers/teamController');
+const teamController = require('../controllers/teamControllers');
 
 // Route to create a new team
 router.post('/create', teamController.createTeam);
@@ -10,5 +10,8 @@ router.post('/join', teamController.joinTeam);
 
 // Route to leave a team
 router.post('/leave', teamController.leaveTeam);
+
+// Route to search a team
+router.get('/search', teamController.getTeamByName);
 
 module.exports = router;

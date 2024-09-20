@@ -5,6 +5,7 @@ require('dotenv').config();
 const playerRouts = require('./routes/playerRouts');
 const tournamentRoutes = require('./routes/tournamentRoutes');
 const organiserRoutes = require('./routes/organiserRoutes');
+const teamRoutes = require('./routes/teamRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/player', playerRouts);
 app.use('/api/tournament',tournamentRoutes);
 app.use('/api/organiser', organiserRoutes);
+app.use('/api/team', teamRoutes);
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {

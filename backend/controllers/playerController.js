@@ -36,7 +36,7 @@ exports.createPlayer = async (req, res) => {
   }
 };
 
-//
+
 // Func: Search tournaments by tid or name
 exports.searchTournaments = async (req, res) => {
   try {
@@ -58,7 +58,6 @@ exports.searchTournaments = async (req, res) => {
     res.status(500).json({ error: 'Error searching tournaments' });
   }
 };
-
 
 // Func: Join a tournament
 exports.joinTournament = async (req, res) => {
@@ -98,7 +97,6 @@ exports.joinTournament = async (req, res) => {
     res.status(500).json({ error: 'Error joining tournament' });
   }
 };
-
 
 // Func: follow Organisation
 exports.followOrganiser = async (req, res) => {

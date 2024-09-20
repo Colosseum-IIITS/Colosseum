@@ -2,10 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 require('dotenv').config();
-const userRoutes = require('./routes/userRoutes');
+const playerRouts = require('./routes/playerRouts');
 const tournamentRoutes = require('./routes/tournamentRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const authRoutes = require('./routes/authRoutes');
+const organiserRoutes = require('./routes/organiserRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -21,12 +20,11 @@ app.get('/', (req, res) => {
 });
 
 // Authentication routes
-app.use('/api/auth', authRoutes);
 
 // Other API routes
-app.use('/api/users', userRoutes);
-app.use('/api/tournaments', tournamentRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/player', playerRouts);
+app.use('/api/tournament',tournamentRoutes);
+app.use('/api/organiser', organiserRoutes);
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {

@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const tournamentSchema = new mongoose.Schema({
   tid: { type: String, required: true},
   name: { type: String, required: true }, 
-  date: { type: Date, required: true },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
   entryFee: { type: Number, default: 0 },
   prizePool: { type: Number, default: 0 },
   status: { type: String, enum: ['Pending', 'Approved', 'Completed'], default: 'Pending' },

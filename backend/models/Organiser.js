@@ -6,7 +6,7 @@ const toSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profilePhoto: { type: String },
   description: {type: String, default: "Hello World!!"},
-  followers: { type: Number, default: 0 },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
   tournamentsConducted: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   tournaments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' }],

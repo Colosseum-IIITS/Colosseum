@@ -14,5 +14,8 @@ router.post('/follow-organiser', playerController.followOrganiser);
 // Route to unfollow an organizer
 router.post('/unfollow-organiser', playerController.unfollowOrganiser);
 
+// Route to create a new player
+router.post('/create', playerController.createPlayer);
+
 
 module.exports = router;

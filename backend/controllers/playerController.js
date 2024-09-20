@@ -4,12 +4,12 @@ const Tournament = require('../models/Tournament');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');
 const team = require('../models/Team');
+const bcrypt = require('bcrypt');
 
-//
+
 // Func: Register a new player
-//
-exports.registerPlayer = async (req, res) => {
-  const { username, email, password, profilePhoto } = req.body;
+exports.createPlayer = async (req, res) => {
+  const { username, email, password } = req.body;
 
   try {
     // Check if email or username already exists
@@ -18,25 +18,26 @@ exports.registerPlayer = async (req, res) => {
       return res.status(400).json({ message: 'Email or Username already exists' });
     }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create a new player
     const player = new Player({
       username,
       email,
-      password,  // In a production environment, make sure to hash the password before saving
-      profilePhoto
+      password: hashedPassword  // Store the hashed password
     });
 
     await player.save();
-    res.status(201).json({ message: 'Player registered successfully', player });
+    res.status(201).json({ message: 'Player created successfully', player });
   } catch (error) {
-    res.status(500).json({ error: 'Error registering player' });
+    console.error('Error during player creation:', error);  // Log the error for debugging
+    res.status(500).json({ error: 'Error creating player', details: error.message });
   }
 };
 
-
 //
 // Func: Search tournaments by tid or name
-//
 exports.searchTournaments = async (req, res) => {
   try {
     const { searchTerm } = req.query;
@@ -58,9 +59,8 @@ exports.searchTournaments = async (req, res) => {
   }
 };
 
-//
+
 // Func: Join a tournament
-//
 exports.joinTournament = async (req, res) => {
   const { playerId, tournamentId } = req.body;
 
@@ -100,9 +100,7 @@ exports.joinTournament = async (req, res) => {
 };
 
 
-//
-//Func: follow Organisations
-//
+// Func: follow Organisation
 exports.followOrganiser = async (req, res) => {
   const { playerId, organiserId } = req.body;
 
@@ -138,7 +136,7 @@ exports.followOrganiser = async (req, res) => {
   }
 };
 
-// // Player unfollows an organizer
+// Func: unfollows organisation
 exports.unfollowOrganiser = async (req, res) => {
   const { playerId, organiserId } = req.body;
 
@@ -173,18 +171,3 @@ exports.unfollowOrganiser = async (req, res) => {
     res.status(500).json({ error: 'Error unfollowing organiser' });
   }
 };
-
-
-
-
-
-
-
-//
-//
-//
-//
-//
-//
-//
-//

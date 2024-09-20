@@ -12,6 +12,16 @@ exports.banOrganiser = async (req, res) => {
   }
 };
 
+// unBan an organiser
+exports.unBanOrganiser = async (req, res) => {
+  try {
+    const organiser = await Organiser.findByIdAndUpdate(req.params.id, { banned: false });
+    res.status(200).json({ message: 'Organiser un-banned', organiser });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
+
 // Delete an organiser
 exports.deleteOrganiser = async (req, res) => {
   try {
@@ -27,6 +37,16 @@ exports.banPlayer = async (req, res) => {
   try {
     const player = await Player.findByIdAndUpdate(req.params.id, { banned: true });
     res.status(200).json({ message: 'Player banned', player });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
+
+// unBan a Player
+exports.unBanPlayer = async (req, res) => {
+  try {
+    const player = await Player.findByIdAndUpdate(req.params.id, { banned: false });
+    res.status(200).json({ message: 'Player un-banned', player });
   } catch (error) {
     res.status(400).json({ error });
   }

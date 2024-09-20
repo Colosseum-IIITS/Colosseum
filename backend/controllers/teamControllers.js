@@ -1,6 +1,7 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
 
+// Create a new team
 exports.createTeam = async (req, res) => {
     const { name, logo, playerId } = req.body;  // Assuming the playerId is the one creating the team
   
@@ -32,9 +33,8 @@ exports.createTeam = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: 'Error creating team' });
     }
-  };
+};
   
-
 // Join an existing team
 exports.joinTeam = async (req, res) => {
   const { teamId, playerId } = req.body;

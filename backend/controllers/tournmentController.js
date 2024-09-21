@@ -1,6 +1,9 @@
 const Tournament = require('../models/Tournament');
+const Player = require('../models/Player');
+const Team = require('../models/Team');
 
-// Create a new tournament
+// Create a new tournament         
+//working
 exports.createTournament = async (req, res) => {
   const { tid, name, startDate, endDate, entryFee, prizePool, organizer, description } = req.body;
 
@@ -31,7 +34,7 @@ exports.createTournament = async (req, res) => {
   }
 };
 
-// Update an existing tournament
+// Update an existing tournament     
 exports.updateTournament = async (req, res) => {
   const { tournamentId } = req.params;  // Tournament ID from the URL params
   const updateData = req.body;  // Data from the request body to update the tournament
@@ -49,3 +52,6 @@ exports.updateTournament = async (req, res) => {
     res.status(500).json({ error: 'Error updating tournament' });
   }
 };
+
+
+

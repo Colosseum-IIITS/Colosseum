@@ -8,4 +8,6 @@ router.post('/create', tournamentController.createTournament);
 // Route to update an existing tournament
 router.post('/update/:tournamentId', tournamentController.updateTournament);
 
+
 module.exports = router;
+    

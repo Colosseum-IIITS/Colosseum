@@ -6,6 +6,7 @@ const playerRouts = require('./routes/playerRouts');
 const tournamentRoutes = require('./routes/tournamentRoutes');
 const organiserRoutes = require('./routes/organiserRoutes');
 const teamRoutes = require('./routes/teamRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api/player', playerRouts);
 app.use('/api/tournament',tournamentRoutes);
 app.use('/api/organiser', organiserRoutes);
 app.use('/api/team', teamRoutes);
+app.use('/api/report', reportRoutes);
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {

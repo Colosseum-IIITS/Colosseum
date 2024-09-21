@@ -1,7 +1,8 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
 
-// Create a new team
+// Create a new team                 
+//working
 exports.createTeam = async (req, res) => {
   const { name, playerId } = req.body;
   try {
@@ -41,7 +42,8 @@ exports.createTeam = async (req, res) => {
 };
 
   
-// Join an existing team
+// Join an existing team              
+//working
 exports.joinTeam = async (req, res) => {
   const { teamId, playerId } = req.body;
 
@@ -92,7 +94,7 @@ exports.leaveTeam = async (req, res) => {
 };
 
 
-
+// search a Team by name
 exports.getTeamByName = async (req, res) => {
   const { searchTerm } = req.query;  // Search term will be passed as a query parameter
 

@@ -2,7 +2,8 @@
 
 const Organiser = require('../models/Organiser');
 
-// Create a new organizer
+// Create a new organizer          
+//working
 exports.createOrganiser = async (req, res) => {
   const { username, email, password, profilePhoto, description } = req.body;
 

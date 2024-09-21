@@ -7,7 +7,8 @@ const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 
 
-// Func: Register a new player
+// Func: Register a new player                         
+//working
 exports.createPlayer = async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -36,8 +37,8 @@ exports.createPlayer = async (req, res) => {
   }
 };
 
-
-// Func: Search tournaments by tid or name
+// Func: Search tournaments by tid or name             
+//working
 exports.searchTournaments = async (req, res) => {
   try {
     const { searchTerm } = req.query;
@@ -56,45 +57,6 @@ exports.searchTournaments = async (req, res) => {
     res.status(200).json(tournaments);
   } catch (error) {
     res.status(500).json({ error: 'Error searching tournaments' });
-  }
-};
-
-// Func: Join a tournament
-exports.joinTournament = async (req, res) => {
-  const { playerId, tournamentId } = req.body;
-
-  try {
-    // Find the tournament by its ID
-    const tournament = await Tournament.findById(tournamentId);
-    if (!tournament) {
-      return res.status(404).json({ message: 'Tournament not found' });
-    }
-
-    // Check if the player already exists in the tournament's player list
-    if (tournament.players.includes(playerId)) {
-      return res.status(400).json({ message: 'Player is already registered in this tournament' });
-    }
-
-    // Find the player by their ID
-    const player = await Player.findById(playerId);
-    if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
-    }
-
-    // Add player to the tournament's player list
-    tournament.players.push(playerId);
-    await tournament.save();
-
-    // Add the tournament to the player's tournaments array (with won = false initially)
-    player.tournaments.push({
-      tournament: tournamentId,
-      won: false
-    });
-    await player.save();
-
-    res.status(200).json({ message: 'Player joined the tournament successfully', tournament, player });
-  } catch (error) {
-    res.status(500).json({ error: 'Error joining tournament' });
   }
 };
 
@@ -134,7 +96,7 @@ exports.followOrganiser = async (req, res) => {
   }
 };
 
-// Func: unfollows organisation
+// Func: unfollows organisation 
 exports.unfollowOrganiser = async (req, res) => {
   const { playerId, organiserId } = req.body;
 
@@ -167,5 +129,41 @@ exports.unfollowOrganiser = async (req, res) => {
     res.status(200).json({ message: 'Organiser unfollowed successfully', player, organiser });
   } catch (error) {
     res.status(500).json({ error: 'Error unfollowing organiser' });
+  }
+};
+
+// Func: Join-Tournmanet                                
+//working
+exports.joinTournament = async (req, res) => {
+  try {
+    const { playerId, tournamentId } = req.body;
+
+    const player = await Player.findById(playerId).populate('team');
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    if (!player.team) {
+      return res.status(400).json({ message: 'Player must be part of a team' });
+    }
+
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    if (tournament.teams.includes(player.team._id)) {
+      return res.status(400).json({ message: 'Team is already registered for this tournament' });
+    }
+
+    tournament.teams.push(player.team._id);
+    await tournament.save();
+
+    player.tournaments.push({ tournament: tournament._id, won: false });
+    await player.save();
+
+    return res.status(200).json({ message: 'Successfully joined the tournament' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error });
   }
 };

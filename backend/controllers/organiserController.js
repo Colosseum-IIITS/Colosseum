@@ -29,7 +29,6 @@ exports.createOrganiser = async (req, res) => {
   }
 };
 
-
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query;  // Search term will be passed as a query parameter

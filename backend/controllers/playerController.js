@@ -6,70 +6,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 
-// Func: Register a new player
-exports.createPlayer = async (req, res) => {
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    try {
-        let existingPlayer = await Player.findOne({ email });
-        if (existingPlayer) {
-            return res.status(400).json({ message: 'Email already exists' });
-        }
-
-        existingPlayer = await Player.findOne({ username });
-        if (existingPlayer) {
-            return res.status(400).json({ message: 'Username already exists' });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const player = new Player({
-            username,
-            email,
-            password: hashedPassword
-        });
-
-        await player.save();
-
-        const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-
-        res.cookie('user_jwt', token, {
-            httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
-        });
-
-        res.status(201).json({ message: 'Player created successfully', player });
-    } catch (error) {
-        console.error('Error during player creation:', error);
-        res.status(500).json({ error: 'Error creating player', details: error.message });
-    }
-};
-
-// Func: Search tournaments by tid or name
-exports.searchTournaments = async (req, res) => {
-    try {
-        const { searchTerm } = req.query;
-
-        const tournaments = await Tournament.find({
-            $or: [
-                { tid: new RegExp(searchTerm, 'i') },
-                { name: new RegExp(searchTerm, 'i') }
-            ]
-        });
-
-        if (tournaments.length === 0) {
-            return res.status(404).json({ message: 'No tournaments found' });
-        }
-        res.status(200).json(tournaments);
-    } catch (error) {
-        res.status(500).json({ error: 'Error searching tournaments' });
-    }
-};
-
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
@@ -131,6 +67,28 @@ exports.unfollowOrganiser = async (req, res) => {
         res.status(200).json({ message: 'Organiser unfollowed successfully', player, organiser });
     } catch (error) {
         res.status(500).json({ error: 'Error unfollowing organiser' });
+    }
+};
+
+
+// Func: Search tournaments by tid or name
+exports.searchTournaments = async (req, res) => {
+    try {
+        const { searchTerm } = req.query;
+
+        const tournaments = await Tournament.find({
+            $or: [
+                { tid: new RegExp(searchTerm, 'i') },
+                { name: new RegExp(searchTerm, 'i') }
+            ]
+        });
+
+        if (tournaments.length === 0) {
+            return res.status(404).json({ message: 'No tournaments found' });
+        }
+        res.status(200).json(tournaments);
+    } catch (error) {
+        res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
 

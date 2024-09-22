@@ -4,7 +4,7 @@ const playerController = require('../controllers/playerController');
 const authController = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
-router.post('/create', playerController.createPlayer); // w
+router.post('/create', authController.createPlayer); // w
 router.post('/login', authController.loginPlayer); // w
 router.get('/searchTournaments', authenticateToken, playerController.searchTournaments); // w
 router.post('/followOrganiser', authenticateToken, playerController.followOrganiser); // w

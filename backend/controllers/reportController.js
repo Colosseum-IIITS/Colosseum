@@ -2,10 +2,11 @@ const Report = require("../models/Report");
 const Player = require("../models/Player");
 const Team = require("../models/Team");
 const Organiser = require("../models/Organiser");
+const jwt = require('jsonwebtoken');
 
 exports.reportTeam = async (req, res) => {
-  const { reportedTeam, reportType, organiser, tournament, reason, playerId } =
-    req.body;
+  const { reportedTeam, reportType, organiser, tournament, reason } = req.body;
+  const { _id: playerId } = req.user;
 
   try {
     const player = await Player.findById(playerId);
@@ -14,7 +15,7 @@ exports.reportTeam = async (req, res) => {
     }
     if (reportType) {
       const team = await Team.findById(reportedTeam);
-      if (!reportedType) {
+      if (!reportType) {
         if (!team) {
           return res.status(404).json({ message: "Team not found" });
         }

@@ -3,10 +3,9 @@ const router = express.Router();
 const organiserController = require("../controllers/organiserController");
 const teamController = require("../controllers/teamControllers");
 const reportController = require("../controllers/reportController");
-const authController = require("../controllers/authController");
+const { authenticateToken } = require("../middleware/authMiddleware");
 
-// Route to create a new Organiser
-router.post("/create", authController.createOrganiser);
+
 
 // Route to search the Organiser
 router.get("/search", organiserController.getOrganiserByUsername);

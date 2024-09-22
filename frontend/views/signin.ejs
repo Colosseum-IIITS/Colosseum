@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+        }
+
+        .login-card {
+            background: white;
+            padding: 80px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 450px;
+            justify-content: center;
+            align-items: center; 
+            text-align: center;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 86% 100%, 0 100%);
+        }
+
+        .login-card h2 {
+            margin-bottom: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid black;
+            width: 0;
+            animation: typing 1s steps(20) forwards, blink 0.5s step-end infinite alternate;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            from { border-color: transparent; }
+            to { border-color: black; }
+        }
+
+        .login-card img {
+            width: 90px;
+            margin-bottom: 60px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 10px 0;
+            margin: 15px 0;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            outline: none;
+            font-size: 13px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideDown 0.5s forwards;
+        }
+
+        @keyframes slideDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card input:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .login-card input:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .login-card .forgot-password {
+            font-size: 12px;
+            color: gray;
+            margin-left: 65%;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideDown 0.5s forwards;
+            animation-delay: 0.5s;
+        }
+
+        .login-card button {
+            background: black;
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 11px;
+            cursor: pointer;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideDown 0.5s forwards;
+            animation-delay: 0.8s;
+        }
+
+        .login-card button:hover {
+            background: #333;
+        }
+
+        .signup-link {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideDown 0.5s forwards;
+            animation-delay: 1s;
+        }
+
+        .signup-link p {
+            display: inline;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid black;
+            width: 0;
+            animation: typing 1s steps(30) forwards, blink 0.5s step-end infinite alternate;
+            animation-delay: 1s;
+        }
+
+        .signup-link a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .input-container {
+            position: relative;
+            margin: 15px auto;
+        }
+
+        .sig {
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <form action="/signin" method="POST" class="form">
+            <input type="hidden" name="role" id="role" value="<%= role %>">
+            <img src="controller.jpg" alt="logo">
+            <h2 id="typing-text">Welcome Player!</h2>
+
+            <input type="username" placeholder="Username" required class="validate1" autocomplete="off" name="username">
+            <input type="password" placeholder="Password" required class="validate1" autocomplete="off" name="password">
+
+            <button class="sig" type="submit">SIGN IN</button>
+
+            <div class="signup-link">
+                <p>Don't have an account? <a class="elseButton" href="/signup?role=<%= role %>">SIGN UP</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const role = "<%= role %>";
+
+        // Redirect to sign-up page with role if needed
+        function redirectToSignup() {
+            window.location.href = `signup2.html?role=${role}`;
+        }
+    </script>
+</body>
+</html>

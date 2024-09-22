@@ -30,6 +30,8 @@ app.get('/', (req, res) => {
   res.render('login');
 });
 
+
+
 // Authentication routes
 
 // Other API routes

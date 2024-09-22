@@ -1,18 +1,19 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
+const jwt = require('jsonwebtoken');
+
 
 // Create a new team                 
-//working
 exports.createTeam = async (req, res) => {
-  const { name, playerId } = req.body;
+  const { name } = req.body;
+  const { _id: playerId } = req.user;  // Extract playerId from JWT token
+
   try {
-    // Check if team name is unique
     const existingTeam = await Team.findOne({ name });
     if (existingTeam) {
       return res.status(400).json({ message: 'Team name already exists' });
     }
 
-    // Check if the player exists and is not already in a team
     const player = await Player.findById(playerId);
     if (!player) {
       return res.status(404).json({ message: 'Player not found' });
@@ -21,7 +22,6 @@ exports.createTeam = async (req, res) => {
       return res.status(400).json({ message: 'Player is already part of another team' });
     }
 
-    // Create new team and automatically assign the player as the captain
     const team = new Team({
       name,
       captain: playerId,
@@ -30,7 +30,6 @@ exports.createTeam = async (req, res) => {
 
     await team.save();
 
-    // Update the player's team reference
     player.team = team._id;
     await player.save();
 
@@ -43,21 +42,17 @@ exports.createTeam = async (req, res) => {
 
   
 // Join an existing team              
-//working
 exports.joinTeam = async (req, res) => {
-  const { teamId, playerId } = req.body;
+  const { teamId } = req.body;
+  const { _id: playerId } = req.user;  // Extract playerId from JWT token
 
   try {
-    // Find the team and add the player to it
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    // Update player's team reference
     await Player.findByIdAndUpdate(playerId, { team: teamId });
-
-    // Add player to the team's players list
     team.players.push(playerId);
     await team.save();
 
@@ -67,23 +62,21 @@ exports.joinTeam = async (req, res) => {
   }
 };
 
+
 // Leave a team
 exports.leaveTeam = async (req, res) => {
-  const { playerId } = req.body;
+  const { _id: playerId } = req.user;  // Extract playerId from JWT token
 
   try {
-    // Find the player and remove the team reference
     const player = await Player.findById(playerId);
     if (!player || !player.team) {
       return res.status(404).json({ message: 'Player is not in a team' });
     }
 
-    // Find the team and remove the player
     const team = await Team.findById(player.team);
     team.players.pull(playerId);
     await team.save();
 
-    // Remove the team reference from the player
     player.team = null;
     await player.save();
 
@@ -92,6 +85,7 @@ exports.leaveTeam = async (req, res) => {
     res.status(500).json({ error: 'Error leaving team' });
   }
 };
+
 
 
 // search a Team by name
@@ -117,30 +111,20 @@ exports.getTeamByName = async (req, res) => {
 };
 
 // Update team name (only by captain)
-// working
 exports.updateTeamName = async (req, res) => {
-  const { teamId, captainId, newName } = req.body;
+  const { teamId, newName } = req.body;
+  const { _id: captainId } = req.user;  // Extract captainId from JWT token
 
   try {
-
-    // Check if the team is actually existing
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    // Check if the Captain is a Player
-    const player = await Player.findById(captainId);
-    if(!player) {
-      return res.status(404).json({messge: 'Captain is not a valid player'});
-    }
-
-    // Check if the player is the captain of the team
     if (team.captain.toString() !== captainId) {
       return res.status(403).json({ message: 'Only the captain can update the team name' });
     }
 
-    // Check if the new team name is already taken
     const existingTeam = await Team.findOne({ name: newName });
     if (existingTeam) {
       return res.status(400).json({ message: 'Team name already exists' });
@@ -155,4 +139,5 @@ exports.updateTeamName = async (req, res) => {
     res.status(500).json({ error: 'Error updating team name', details: error.message });
   }
 };
+
 

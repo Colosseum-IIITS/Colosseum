@@ -9,5 +9,4 @@ router.post('/create', organiserController.createOrganiser);
 // Route to search the Organiser
 router.get('/search', organiserController.getOrganiserByUsername);
 
-
 module.exports = router;

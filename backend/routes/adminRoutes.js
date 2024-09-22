@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
+const { authToken } = require("../middleware/authMiddleware");
 
 // Ban an organiser
 router.put("/ban-organiser/:id", adminController.banOrganiser);

@@ -14,4 +14,10 @@ router.post('/leave', teamController.leaveTeam);
 // Route to search a team
 router.get('/search', teamController.getTeamByName);
 
+
+// Route to update team name (only by captain)
+// working
+router.put('/updateTeamName', teamController.updateTeamName);
+
+
 module.exports = router;

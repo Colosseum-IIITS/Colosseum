@@ -54,4 +54,43 @@ exports.updateTournament = async (req, res) => {
 };
 
 
+// Update Winner
+exports.updateWinner = async (req, res) => {
+  const { tournamentId, winnerId } = req.body;
+
+  try {
+    // Find the tournament by ID
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    // Check if the requester is the organizer
+    if (!tournament.organizer.equals(req.user.id)) {
+      return res.status(403).json({ message: 'Only the organizer can update the winner' });
+    }
+    
+    // Update the winner in the tournament
+    tournament.winner = winnerId;
+    await tournament.save();
+
+    // Update the player's tournament won status
+    const player = await Player.findById(winnerId);
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const tournamentIndex = player.tournaments.findIndex(t => t.tournament.equals(tournamentId));
+    if (tournamentIndex !== -1) {
+      player.tournaments[tournamentIndex].won = true;
+      await player.save();
+    }
+
+    res.status(200).json({ message: 'Winner updated successfully', tournament });
+  } catch (error) {
+    console.error('Error updating winner:', error);
+    res.status(500).json({ error: 'Error updating winner' });
+  }
+};
+
 

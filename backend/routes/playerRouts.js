@@ -1,21 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const playerController = require('../controllers/playerController');
+const authController = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
-// Route to search tournaments
-router.get('/search-tournaments', playerController.searchTournaments);
-
-// Route to follow an organizer
-router.post('/follow-organiser', playerController.followOrganiser);
-
-// Route to unfollow an organizer
-router.post('/unfollow-organiser', playerController.unfollowOrganiser);
-
-// Route to create a new player
-router.post('/create', playerController.createPlayer);
-
-
-// Route to join a tournment  
-router.post('/join-tournament', playerController.joinTournament);
+router.post('/create', playerController.createPlayer); // w
+router.post('/login', authController.loginPlayer); // w
+router.get('/searchTournaments', authenticateToken, playerController.searchTournaments); // w
+router.post('/followOrganiser', authenticateToken, playerController.followOrganiser); // w
+router.post('/unFollowOrganiser', authenticateToken, playerController.unfollowOrganiser); // w
+router.post('/joinTournament', authenticateToken, playerController.joinTournament); // w 
+router.put('/updateUsername', authenticateToken, playerController.updateUsername); // w
+router.put('/updatePassword', authenticateToken, playerController.updatePassword); // w
+router.put('/updateEmail', authenticateToken, playerController.updateEmail); // w
+router.get('/tournamentsPlayed', authenticateToken, playerController.getTournamentsPlayed); // w
+router.get('/tournamentsWon', authenticateToken, playerController.getTournamentsWon); // w
+router.get('/ranking', authenticateToken, playerController.getPlayerRanking); // w
 
 module.exports = router;

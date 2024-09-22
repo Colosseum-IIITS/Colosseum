@@ -115,3 +115,44 @@ exports.getTeamByName = async (req, res) => {
       res.status(500).json({ error: 'Error fetching team', details: error.message });
   }
 };
+
+// Update team name (only by captain)
+// working
+exports.updateTeamName = async (req, res) => {
+  const { teamId, captainId, newName } = req.body;
+
+  try {
+
+    // Check if the team is actually existing
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ message: 'Team not found' });
+    }
+
+    // Check if the Captain is a Player
+    const player = await Player.findById(captainId);
+    if(!player) {
+      return res.status(404).json({messge: 'Captain is not a valid player'});
+    }
+
+    // Check if the player is the captain of the team
+    if (team.captain.toString() !== captainId) {
+      return res.status(403).json({ message: 'Only the captain can update the team name' });
+    }
+
+    // Check if the new team name is already taken
+    const existingTeam = await Team.findOne({ name: newName });
+    if (existingTeam) {
+      return res.status(400).json({ message: 'Team name already exists' });
+    }
+
+    team.name = newName;
+    await team.save();
+
+    res.status(200).json({ message: 'Team name updated successfully', team });
+  } catch (error) {
+    console.error('Error updating team name:', error);
+    res.status(500).json({ error: 'Error updating team name', details: error.message });
+  }
+};
+

@@ -13,7 +13,7 @@ router.post('/join', authenticateToken, teamController.joinTeam);
 router.post('/leave', authenticateToken, teamController.leaveTeam);
 
 // Route to search a team
-router.get('/search', teamController.getTeamByName);
+router.get('/search', teamController.getTeamsByName);
 
 
 // Route to update team name (only by captain)

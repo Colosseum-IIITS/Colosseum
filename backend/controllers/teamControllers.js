@@ -89,26 +89,27 @@ exports.leaveTeam = async (req, res) => {
 
 
 // search a Team by name
-exports.getTeamByName = async (req, res) => {
+exports.getTeamsByName = async (req, res) => {
   const { searchTerm } = req.query;  // Search term will be passed as a query parameter
 
   try {
-      // Perform a case-insensitive search on the team name
-      const team = await Team.findOne({ name: { $regex: new RegExp(searchTerm, 'i') } })
+      // Perform a case-insensitive search on team names
+      const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
           .populate('players')  // Populate player details
           .populate('captain');  // Populate captain details
 
-      // Check if the team exists
-      if (!team) {
-          return res.status(404).json({ message: 'Team not found' });
+      // Check if any teams are found
+      if (!teams.length) {
+          return res.status(404).json({ message: 'No teams found' });
       }
 
-      res.status(200).json({ team });
+      res.status(200).json({ teams });
   } catch (error) {
-      console.error('Error fetching team:', error);
-      res.status(500).json({ error: 'Error fetching team', details: error.message });
+      console.error('Error fetching teams:', error);
+      res.status(500).json({ error: 'Error fetching teams', details: error.message });
   }
 };
+
 
 // Update team name (only by captain)
 exports.updateTeamName = async (req, res) => {

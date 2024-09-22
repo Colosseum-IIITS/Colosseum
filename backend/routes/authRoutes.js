@@ -1,11 +1,13 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const authController = require("../controllers/authController");
+const authController = require('../controllers/authController');
 
-router.post('/player/signup', authController.createPlayer); // w
-router.post('/player/signin', authController.loginPlayer); // w
+// Player routes
+router.post('/player/signin', authController.loginPlayer);
+router.post('/player/signup', authController.createPlayer);
 
-router.post("/org/signup", authController.createOrganiser);
-router.post("/org/signin", authController.loginOrganiser);
+// Organizer routes
+router.post('/org/signin', authController.loginOrganiser);
+router.post('/org/signup', authController.createOrganiser);
 
 module.exports = router;

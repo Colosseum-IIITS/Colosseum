@@ -1,176 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup Card</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Signup Card</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/signupStyle.css">
+        <script src="/assets/signup.js" defer></script>
+    </head>
+    <body>
+        <div class="signup-card">
+            <img src="/assets/controller.jpg" alt="logo"> <!-- Make sure the image path is correct -->
+            <h2 id="signup-typing-text">Create Account</h2>
+            <form id="signupForm" method="POST" class="form" onsubmit="return validateForm()" 
+            action="<%= role === 'player' ? '/auth/player/signup' : '/auth/org/signup' %>">
+                      <input type="hidden" name="role" id="role" value="<%= role %>">
+                <input type="text" id="username" placeholder="Username" name="username" required class="validate1" autocomplete="off">
+                <input type="email" id="email" placeholder="Email" required name="email" class="validate3" autocomplete="off">
+                <input type="password" id="password" placeholder="Password" name="password" required class="validate2" autocomplete="off">
+                <button class="sig" type="submit">SIGN UP</button>
+                <div class="signin-link">
+                    <p>Already have an account? <a href="/signin?role=<%= role %>">LOG IN</a></p>
+                </div>
+            </form>
+            
+        </div>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            height: 100%;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #000000;
-        }
-
-        .signup-card {
-            background: white;
-            padding: 56px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            width: 450px;
-            justify-content: center;
-            align-items: center; 
-            text-align: center;
-            position: relative;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 86% 100%, 0 100%);
-        }
-
-        .signup-card h2 {
-            margin-bottom: 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 16px;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 3px solid black;
-            width: 0;
-            animation: typing 1s steps(20) forwards, blink 0.5s step-end infinite alternate;
-        }
-
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes blink {
-            from { border-color: transparent; }
-            to { border-color: black; }
-        }
-
-        .signup-card img {
-            width: 90px;
-            margin-bottom: 60px;
-        }
-
-        .signup-card input {
-            width: 84%;
-            padding: 10px 0;
-            margin: 15px 0;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            outline: none;
-            font-size: 13px;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: slideDown 0.5s forwards;
-        }
-
-        @keyframes slideDown {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .signup-card input:nth-child(4) {
-            animation-delay: 0.2s;
-        }
-
-        .signup-card input:nth-child(5) {
-            animation-delay: 0.4s;
-        }
-
-        .signup-card button {
-            background: black;
-            color: white;
-            border: none;
-            padding: 16px;
-            width: 84%;
-            border-radius: 11px;
-            cursor: pointer;
-            margin-top: 20px;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: slideDown 0.5s forwards;
-            animation-delay: 0.6s;
-        }
-
-        .signup-card button:hover {
-            background: #333;
-        }
-
-        .signin-link {
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: slideDown 0.5s forwards;
-            animation-delay: 0.8s;
-        }
-
-        .signin-link p {
-            display: inline;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 3px solid black;
-            width: 0;
-            animation: typing 1s steps(30) forwards, blink 0.5s step-end infinite alternate;
-            animation-delay: 1s;
-        }
-
-        .signin-link a {
-            color: black;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            cursor: pointer;
-        }
-        .sig{
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
-        }
-    </style>
-</head>
-<body>
-    <div class="signup-card">
-        <img src="controller.jpg" alt="logo">
-        <h2 id="signup-typing-text">Create Account</h2>
-        <form action="/signup" method="POST" class="form" onsubmit="return validateForm()">
-            <input type="hidden" name="role" id="role" value="<%= role %>">
-            <input type="text" id="username" placeholder="Username" name="username" required class="validate1" autocomplete="off">
-            <input type="email" id="email" placeholder="Email" required name="email" class="validate3" autocomplete="off">
-            <input type="password" id="password" placeholder="Password" name="password" required class="validate2" autocomplete="off">
-
-            <button class="sig" type="submit">SIGN UP</button>
-
-            <div class="signin-link">
-                <p>Already have an account? <a href="/signin?role=<%= role %>">LOG IN</a></p>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        const role = "<%= role %>";
-
-        // Redirect to sign-in page with role if needed
-        function redirectToSignin() {
-            window.location.href = `signin12.html?role=${role}`;
-        }
-    </script>
-</body>
-</html>
+    </body>
+    </html>

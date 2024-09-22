@@ -4,16 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="/main.js" defer></script>
+    <script src="/assets/main.js" defer></script>
     <title>Demo title here</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,700;1,900&display=swap"
-      rel="stylesheet"
-    />
-    <link href="styl.css" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,700;1,900&display=swap" rel="stylesheet" />
+    <link href="/assets/styles.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
@@ -31,21 +27,13 @@
         </div>
       </div>
 
-      <img class="parallax__bg" src="bg.jpg" alt="" />
-      <img class="parallax__dust" src="dust.webp" alt="" />
-      <img
-        class="parallax__foreground-back"
-        src="foreground-back.webp"
-        alt=""
-      />
-      <img
-        class="parallax__foreground-front"
-        src="foreground-front.webp"
-        alt=""
-      />
+      <img class="parallax__bg" src="/assets/bg.jpg" alt="" />
+      <img class="parallax__dust" src="/assets/dust.webp" alt="" />
+      <img class="parallax__foreground-back" src="/assets/foreground-back.webp" alt="" />
+      <img class="parallax__foreground-front" src="/assets/foreground-front.webp" alt="" />
        <!-- Removed the jax image  -->
-       <img class="parallax__luna" src="rays.webp" alt=""/>
-       <img class="parallax__luna" src="luna.webp" alt=""/>
+       <img class="parallax__luna" src="/assets/rays.webp" alt=""/>
+       <img class="parallax__luna" src="/assets/luna.webp" alt=""/>
     </div>
     <main class="main-content">
       <div class="wrapper">
@@ -65,41 +53,12 @@
           <button class="button" onclick="redirectToSignin('organiser')">Organizer</button>
        </div> 
        <div class="links">
-        <img src="github.png" class="git" >
-        <img src="gmail.png" class="gmail">
-        <img src="youtube.png" class="youtube">
+        <img src="../assets/github.png" class="git" >
+        <img src="../assets/gmail.png" class="gmail">
+        <img src="../assets/youtube.png" class="youtube">
        </div>                      
       </div>
     </main>
-    <script>
-      
-      // Function to handle redirection to signin page with role parameter
-      function redirectToSignin(role) {
-          window.location.href = `signin12.html?role=${role}`;
-      }
-
-      // If you want to add any further interactivity
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      document.querySelectorAll('.play-word').forEach(word => {
-          word.addEventListener('mouseover', event => {
-              let iterations = 0;
-              const interval = setInterval(() => {
-                  event.target.innerText = event.target.innerText
-                      .split("")
-                      .map((letter, index) => {
-                          if (index < iterations) {
-                              return event.target.dataset.value[index];
-                          }
-                          return letters[Math.floor(Math.random() * 26)];
-                      })
-                      .join("");
-                  if (iterations >= event.target.dataset.value.length) {
-                      clearInterval(interval);
-                  }
-                  iterations += 1 / 3;
-              }, 30); 
-          });
-      });
-  </script>
+            
   </body>
 </html>

@@ -71,3 +71,13 @@ exports.approveTournament = async (req, res) => {
     res.status(400).json({ error });
   }
 };
+
+// Fetch reports related to organisers (for admin)
+exports.fetchOrganiserReportsForAdmin = async (req, res) => {
+    try {
+        const reports = await Report.find().populate('reportedBy organiser');
+        res.status(200).json(reports);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching reports', details: error.message });
+    }
+};

@@ -29,7 +29,6 @@ app.set('views', path.join(__dirname, '../frontend/views'));
 
 // Serve static files from the "assets" directory
 app.use('/assets', express.static(path.join(__dirname, '../frontend/assets')));
-app.use(express.static(path.join(__dirname, '../frontend/views')));
 
 // Route for searching tournaments
 app.get('/searchTournaments', playerController.searchTournaments); // Tournament search route
@@ -47,9 +46,9 @@ app.get('/signup', (req, res) => {
 app.get('/', (req, res) => {
   res.render('parallax');
 });
-app.get('/homepage', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/views/homepage.html'));
-});
+// app.get('/homepage', (req, res) => {
+//   res.render('homepage', { role });
+// });
 
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication

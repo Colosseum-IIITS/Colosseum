@@ -69,7 +69,7 @@ exports.loginPlayer = async (req, res) => {
 
         const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
         res.cookie('user_jwt', token, { httpOnly: true, maxAge: 3600000, secure: process.env.NODE_ENV === 'production' });
-        res.status(200).json({ message: 'Login successful', player });
+        res.redirect('homepage');
     } catch (error) {
         console.error('Error during player login:', error);
         res.status(500).json({ error: 'Internal server error' });

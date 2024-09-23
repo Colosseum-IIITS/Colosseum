@@ -88,9 +88,7 @@ exports.searchTournaments = async (req, res) => {
 
         console.log('Tournaments Found:', tournaments); // Debugging line
 
-        if (!tournaments || tournaments.length === 0) {
-            return res.status(404).json({ message: 'No tournaments found' });
-        }
+        // Return a 200 status with an empty array if no tournaments found
         res.status(200).json(tournaments);
     } catch (error) {
         console.error('Error searching tournaments:', error); // Log the error

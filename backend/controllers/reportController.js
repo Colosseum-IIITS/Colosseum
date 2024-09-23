@@ -1,4 +1,4 @@
-i// controllers/reportController.js
+// controllers/reportController.js
 const Report = require('../models/Report');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');

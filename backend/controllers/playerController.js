@@ -72,9 +72,12 @@ exports.unfollowOrganiser = async (req, res) => {
 
 
 // Func: Search tournaments by tid or name
+// searchController.js
+
 exports.searchTournaments = async (req, res) => {
     try {
         const { searchTerm } = req.query;
+        console.log('Search Term:', searchTerm); // Debugging line
 
         const tournaments = await Tournament.find({
             $or: [
@@ -83,14 +86,24 @@ exports.searchTournaments = async (req, res) => {
             ]
         });
 
-        if (tournaments.length === 0) {
+        console.log('Tournaments Found:', tournaments); // Debugging line
+
+        if (!tournaments || tournaments.length === 0) {
             return res.status(404).json({ message: 'No tournaments found' });
         }
         res.status(200).json(tournaments);
     } catch (error) {
+        console.error('Error searching tournaments:', error); // Log the error
         res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
+
+
+
+
+
+
+
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {

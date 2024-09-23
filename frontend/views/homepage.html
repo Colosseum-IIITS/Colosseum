@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tournaments</title>
+    <link rel="stylesheet" href="../assets/homePage.css">
+    <!-- <script src="/frontend/assets/homepage.js"></script> -->
+
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">MyWebsite</div>
+
+        <!-- Search form -->
+        <div class="search-profile">
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <input type="text" id="search-input" placeholder="Search Tournaments (start with '>')">
+                <button type="submit">Search</button>
+            </form>
+            
+            <img src="../assets/user.png" alt="Profile" class="profile-pic">
+        </div>
+        <div id="welcome-message"></div>
+        <div id="role-message"></div>
+    </nav>
+
+    <!-- Search results container -->
+    <div id="search-results"></div>
+
+
+    <script>
+
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+       const username = urlParams.get('username');
+       const role = urlParams.get('role');
+   
+       // Display the username or other details
+       if (username) {
+           document.getElementById('welcome-message').textContent = `Welcome, ${username}!`;
+       }
+       if (role) {
+           document.getElementById('role-message').textContent = `You are logged in as ${role}.`;
+       }
+   
+   
+       async function handleSearch(event) {
+    event.preventDefault();
+    const searchInput = document.getElementById('search-input').value.trim();
+
+    if (!searchInput.startsWith('>')) {
+        alert('Please start your search with ">" to search tournaments.');
+        return;
+    }
+
+    const searchTerm = searchInput.slice(1).trim(); 
+
+    try {
+        // Retrieve the token from localStorage (or wherever it's stored)
+        const token = localStorage.getItem('token'); // Adjust this line as necessary
+
+        const response = await fetch(`/api/player/searchTournaments?searchTerm=${encodeURIComponent(searchTerm)}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Include the token in the headers
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Data received from backend:', data);
+
+        const resultsDiv = document.getElementById('search-results');
+        resultsDiv.innerHTML = '';
+
+        if (data.length > 0) {
+            data.forEach(tournament => {
+                const tournamentDiv = document.createElement('div');
+                tournamentDiv.textContent = `Tournament: ${tournament.name} (ID: ${tournament.tid})`;
+                resultsDiv.appendChild(tournamentDiv);
+            });
+        } else {
+            resultsDiv.textContent = 'No tournaments found';
+        }
+
+    } catch (error) {
+        console.error('Error fetching tournaments:', error);
+        alert('Error fetching tournaments. Please try again.');
+    }
+}
+
+    </script>
+</body>
+</html>

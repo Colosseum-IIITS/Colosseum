@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 
 // Player routes
-router.post('/player/signin', authController.loginPlayer);
+router.post('/player/signin', authController.loginPlayer); // Make sure this is defined
 router.post('/player/signup', authController.createPlayer);
 
 // Organizer routes

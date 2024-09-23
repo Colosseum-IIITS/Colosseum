@@ -412,6 +412,30 @@ canvas {
                 window.location.href = item.href; 
             });
         });
+        async function fetchTournamentsWon() {
+    try {
+        const token = localStorage.getItem('token'); // or wherever you store the token
+
+        const response = await fetch('/api/player/tournamentsWon', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Pass the token if needed
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching tournaments won');
+        }
+
+        const data = await response.json();
+        document.getElementById('tournaments-won').textContent = data.tournamentsWon;
+    } catch (error) {
+        console.error(error);
+        document.getElementById('tournaments-won').textContent = 'Error loading data';
+    }
+}
+
     </script>
 </body>
 </html>

@@ -16,9 +16,6 @@
 
             <input type="hidden" name="role" id="role" value="<%= role %>">
             <img src="/assets/controller.jpg" alt="logo">
-            <h2 id="typing-text">Welcome <%= role.charAt(0).toUpperCase() + role.slice(1) %>!</h2>
-            <img src="/assets/controller.jpg" alt="logo">
-
             <h2 id="typing-text">Welcome <%= role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Guest' %>!</h2>
 
             <input type="text" placeholder="Username" required class="validate1" autocomplete="off" name="username">

@@ -84,7 +84,7 @@
 .main-content {
   position: relative;
   background: hsl(238, 100%, 6%);
-  padding-block: 2rem;
+  /* padding-block: 2rem; */
   margin-bottom: 0; /* Ensure no margin is added below */
 }
 
@@ -372,17 +372,17 @@ img {
 .git {
   max-width: 36px;
   padding: 8px;
-  margin-bottom: -2%;
+  margin-top: 2%;
 }
 
 .gmail {
   max-width: 70px;
   padding: 8px;
-  margin-bottom: -2%;
+  margin-top: 2%;
 }
 
 .youtube {
   max-width: 50px;
   padding: 8px;
-  margin-bottom: -2%;
+  margin-top: 2%;
 }

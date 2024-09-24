@@ -68,7 +68,7 @@ exports.loginPlayer = async (req, res) => {
 
         const banStatus = player.banned;
         if(banStatus) {
-            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You;re Banned'});
+            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You are Banned'});
         }
 
         const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
@@ -141,7 +141,7 @@ exports.loginOrganiser = async (req, res) => {
 
         const banStatus = organiser.banned;
         if(banStatus) {
-            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You;re Banned'});
+            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You are Banned'});
         }
 
         if (!isPasswordValid) {

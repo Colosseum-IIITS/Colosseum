@@ -22,7 +22,7 @@ exports.reportTeam = async (req, res) => {
     }
 };
 
-// Player reports an organiser
+// Player reports an organise
 exports.reportOrganiser = async (req, res) => {
     const { organiserId, reason } = req.body;
     const playerId = req.user._id; // Extracting user ID from token
@@ -31,7 +31,7 @@ exports.reportOrganiser = async (req, res) => {
         const report = new Report({
             reportedBy: playerId,
             reportType: 'Organiser',
-            organiser: organiserId,
+            reportedOrganiser: organiserId,
             reason
         });
         await report.save();

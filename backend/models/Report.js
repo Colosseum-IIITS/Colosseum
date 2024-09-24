@@ -8,7 +8,7 @@ const reportSchema = new mongoose.Schema(
     },
     reportType: { type: String, enum: ["Team", "Organiser"], required: true },
     reportedTeam: { type: mongoose.Schema.Types.ObjectId, ref: "Team" },
-    organiser: { type: mongoose.Schema.Types.ObjectId, ref: "Organiser" },
+    reportedOrganiser: { type: mongoose.Schema.Types.ObjectId, ref: "Organiser" },
     reason: { type: String, required: true },
     status: { type: String, enum: ["Pending", "Reviewed"], default: "Pending" },
   },

@@ -74,7 +74,7 @@ exports.updateTournament = async (req, res) => {
 exports.updateWinner = async (req, res) => {
   const { tournamentId, winnerId } = req.body;
 
-  try {
+ try {
     // Find the tournament by ID
     const tournament = await Tournament.findById(tournamentId);
     if (!tournament) {

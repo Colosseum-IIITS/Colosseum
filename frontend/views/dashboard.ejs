@@ -1,6 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <head>
     <link rel="stylesheet" href="/assets/dashboard.css">
     <script src="/assets/dashboard.js" defer></script> <!-- Ensure the leading slash is included -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -8,7 +16,7 @@
         <div class="sidebar">
             <ul>
                 <li><a href="#" class="menu-item"><img src="/assets/cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
-                <li><a href="profile.html" class="menu-item"><img src="/assets/dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
+                <li><a href="" class="menu-item active"><img src="/assets/dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
                 <li><a href="settings.html" class="menu-item"><img src="/assets/settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
             </ul>
         </div>
@@ -43,47 +51,53 @@
                             <h3>Global Rank</h3>
                         </div>
                         <div>
-                            <p id="Global-rank">Loading...</p>
+                            <p id="Global-rank" class="stat-value Global-rank">Loading...</p>
                         </div>
                     </div>
-                    <!-- Tournaments won -->
-                    <div class="stat-card" id="u2">
-                        <div>
-                            <h3>Tournaments Won</h3>
-                        </div>
-                        <div>
-                            <p id="tournaments-Won">Loading...</p>
-                        </div>
+                   <!-- Tournaments won -->
+                <div class="stat-card" id="u2">
+                    <div>
+                        <h3>Tournaments Won</h3>
                     </div>
-                    <!-- Tournaments played -->
-                    <div class="stat-card" id="u3">
-                        <div>
-                            <h3>Tournaments Played</h3>
-                        </div>
-                        <div>
-                            <p id="Tournaments-played">Loading...</p>
-                        </div>
+                    <div>
+                        <p id="tournaments-Won" class="stat-value tournament-won">Loading...</p> <!-- Value will be replaced here -->
                     </div>
-                    <!-- Win Percentage (Circular Chart) -->
+                </div>
+
+                 <!-- Tournaments played -->
+                <div class="stat-card" id="u3">
+                    <div>
+                        <h3>Tournaments Played</h3>
+                    </div>
+                    <div>
+                        <p id="Tournaments-played" class="stat-value tournament-played">Loading...</p> <!-- Value will be replaced here -->
+                    </div>
+                </div>
+                    <!--games played -->
                     <div class="stat-card" id="u4">
                         <div>
-                            <h3>Games Played</h3>
+                            <h3>Games played</h3>
                         </div>
                         <div>
-                            <p id="winPercentageChart">Loading...</p>
+                            <p id="gamesPlayedChart" class="stat-value Games-played">Loading...</p>
                         </div>
                     </div>
-                    <!-- Monthly Games Played (Bar Graph) -->
+                    <!-- win percentage -->
+                     
                     <div class="stat-card" id="u5">
                         <div>
                             <h3>Win Percentage</h3>
                         </div>
                         <div>
-                            <p id="gamesPlayedChart">Loading...</p>
+                            <canvas id="winPercentageChartCanvas" width="150" height="150"></canvas>
+                            <p id="winPercentageValue" class="stat-value win-percentage">Loading...</p>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>
     </div>
 </body>
+
+

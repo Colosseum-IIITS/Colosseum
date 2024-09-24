@@ -21,5 +21,21 @@ router.get('/ranking', authenticateToken, playerController.getPlayerRanking); //
 router.get('/searchOrganisers',authenticateToken, organiserController.getOrganiserByUsername);
 router.post('/report-team', authenticateToken, reportController.reportTeam);
 router.post('/report-organiser', authenticateToken, reportController.reportOrganiser);
+router.get('/dashboard', authenticate, async (req, res) => {
+    const userId = req.user._id; // Get user ID from authenticated request
+    try {
+        const user = await Player.findById(userId); // Assuming you are using the Player model
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Pass user data to the template
+        res.render('dashboard', { user });
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 
 module.exports = router;

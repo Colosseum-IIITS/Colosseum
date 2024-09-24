@@ -15,14 +15,8 @@
         <form action="<%= role === 'player' ? '/api/player/signin' : '/auth/org/signin' %>" method="POST" class="form">
 
             <input type="hidden" name="role" id="role" value="<%= role %>">
-<<<<<<< Updated upstream
-            <img src="controller.jpg" alt="logo">
-
-            <h2 id="typing-text">Welcome <%= role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Guest' %>!</h2>
-=======
             <img src="/assets/controller.jpg" alt="logo">
             <h2 id="typing-text">Welcome <%= role.charAt(0).toUpperCase() + role.slice(1) %>!</h2>
->>>>>>> Stashed changes
 
             <input type="text" placeholder="Username" required class="validate1" autocomplete="off" name="username">
             <input type="password" placeholder="Password" required class="validate1" autocomplete="off" name="password">

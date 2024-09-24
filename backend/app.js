@@ -48,7 +48,6 @@ app.get('/', (req, res) => {
 });
 
 
-
 // Use routes for players, tournaments, organisers, teams, reports, and authentication
 app.use('/api/player', playerRoutes);
 app.use('/api/tournament', tournamentRoutes);

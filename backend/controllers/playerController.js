@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user;
+    const { _id } = req.user; // Assuming _id is player's ID
 
     try {
         const player = await Player.findOne({ _id });
@@ -22,13 +22,16 @@ exports.followOrganiser = async (req, res) => {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
+        // Check if player is already following this organiser
         if (player.following.includes(organiserId)) {
-            return res.status(400).json({ message: 'Player is already following this organiser' });
+            return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
+        // Add organiser to player's following list
         player.following.push(organiserId);
         await player.save();
 
+        // Add player to organiser's followers list
         organiser.followers.push(player._id);
         await organiser.save();
 
@@ -37,6 +40,7 @@ exports.followOrganiser = async (req, res) => {
         res.status(500).json({ error: 'Error following organiser' });
     }
 };
+
 
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
@@ -95,12 +99,6 @@ exports.searchTournaments = async (req, res) => {
         res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
-
-
-
-
-
-
 
 
 // Func: Join Tournament

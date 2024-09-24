@@ -46,9 +46,7 @@ app.get('/signup', (req, res) => {
 app.get('/', (req, res) => {
   res.render('parallax');
 });
-// app.get('/homepage', (req, res) => {
-//   res.render('homepage', { role });
-// });
+
 
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication

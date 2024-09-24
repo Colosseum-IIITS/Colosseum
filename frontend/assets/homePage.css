@@ -1,95 +1,198 @@
+/* General reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
+/* Navbar */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f8f9fa;
-    padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 10px 20px;
 }
 
 .navbar-brand {
-    font-size: 24px;
-    font-weight: bold;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .navbar-nav {
-    display: flex;
-    list-style: none;
+  display: flex;
+  list-style: none;
 }
 
 .navbar-nav li {
-    margin-right: 20px;
+  margin-right: 20px;
 }
 
 .navbar-nav li a {
-    text-decoration: none;
-    color: #000;
-    font-size: 18px;
-    padding: 5px 10px;
+  text-decoration: none;
+  color: #000;
+  font-size: 18px;
+  padding: 5px 10px;
 }
 
 .navbar-nav li a:hover {
-    background-color: #ddd;
-    border-radius: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
 }
 
+/* For right-side alignment (Search + Profile) */
 .search-profile {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .search-form {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
 }
 
 .search-form input {
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 250px;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 250px;
 }
 
 .search-form button {
-    padding: 8px 12px;
-    margin-left: 10px;
-    font-size: 16px;
-    border: 1px solid #28a745;
-    background-color: #28a745;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
+  padding: 8px 12px;
+  margin-left: 10px;
+  font-size: 16px;
+  border: 1px solid #28a745;
+  background-color: #28a745;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .search-form button:hover {
-    background-color: #218838;
+  background-color: #218838;
 }
 
 .profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-left: 20px;
-    cursor: pointer;
-}
-#search-results, #welcome-message, #role-message {
-    margin-top: 20px;
-    font-size: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-#search-results div {
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+/* Main content container */
+.maincontent {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  margin-top: 6%;
+  height: auto; /* Let it grow with content */
+  padding: 3%;
+}
+
+/* Middle side (tournament section) */
+.middleSide {
+  width: 450px;
+  height: 850px;
+  flex: 1;
+  overflow-y: scroll;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  background-color: #231d2e;
+}
+
+.middleSide .heading {
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  color: white;
+  margin-top: 4%;
+}
+
+/* Right and left side configuration */
+.rightSide, .leftSide {
+  width: 450px;
+  min-height: 450px; /* Ensure they don't collapse */
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+
+.rightSide {
+  background-color: #330e3a;
+}
+
+.leftSide {
+  background-color: #2086ce;
+}
+
+/* Container for both sides */
+.RightTotal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  margin-top: 7px;
+  margin-bottom: 85%;
+}
+
+/* Additional styling for headings */
+.heading {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  padding: 10px;
+}
+
+/* Tournament Info Box Styling */
+.tournamentInfo {
+  display: flex;
+  flex-direction: column;
+  width: 24rem;
+  height: 12rem;
+  margin-left: 11%;
+  margin-top: 10%;
+  background: #29292c;
+  border-radius: 1rem;
+  overflow: hidden;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 16px;
+  position: relative;
+}
+
+/* Tournament Info Glows */
+.tournamentInfo .notiglow,
+.tournamentInfo .notiborderglow {
+  position: absolute;
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(circle closest-side at center, white, transparent);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  z-index: 1;
+}
+
+.tournamentInfo:hover .notiglow,
+.tournamentInfo:hover .notiborderglow {
+  opacity: 0.1;
+}
+
+.tournamentInfo .notititle {
+  color: #32a6ff;
+  padding: 0.65rem 0.25rem 0.4rem 1.25rem;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.tournamentInfo .notibody {
+  color: #99999d;
+  padding: 0 1.25rem;
 }

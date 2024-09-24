@@ -6,24 +6,27 @@ const bcrypt = require('bcrypt');
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
-  const { searchTerm } = req.query;  // Search term will be passed as a query parameter
+    const { searchTerm } = req.query;  // Search term will be passed as a query parameter
 
-  try {
-      // Perform a case-insensitive search on the organiser username
-      const organiser = await Organiser.findOne({ username: { $regex: new RegExp(searchTerm, 'i') } })
-          .populate('followers')  // Populate followers details
-          .populate('tournaments');  // Populate tournaments organised by the organiser
+    try {
+        // Perform a case-insensitive search on the organiser username
+        const organiser = await Organiser.findOne({ username: { $regex: new RegExp(searchTerm, 'i') } })
+            .populate('followers')  // Populate followers details
+            .populate('tournaments');  // Populate tournaments organised by the organiser
 
-      // Check if the organiser exists
-      if (!organiser) {
-          return res.status(404).json({ message: 'Organiser not found' });
-      }
+        console.log(`Search term received: ${searchTerm}`); // Log received search term
+        // Check if the organiser exists
+        if (!organiser) {
+            console.log(`No organiser found for the username: ${searchTerm}`); // Log if no organiser is found
+            return res.status(200).json({ message: 'No organiser found' }); // Send 200 OK for not found
+        }
 
-      res.status(200).json({ organiser });
-  } catch (error) {
-      console.error('Error fetching organiser:', error);
-      res.status(500).json({ error: 'Error fetching organiser', details: error.message });
-  }
+        console.log(`Organiser found: ${organiser.username}`); // Log if organiser is found
+        res.status(200).json({ organiser }); // Send organiser data if found
+    } catch (error) {
+        console.error('Error fetching organiser:', error);
+        res.status(500).json({ error: 'Error fetching organiser', details: error.message });
+    }
 };
 
 

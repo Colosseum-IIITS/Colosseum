@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Tournaments</title>
-    <link rel="stylesheet" href="/assets/homePage.css">
-    <script src="/assets/homepage.js" defer></script> 
+    <link rel="stylesheet" href="/frontend/assets/homePage.css">
+    <script src="/frontend/assets/homepage.js" defer></script> 
 </head>
 <body>
     <nav class="navbar">
@@ -14,19 +14,19 @@
         <!-- Search form for tournaments -->
         <div class="search-profile">
             <form class="search-form" onsubmit="handleTournamentSearch(event)">
-                <input type="text" id="search-input" placeholder="Search Tournaments (start with '>')">
+                <input type="text" id="tournament-search-input" placeholder="Search Tournaments (start with '>')">
                 <button type="submit">Search Tournaments</button>
             </form>
             <img src="/frontend/assets/user.png" alt="Profile" class="profile-pic">
         </div>
-       
         <div id="role-message" hidden></div>
     </nav>
-    <div id="search-results" style="display:none;"></div>
-    <div id="follow-status"></div>
-
     <div class="maincontent">
-        
+        <div class="leftSide">
+            <div class="heading">
+                SOMETHING
+            </div>
+        </div>
         <div class="middleSide">
             <div class="heading">
                 TOURNAMENTS
@@ -69,7 +69,6 @@
             </div>
 
         </div>
-        <div class="RightTotal">
         <div class="rightSide">
             <div class="heading">
                 ORGANISATIONS
@@ -83,12 +82,6 @@
                 <div id="search-results"></div>
             </div>
         </div>
-        <div class="leftSide">
-            <div class="heading">
-                SOMETHING
-            </div>
-        </div>
-    </div>
     </div>
 
 

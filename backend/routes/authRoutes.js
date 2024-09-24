@@ -10,4 +10,7 @@ router.post('/player/signup', authController.createPlayer);
 router.post('/org/signin', authController.loginOrganiser);
 router.post('/org/signup', authController.createOrganiser);
 
+// Admin routes
+router.post('/admin/login', authController.loginAdmin);
+
 module.exports = router;

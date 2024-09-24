@@ -165,4 +165,23 @@ exports.loginOrganiser = async (req, res) => {
     }
 };
 
+exports.loginAdmin = async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const admin = await Admin.findOne({ username });
+        if (!admin) {
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
+        }
 
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
+        }
+
+        res.redirect('/admin/dashboard');
+
+    } catch (error) {
+        console.error('Error during admin login:', error);
+        return res.status(500).render( 'error' , {statusCode:'500' ,errorMessage:'Internal server error'});
+    }
+};

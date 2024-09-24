@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/signinStyle.css">
+    <script src="/assets/signin.js"></script>
+</head>
+<body>
+    <div class="login-card">
+        <form action="/admin/dashboard" method="GET" class="form">
+
+            <img src="/assets/controller.jpg" alt="logo">
+            <h2 id="typing-text">Welcome Admin!</h2>
+
+            <input type="text" placeholder="Username" required class="validate1" autocomplete="off" name="username">
+            <input type="password" placeholder="Password" required class="validate1" autocomplete="off" name="password">
+
+            <button class="sig" type="submit">SIGN IN</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -44,6 +44,11 @@ app.get('/signup', (req, res) => {
     const role = req.query.role;
     res.render('signup', { role });
 });
+
+app.get('/admin', (req, res) => {
+    res.render('adminSignin');
+});
+
 app.get('/', (req, res) => {
   res.render('parallax');
 });

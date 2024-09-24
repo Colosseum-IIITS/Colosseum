@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gds</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/dashboard.css">
+    <script src="/assets/dashboard.js" defer></script> <!-- Ensure the leading slash is included -->
 </head>
 <body>
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar">
             <ul>
-                <li><a href="#" class="menu-item"><img src="cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
-                <li><a href="profile.html" class="menu-item"><img src="dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
-                <li><a href="settings.html" class="menu-item"><img src="settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
+                <li><a href="#" class="menu-item"><img src="/assets/cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
+                <li><a href="profile.html" class="menu-item"><img src="/assets/dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
+                <li><a href="settings.html" class="menu-item"><img src="/assets/settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
             </ul>
         </div>
 
@@ -28,9 +21,8 @@
                 <div class="profile-box">
                     <div class="profile-circle"></div>
                     <div class="profile-text">
-                        <!-- Dynamic user data -->
-                        <p class="player-name"> username</p>
-                        <p class="player-email">user.email  </p>
+                        <p class="player-name">Spikyy</p>
+                        <p class="player-email">spikeyy@gmail.com</p>
                     </div>
                     
                     <!-- TeamFooL Card -->
@@ -43,53 +35,55 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="stats">
-                    <!-- Tournaments Won -->
-                    <div class="stat-card " id="u1">
+                    <!-- global rank -->
+                    <div class="stat-card" id="u1">
                         <div>
-                        <h3>Tournaments Won</h3></div>
+                            <h3>Global Rank</h3>
+                        </div>
                         <div>
-                        <p id="tournaments-won">Loading...</p>
+                            <p id="Global-rank">Loading...</p>
+                        </div>
                     </div>
-                    </div>
-                    <!-- Tournaments Played -->
+                    <!-- Tournaments won -->
                     <div class="stat-card" id="u2">
                         <div>
-                        <h3>Tournaments played</h3></div>
+                            <h3>Tournaments Won</h3>
+                        </div>
                         <div>
-                        <p id="tournaments-played">Loading...</p>
+                            <p id="tournaments-Won">Loading...</p>
+                        </div>
                     </div>
-                    </div>
-                    <!-- Global Rank -->
+                    <!-- Tournaments played -->
                     <div class="stat-card" id="u3">
                         <div>
-                        <h3>Global rank</h3></div>
+                            <h3>Tournaments Played</h3>
+                        </div>
                         <div>
-                        <p id="global-rank">Loading...</p>
-                    </div>
+                            <p id="Tournaments-played">Loading...</p>
+                        </div>
                     </div>
                     <!-- Win Percentage (Circular Chart) -->
                     <div class="stat-card" id="u4">
                         <div>
-                        <h3>Games Played</h3></div>
+                            <h3>Games Played</h3>
+                        </div>
                         <div>
-                        <p id="winPercentageChart">Loading...</p>
-                    </div>
+                            <p id="winPercentageChart">Loading...</p>
+                        </div>
                     </div>
                     <!-- Monthly Games Played (Bar Graph) -->
                     <div class="stat-card" id="u5">
                         <div>
-                        <h3>Win Percentage</h3></div>
+                            <h3>Win Percentage</h3>
+                        </div>
                         <div>
-                        <p id="gamesPlayedChart">Loading...</p>
-                    </div>
+                            <p id="gamesPlayedChart">Loading...</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="/assets/dashboard.js"></script>
 </body>
-</html>

@@ -235,6 +235,7 @@ exports.getTournamentsPlayed = async (req, res) => {
 };
 
 // Fetch number of tournaments won by the player
+// backend/controllers/playerController.js
 exports.getTournamentsWon = async (req, res) => {
     const { _id } = req.user;
 

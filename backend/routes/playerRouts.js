@@ -4,6 +4,7 @@ const playerController = require('../controllers/playerController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const organiserController = require('../controllers/organiserController');
 const reportController = require('../controllers/reportController');
+const Player = require('../models/Player');
 const organiser = require('../models/Organiser');
 router.get('/homepage', authenticateToken, (req, res) => {
     res.render('homepage'); 
@@ -21,7 +22,7 @@ router.get('/ranking', authenticateToken, playerController.getPlayerRanking); //
 router.get('/searchOrganisers',authenticateToken, organiserController.getOrganiserByUsername);
 router.post('/report-team', authenticateToken, reportController.reportTeam);
 router.post('/report-organiser', authenticateToken, reportController.reportOrganiser);
-router.get('/dashboard', authenticate, async (req, res) => {
+router.get('/dashboard', authenticateToken, async (req, res) => {
     const userId = req.user._id; // Get user ID from authenticated request
     try {
         const user = await Player.findById(userId); // Assuming you are using the Player model
@@ -35,7 +36,6 @@ router.get('/dashboard', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 module.exports = router;

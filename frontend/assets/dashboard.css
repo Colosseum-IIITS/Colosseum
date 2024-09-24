@@ -1,4 +1,3 @@
-
 body {
    font-family: Arial, sans-serif;
    background-color: #1f1f2e;
@@ -118,7 +117,7 @@ background-color: #292d42;
 padding: 20px;
 border-radius: 10px;
 text-align: center;
-margin-top: 50px;
+margin-top: 25px;
 box-shadow: 0 0 70px rgba(0, 0, 0, 0.2);
 }
 
@@ -139,31 +138,31 @@ height: 50%;
 width: 50%;
 }
 #u1{
-height: 95%;
-width: 53%;
-margin-left: 59%;
+height: 80%;
+width: 98%;
+transform: translateX( 55% );
 }
 #u2{
-height: 95%;
-width: 53%;
-margin-left: 22%;
+height: 80%;
+width: 40%;
+margin-left: 64%;
 }
 #u3{
-height: 95%;
-width: 90%;
-transform: translateX(-15%);
+   height: 80%;
+width: 40%;
+margin-left: 10%;
 }
 #u4{
-height: 95%;
-width: 120%;
+height: 100%;
+width: 98%;
 margin-left: 59%;
-margin-top: 20%;
+margin-top: 5%;
 }
 #u5{
-height: 95%;
-width: 90%;
-margin-left: 90%;
-margin-top: 20%;
+height: 100%;
+width: 91%;
+margin-left: 64%;
+margin-top: 5%;
 }
 
 canvas {
@@ -199,11 +198,11 @@ align-items: center; /* Vertically center items */
 background-color: #292d42; /* Background color for the box */
 padding: 40px; /* Space inside the box */
 border-radius: 10px; /* Rounded corners */
-box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+box-shadow: 0 0 90px rgba(0, 0, 0, 0.2); /* Shadow for depth */
 margin-left: 250px; /* Space from the left */
-margin-top: 40px; /* Space from the top */
-height: 300px;
-width: 70%;
+margin-top: 60px; /* Space from the top */
+
+width: 62%;
 }
 
 .profile-circle {

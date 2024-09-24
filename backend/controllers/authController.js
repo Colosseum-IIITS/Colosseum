@@ -35,7 +35,7 @@ exports.createPlayer = async (req, res) => {
             password: hashedPassword
         });
 
-        await player.save(); // Check for errors here
+        await player.save();
 
         const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
@@ -45,18 +45,14 @@ exports.createPlayer = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
-        res.status(201).json({ message: 'Player created successfully', player });
+        // Instead of returning JSON, redirect to the signin page
+        res.redirect('/signin?role=player'); // Redirect to /signin
     } catch (error) {
         console.error('Error during player creation:', error);
         res.status(500).json({ error: 'Error creating player', details: error.message });
     }
 };
 
-
-const jwtSecret = process.env.JWT_SECRET_KEY;
-if (!jwtSecret) {
-    console.error("JWT_SECRET_KEY is not set.");
-}
 
 exports.loginPlayer = async (req, res) => {
     const { username, password } = req.body;
@@ -73,7 +69,7 @@ exports.loginPlayer = async (req, res) => {
 
         const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
         res.cookie('user_jwt', token, { httpOnly: true, maxAge: 3600000, secure: process.env.NODE_ENV === 'production' });
-        res.status(200).json({ message: 'Login successful', player });
+        res.redirect('homepage');
     } catch (error) {
         console.error('Error during player login:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -117,7 +113,7 @@ exports.createOrganiser = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
-        res.status(201).json({ message: 'Organiser created successfully', organiser });
+        res.redirect('/signin?role=organiser');
     } catch (error) {
         console.error('Error during organiser creation:', error);
         res.status(500).json({ error: 'Error creating organiser', details: error.message });

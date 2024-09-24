@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tournaments</title>
+    <link rel="stylesheet" href="/assets/homePage.css">
+     <script src="/assets/homepage.js" defer></script> 
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">MyWebsite</div>
+
+        <!-- Search form -->
+        <div class="search-profile">
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <input type="text" id="search-input" placeholder="Search Tournaments (start with '>')">
+                <button type="submit">Search</button>
+            </form>
+            
+            <img src="/assets/user.png" alt="Profile" class="profile-pic">
+        </div>
+        <div id="welcome-message"></div>
+        <div id="role-message"></div>
+    </nav>
+
+    <!-- Search results container -->
+    <div id="search-results"></div>
+</body>
+</html>

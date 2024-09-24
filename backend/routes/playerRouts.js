@@ -3,7 +3,9 @@ const router = express.Router();
 const playerController = require('../controllers/playerController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const reportController = require('../controllers/reportController');
-
+router.get('/homepage', authenticateToken, (req, res) => {
+    res.render('homepage'); 
+});
 router.get('/searchTournaments', authenticateToken, playerController.searchTournaments); // w
 router.post('/followOrganiser', authenticateToken, playerController.followOrganiser); // w
 router.post('/unFollowOrganiser', authenticateToken, playerController.unfollowOrganiser); // w

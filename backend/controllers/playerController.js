@@ -5,7 +5,6 @@ const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
@@ -69,7 +68,6 @@ exports.unfollowOrganiser = async (req, res) => {
         res.status(500).json({ error: 'Error unfollowing organiser' });
     }
 };
-
 
 // Func: Search tournaments by tid or name
 exports.searchTournaments = async (req, res) => {
@@ -266,5 +264,23 @@ exports.getPlayerRanking = async (req, res) => {
     }
 };
 
+exports.getFollowedOrganisers = async (req, res) => {
+    const { _id } = req.user;
+    try {
+        // Find the player by their ID
+        const player = await Player.findById(_id).populate('following');
 
+        console.log('Player ID from token:', _id);
 
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        const followingOrganisers = player.following;
+
+        res.status(200).json({ followingOrganisers });
+    } catch (error) {
+        console.error('Error fetching organisers followed:', error);
+        res.status(500).json({ error: 'Error fetching organisers followed' });
+    }
+};

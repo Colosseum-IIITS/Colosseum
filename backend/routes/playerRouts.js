@@ -14,6 +14,7 @@ router.put('/updateEmail', authenticateToken, playerController.updateEmail); // 
 router.get('/tournamentsPlayed', authenticateToken, playerController.getTournamentsPlayed); // w
 router.get('/tournamentsWon', authenticateToken, playerController.getTournamentsWon); // w
 router.get('/ranking', authenticateToken, playerController.getPlayerRanking); // w
+router.get('/followingOrgs', playerController.followOrganiser);
 
 router.post('/report-team', authenticateToken, reportController.reportTeam);
 router.post('/report-organiser', authenticateToken, reportController.reportOrganiser);

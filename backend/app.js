@@ -10,6 +10,8 @@ const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const jwtSecretKey = process.env.JWT_SECRET_KEY;
+
 
 const app = express();
 app.use(express.json());
@@ -39,8 +41,6 @@ app.get('/signup', (req, res) => {
   res.render('signup', { role });
 });
 
-const jwtSecretKey = process.env.JWT_SECRET_KEY;
-console.log("JWT_SECRET_KEY:", jwtSecretKey);
 
 
 // Authentication routes

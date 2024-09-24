@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tournaments</title>
+    <link rel="stylesheet" href="/frontend/assets/homePage.css">
+    <script src="/frontend/assets/homepage.js" defer></script> 
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">MyWebsite</div>
+        <div id="welcome-message"></div>
+        <!-- Search form for tournaments -->
+        <div class="search-profile">
+            <form class="search-form" onsubmit="handleTournamentSearch(event)">
+                <input type="text" id="tournament-search-input" placeholder="Search Tournaments (start with '>')">
+                <button type="submit">Search Tournaments</button>
+            </form>
+            <img src="/frontend/assets/user.png" alt="Profile" class="profile-pic">
+        </div>
+        <div id="role-message" hidden></div>
+    </nav>
+    <div class="maincontent">
+        <div class="leftSide">
+            <div class="heading">
+                SOMETHING
+            </div>
+        </div>
+        <div class="middleSide">
+            <div class="heading">
+                TOURNAMENTS
+            </div>
+
+            <!-- Multiple tournamentInfo sections -->
+            <div class="tournamentInfo">
+                <div class="notiglow"></div>
+                <div class="notiborderglow"></div>
+                <div class="notititle">Welcome To Uiverse</div>
+                <div class="notibody">Contribute to Open Source UI Elements</div>
+            </div>
+
+            <div class="tournamentInfo">
+                <div class="notiglow"></div>
+                <div class="notiborderglow"></div>
+                <div class="notititle">Tournament A</div>
+                <div class="notibody">Details about Tournament A.</div>
+            </div>
+
+            <div class="tournamentInfo">
+                <div class="notiglow"></div>
+                <div class="notiborderglow"></div>
+                <div class="notititle">Tournament B</div>
+                <div class="notibody">Details about Tournament B.</div>
+            </div>
+
+            <div class="tournamentInfo">
+                <div class="notiglow"></div>
+                <div class="notiborderglow"></div>
+                <div class="notititle">Tournament C</div>
+                <div class="notibody">Details about Tournament C.</div>
+            </div>
+
+            <div class="tournamentInfo">
+                <div class="notiglow"></div>
+                <div class="notiborderglow"></div>
+                <div class="notititle">Tournament D</div>
+                <div class="notibody">Details about Tournament D.</div>
+            </div>
+
+        </div>
+        <div class="rightSide">
+            <div class="heading">
+                ORGANISATIONS
+            </div>
+            <!-- Search form for organizations -->
+            <div class="searchOrg">
+                <form class="searchForm" onsubmit="handleOrganizerSearch(event)">
+                    <input type="text" id="organizer-search-input" placeholder="Search Organizations (start with '/')">
+                    <button type="submit">Search Organizations</button>
+                </form>
+                <div id="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+
+    
+</body>
+</html>

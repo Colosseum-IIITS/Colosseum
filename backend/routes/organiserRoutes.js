@@ -3,12 +3,20 @@ const router = express.Router();
 const organiserController = require("../controllers/organiserController");
 const teamController = require("../controllers/teamControllers");
 const reportController = require("../controllers/reportController");
-const { authenticateToken } = require("../middleware/authMiddleware");
+const { authenticateToken, authenticateOrganiser } = require("../middleware/authMiddleware");
 
 
 
 // Route to search the Organiser
 router.get("/search", organiserController.getOrganiserByUsername);
+router.post("/updateUsername",authenticateOrganiser,organiserController.updateUsername);
+router.post("/updateEmail",authenticateOrganiser,organiserController.updateEmail);
+router.post("/updatePassword",authenticateOrganiser,organiserController.updatePassword);
+router.post("/updateDescription",authenticateOrganiser,organiserController.updateDescription);
+router.post("/updateProfilePhoto",authenticateOrganiser,organiserController.updateProfilePhoto);
+router.get("/fetchDashboard",authenticateOrganiser,organiserController.getOrganiserDashboard);
+router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
+
 
 // router.get("/getReports", async(req,res=>{
 //     const organiserId = req.body.organiserId;

@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user;
+    const { _id } = req.user; // Assuming _id is player's ID
 
     try {
         const player = await Player.findOne({ _id });
@@ -21,13 +21,16 @@ exports.followOrganiser = async (req, res) => {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
+        // Check if player is already following this organiser
         if (player.following.includes(organiserId)) {
-            return res.status(400).json({ message: 'Player is already following this organiser' });
+            return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
+        // Add organiser to player's following list
         player.following.push(organiserId);
         await player.save();
 
+        // Add player to organiser's followers list
         organiser.followers.push(player._id);
         await organiser.save();
 
@@ -36,6 +39,7 @@ exports.followOrganiser = async (req, res) => {
         res.status(500).json({ error: 'Error following organiser' });
     }
 };
+
 
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
@@ -70,9 +74,12 @@ exports.unfollowOrganiser = async (req, res) => {
 };
 
 // Func: Search tournaments by tid or name
+// searchController.js
+
 exports.searchTournaments = async (req, res) => {
     try {
         const { searchTerm } = req.query;
+        console.log('Search Term:', searchTerm); // Debugging line
 
         const tournaments = await Tournament.find({
             $or: [
@@ -81,14 +88,16 @@ exports.searchTournaments = async (req, res) => {
             ]
         });
 
-        if (tournaments.length === 0) {
-            return res.status(404).json({ message: 'No tournaments found' });
-        }
+        console.log('Tournaments Found:', tournaments); // Debugging line
+
+        // Return a 200 status with an empty array if no tournaments found
         res.status(200).json(tournaments);
     } catch (error) {
+        console.error('Error searching tournaments:', error); // Log the error
         res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
+
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {

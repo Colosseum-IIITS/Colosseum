@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/dashboard.css">
+
+</head>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="#" class="menu-item"><img src="cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
+                <li><a href="profile.html" class="menu-item"><img src="dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
+                <li><a href="settings.html" class="menu-item"><img src="settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <button class="menu-toggle" id="menu-toggle">&#9776;</button> <!-- Hamburger Menu Icon -->
+            <div class="header">
+                <h1 class="Player ani">Player Statistics</h1>
+                <div class="profile-box">
+                    <div class="profile-circle"></div>
+                    <div class="profile-text">
+                        <p class="player-name">Spikyy</p>
+                        <p class="player-email">spikeyy@gmail.com</p>
+                       
+                    </div>
+                    
+                    <!-- TeamFooL Card -->
+                    <div class="card">
+                        <div class="img"></div>
+                        <div class="textBox">
+                            <div class="textContent">
+                                <h1 class="team">TeamFooL</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+            <div class="stats">
+                <!-- Tournaments Won -->
+                <div class="stat-card " id="u1">
+                    <div>
+                    <h3>Tournaments Won</h3></div>
+                    <div>
+                    <p id="tournaments-won">Loading...</p>
+                </div>
+                </div>
+                <!-- Tournaments Played -->
+                <div class="stat-card" id="u2">
+                    <div>
+                    <h3>Tournaments played</h3></div>
+                    <div>
+                    <p id="tournaments-played">Loading...</p>
+                </div>
+                </div>
+                <!-- Global Rank -->
+                <div class="stat-card" id="u3">
+                    <div>
+                    <h3>Global rank</h3></div>
+                    <div>
+                    <p id="global-rank">Loading...</p>
+                </div>
+                </div>
+                <!-- Win Percentage (Circular Chart) -->
+                <div class="stat-card" id="u4">
+                    <div>
+                    <h3>Games Played</h3></div>
+                    <div>
+                    <p id="winPercentageChart">Loading...</p>
+                </div>
+                </div>
+                <!-- Monthly Games Played (Bar Graph) -->
+                <div class="stat-card" id="u5">
+                    <div>
+                    <h3>Win Percentage</h3></div>
+                    <div>
+                    <p id="gamesPlayedChart">Loading...</p>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/dashboard.js"></script>
+</body>
+</html>

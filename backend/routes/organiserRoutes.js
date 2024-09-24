@@ -14,6 +14,8 @@ router.post("/updateEmail",authenticateOrganiser,organiserController.updateEmail
 router.post("/updatePassword",authenticateOrganiser,organiserController.updatePassword);
 router.post("/updateDescription",authenticateOrganiser,organiserController.updateDescription);
 router.post("/updateProfilePhoto",authenticateOrganiser,organiserController.updateProfilePhoto);
+router.get("/fetchDashboard",authenticateOrganiser,organiserController.getOrganiserDashboard);
+router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 
 
 // router.get("/getReports", async(req,res=>{

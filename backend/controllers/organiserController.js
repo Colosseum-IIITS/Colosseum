@@ -1,4 +1,8 @@
 const Organiser = require('../models/Organiser');
+const Player = require('../models/Player');
+const Tournament = require('../models/Tournament');
+const Team = require('../models/Team');
+const bcrypt = require('bcrypt');
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
@@ -92,7 +96,7 @@ exports.updatePassword = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        player.password = hashedPassword;
+        organiser.password = hashedPassword;
         await organiser.save();
 
         res.status(200).json({ message: 'Password updated successfully' });
@@ -145,21 +149,85 @@ exports.updateProfilePhoto = async (req, res) => {
     }
 };
 
+exports.getOrganiserDashboard = async (req, res) => {
+    const { _id } = req.user;  
+    try {
+        const organiser = await Organiser.findById(_id)
+            .populate('tournaments')
+            .populate('followers');
 
+        if (!organiser) {
+            return res.status(404).json({ message: 'Organiser not found' });
+        }
 
+        const totalTournaments = organiser.tournaments.length;
+
+        const followerCount = organiser.followers.length;
+
+        const tournaments = await Tournament.find({ organizer: _id });
+        const totalPrizePool = tournaments.reduce((sum, tournament) => sum + tournament.prizePool, 0);
+
+        const currentDate = new Date();
+
+        const completedTournaments = tournaments.filter(t => t.endDate < currentDate && t.status === 'Completed');
+        const ongoingTournaments = tournaments.filter(t => t.startDate <= currentDate && t.endDate >= currentDate && t.status === 'Approved');
+        const upcomingTournaments = tournaments.filter(t => t.startDate > currentDate && t.status !== 'Completed');
+
+        res.status(200).json({
+            message: 'Dashboard fetched successfully',
+            totalTournaments,
+            followerCount,
+            totalPrizePool,
+            ongoingTournaments,
+            upcomingTournaments,
+            completedTournaments
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard:', error);
+        res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
+    }
+};
+
+exports.banTeam = async (req, res) => {
+    const { teamId } = req.body;  
+    const { _id } = req.user;  
+
+    try {
+        const organiser = await Organiser.findById(_id);
+        if (!organiser) {
+            return res.status(404).json({ message: 'Organiser not found' });
+        }
+
+        const team = await Team.findById(teamId);
+        if (!team) {
+            return res.status(404).json({ message: 'Team not found' });
+        }
+
+        if (organiser.bannedTeams.includes(teamId)) {
+            return res.status(400).json({ message: 'Team is already banned' });
+        }
+
+        organiser.bannedTeams.push(teamId);
+        await organiser.save();
+
+        res.status(200).json({ message: 'Team banned successfully from organiser\'s tournaments', organiser });
+    } catch (error) {
+        console.error('Error banning team:', error);
+        res.status(500).json({ error: 'Error banning team', details: error.message });
+    }
+};
 // Route Has Been Tested and Is working successfully
 
     
 // create update organiserdetails <DONE> 
 // update passwords  <DONE>
 // Dashboards with details-->{
-//      Tournaments Conducted:
-//      Total People in the Org:
-//      total people played with the Org:
-//      Total prizepool
-//      current Matches
-//      upcoming Matches
-//      completed matches
+//      Tournaments Conducted:<DONE>
+//      total people played with the Org:<DONE>
+//      Total prizepool <DONE>
+//      current Matches <DONE>
+//      upcoming Matches <DONE>
+//      completed matches <DONE>
 //      }
-// Ban Teams from organiser
+// Ban Teams from organiser<DONE>
 // Ban Players from organiser

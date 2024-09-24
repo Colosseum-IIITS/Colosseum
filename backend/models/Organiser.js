@@ -10,6 +10,7 @@ const toSchema = new mongoose.Schema({
   tournamentsConducted: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   tournaments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' }],
+  bannedTeams:[{type:mongoose.Schema.Types.ObjectId,ref: 'Player'}],
   banned: { type: Boolean, default: false }  // New field to ban an organiser
 }, { timestamps: true });
 

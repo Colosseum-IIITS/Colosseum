@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="/assets/profile.css">
 </head>
 <body>
+    <div class="profile-picture-container">
+        <div class="profile-picture">
+            <% if (user && user.image && user.image.data) { %>
+                <img src="data:<%= user.image.contentType %>;base64,<%= user.image.data.toString('base64') %>" alt="Profile Picture" id="profileImage">
+            <% } else { %>
+                <img src="/images/default-profile.png" alt="Default Profile Picture" id="profileImage">
+            <% } %>
+            <button type="button" class="edit-button" id="editPictureButton">Edit</button>
+        </div>
+          </div>
     <div class="container">
         <div class="profile-container">
             <form id="profileForm" method="POST" action="/api/player/updateProfile" >
@@ -34,7 +44,6 @@
             
         </div>
     </div>
-
     <!-- Hidden file input for image upload -->
     <input type="file" id="file-input" style="display: none;" accept="image/*">
 

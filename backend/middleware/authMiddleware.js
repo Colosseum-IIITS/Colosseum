@@ -39,7 +39,45 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken };
+
+const authenticateOrganiser = async (req, res, next) => {
+  const token =
+    req.cookies.user_jwt ||
+    (req.headers["authorization"] &&
+      req.headers["authorization"].split(" ")[1]); // Extract from cookies or Bearer token
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  try {
+    // Verify the JWT and decode it
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Decode the token
+    console.log("Decoded JWT:", decoded);
+
+    // Fetch the player by the decoded id
+    const organiser = await Organiser.findById(decoded.id); // Ensure `decoded.id` is present in JWT payload
+    if (!organiser) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
+
+    // Attach the Organsier object to req.user
+    req.user = organiser;
+    next(); // Proceed to the next middleware
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    }
+    if (error.name === "JsonWebTokenError") {
+      return res.status(403).json({ message: "Invalid token" });
+    }
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 const authenticateUser = async (req, res, next) => {
   const token =

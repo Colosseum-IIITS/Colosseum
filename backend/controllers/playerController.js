@@ -1,9 +1,10 @@
 const Tournament = require('../models/Tournament');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');
-const team = require('../models/Team');
+const Team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
@@ -81,23 +82,24 @@ exports.searchTournaments = async (req, res) => {
         const { searchTerm } = req.query;
         console.log('Search Term:', searchTerm); // Debugging line
 
+        // Query to find tournaments that are approved (status: "Approved")
         const tournaments = await Tournament.find({
+            status: "Approved", // Only include tournaments with status "Approved"
             $or: [
-                { tid: new RegExp(searchTerm, 'i') },
-                { name: new RegExp(searchTerm, 'i') }
+                { tid: new RegExp(searchTerm, 'i') }, // Search by tournament ID (tid)
+                { name: new RegExp(searchTerm, 'i') } // Search by tournament name
             ]
         });
 
-        console.log('Tournaments Found:', tournaments); // Debugging line
+        console.log('Approved Tournaments Found:', tournaments); // Debugging line
 
-        // Return a 200 status with an empty array if no tournaments found
+        // Return a 200 status with the found tournaments
         res.status(200).json(tournaments);
     } catch (error) {
         console.error('Error searching tournaments:', error); // Log the error
         res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
-
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
@@ -217,6 +219,60 @@ exports.updateEmail = async (req, res) => {
         res.status(500).json({ error: 'Error updating email', details: error.message });
     }
 };
+
+
+exports.updateProfile = async (req, res) => {
+    const { username, email, currentPassword, newPassword } = req.body;
+    console.log("rithvik hot" ,req.body);
+    const userId = req.user._id; // Ensure you have the user's ID from the JWT
+
+    try {
+        const player = await Player.findById(userId);
+        console.log("helooasd i want player : " ,player);
+        
+        if (!player) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // // Log to check the incoming data
+        // console.log('Incoming data:', req.body);
+        // console.log('Fetched Player:', player);
+
+        console.log(currentPassword);
+
+        // Check if currentPassword is provided
+        if (!currentPassword) {
+            return res.status(400).json({ message: 'Current password is required' });
+        }
+
+        // Compare the provided current password with the stored hashed password
+        const match = await bcrypt.compare(currentPassword, player.password);
+        if (!match) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+
+        // Update username and email
+        player.username = username;
+        player.email = email;
+
+        // If a new password is provided, hash it and update
+        if (newPassword) {
+            player.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        // Save the updated player information
+        await player.save();
+
+        res.status(200).json({ message: 'Profile updated successfully' });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+
 
 // Fetch number of tournaments played by the player
 exports.getTournamentsPlayed = async (req, res) => {

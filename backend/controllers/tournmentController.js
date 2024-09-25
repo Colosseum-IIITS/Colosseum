@@ -4,6 +4,9 @@ const Team = require("../models/Team");
 const { findOneAndUpdate } = require("../models/Organiser");
 
 // Create a new tournament
+exports.createTournamentForm=async(req,res)=>{
+    res.render('createTournament',{organiser:req.user});
+}
 //working
 exports.createTournament = async (req, res) => {
   const {
@@ -16,7 +19,7 @@ exports.createTournament = async (req, res) => {
     organizer,
     description,
   } = req.body;
-  const {_id}=req.user;
+  const organiser = req.user._id;
 
   try {
     // Check if tournament ID is unique
@@ -34,7 +37,7 @@ exports.createTournament = async (req, res) => {
       entryFee,
       prizePool,
       status: "Pending", // Initially setting the tournament status to 'Pending'
-      organizer,
+      organiser,
       description,
     });
 
@@ -76,7 +79,7 @@ exports.updateTournament = async (req, res) => {
 exports.updateWinner = async (req, res) => {
   const { tournamentId, winnerId } = req.body;
 
- try {
+  try {
     // Find the tournament by ID
     const tournament = await Tournament.findById(tournamentId);
     if (!tournament) {
@@ -120,37 +123,44 @@ exports.updateWinner = async (req, res) => {
 // In your controller function
 exports.getEnrolledTournaments = async (req, res) => {
   const { id: playerId } = req.user; // Extract playerId from JWT token
-  console.log('Fetching tournaments for player:', playerId); // Log player ID
+  console.log("Fetching tournaments for player:", playerId); // Log player ID
 
   try {
-      const player = await Player.findById(playerId).populate('team'); // Ensure you have the player's team populated
-      if (!player || !player.team) {
-          return res.status(404).json({ message: 'Player or team not found' });
-      }
+    const player = await Player.findById(playerId).populate("team"); // Ensure you have the player's team populated
+    if (!player || !player.team) {
+      return res.status(404).json({ message: "Player or team not found" });
+    }
 
-      // Find tournaments that the player's team is enrolled in
-      const tournaments = await Tournament.find({ teams: player.team._id }).populate('teams', 'name'); // Populate the teams with only the name
+    // Find tournaments that the player's team is enrolled in
+    const tournaments = await Tournament.find({
+      teams: player.team._id,
+    }).populate("teams", "name"); // Populate the teams with only the name
 
-      console.log('Tournaments Found:', tournaments); // Log the tournaments found
+    console.log("Tournaments Found:", tournaments); // Log the tournaments found
 
-      if (tournaments.length > 0) {
-          // If tournaments are found, send them back along with a message
-          res.json({ 
-              tournaments: tournaments.map(tournament => ({
-                  tournamentId: tournament._id,
-                  tournamentName: tournament.name,
-                  teams: tournament.teams, // This will now include the populated team details
-              })),
-              message: "You are already enrolled in the following tournaments." 
-          });
-      } else {
-          // If no tournaments are found
-          res.json({ 
-              tournaments: [], 
-              message: "You are not enrolled in any tournaments." 
-          });
-      }
+    if (tournaments.length > 0) {
+      // If tournaments are found, send them back along with a message
+      res.json({
+        tournaments: tournaments.map((tournament) => ({
+          tournamentId: tournament._id,
+          tournamentName: tournament.name,
+          teams: tournament.teams, // This will now include the populated team details
+        })),
+        message: "You are already enrolled in the following tournaments.",
+      });
+    } else {
+      // If no tournaments are found
+      res.json({
+        tournaments: [],
+        message: "You are not enrolled in any tournaments.",
+      });
+    }
   } catch (error) {
-      res.status(500).json({ message: "Error fetching enrolled tournaments", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error fetching enrolled tournaments",
+        error: error.message,
+      });
   }
 };

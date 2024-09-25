@@ -5,6 +5,8 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 const organiserController = require('../controllers/organiserController');
 const reportController = require('../controllers/reportController');
 const Player = require('../models/Player');
+const teamController = require('../controllers/teamControllers');
+const tournmentController = require('../controllers/tournmentController');
 const organiser = require('../models/Organiser');
 
 

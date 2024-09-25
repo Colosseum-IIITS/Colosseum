@@ -1,54 +1,54 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Profile</title>
-    <link rel="stylesheet" href="/assets/css/updateOrganiserProfile.css">
-</head>
 <body>
     <h1>Update Profile</h1>
 
-    <!-- Form to update username -->
-    <form action="/organiser/update-username" method="POST">
-        <label for="username">New Username:</label>
-        <input type="text" id="username" name="newUsername" value="<%= organiser.username %>" required>
-        <button type="submit">Update Username</button>
-    </form>
+    <div class="form-card">
+        <!-- Form to update username -->
+        <form action="/organiser/update-username" method="POST">
+            <label for="username">New Username:</label>
+            <input type="text" id="username" name="newUsername" value="<%= organiser.username %>" required>
+            <button type="submit">Update Username</button>
+        </form>
+    </div>
 
-    <!-- Form to update email -->
-    <form action="/organiser/update-email" method="POST">
-        <label for="email">New Email:</label>
-        <input type="email" id="email" name="newEmail" value="<%= organiser.email %>" required>
-        <button type="submit">Update Email</button>
-    </form>
+    <div class="form-card">
+        <!-- Form to update email -->
+        <form action="/organiser/update-email" method="POST">
+            <label for="email">New Email:</label>
+            <input type="email" id="email" name="newEmail" value="<%= organiser.email %>" required>
+            <button type="submit">Update Email</button>
+        </form>
+    </div>
 
-    <!-- Form to update description -->
-    <form action="/organiser/update-description" method="POST">
-        <label for="description">New Description:</label>
-        <textarea id="description" name="newDescription" required><%= organiser.description %></textarea>
-        <button type="submit">Update Description</button>
-    </form>
+    <div class="form-card">
+        <!-- Form to update description -->
+        <form action="/organiser/update-description" method="POST">
+            <label for="description">New Description:</label>
+            <textarea id="description" name="newDescription" required><%= organiser.description %></textarea>
+            <button type="submit">Update Description</button>
+        </form>
+    </div>
 
-    <!-- Form to update profile photo -->
-    <form action="/organiser/update-profile-photo" method="POST">
-        <label for="profilePhoto">New Profile Photo URL:</label>
-        <input type="text" id="profilePhoto" name="newProfilePhoto" value="<%= organiser.profilePhoto %>" required>
-        <button type="submit">Update Profile Photo</button>
-    </form>
+    <div class="form-card">
+        <!-- Form to update profile photo -->
+        <form action="/organiser/update-profile-photo" method="POST">
+            <label for="profilePhoto">New Profile Photo URL:</label>
+            <input type="text" id="profilePhoto" name="newProfilePhoto" value="<%= organiser.profilePhoto %>" required>
+            <button type="submit">Update Profile Photo</button>
+        </form>
+    </div>
 
-    <!-- Form to update password -->
-    <form action="/organiser/update-password" method="POST">
-        <label for="currentPassword">Current Password:</label>
-        <input type="password" id="currentPassword" name="currentPassword" required>
+    <div class="form-card">
+        <!-- Form to update password -->
+        <form action="/organiser/update-password" method="POST">
+            <label for="currentPassword">Current Password:</label>
+            <input type="password" id="currentPassword" name="currentPassword" required>
 
-        <label for="newPassword">New Password:</label>
-        <input type="password" id="newPassword" name="newPassword" required>
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
 
-        <button type="submit">Update Password</button>
-    </form>
+            <button type="submit">Update Password</button>
+        </form>
+    </div>
 
     <a href="/organiser/dashboard">Back to Dashboard</a>
 </body>
-</html>

@@ -61,6 +61,7 @@ app.get('/', (req, res) => {
   res.render('parallax');
 });
 
+    
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication
 app.use('/api/player', playerRoutes);

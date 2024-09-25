@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
+<<<<<<< Updated upstream
   const { searchTerm } = req.query; // Search term will be passed as a query parameter
 
   try {
@@ -19,6 +20,27 @@ exports.getOrganiserByUsername = async (req, res) => {
     // Check if the organiser exists
     if (!organiser) {
       return res.status(404).json({ message: "Organiser not found" });
+=======
+    const { searchTerm } = req.query; 
+
+    try {
+        const organisers = await Organiser.find({ username: { $regex: new RegExp(searchTerm, 'i') } })
+            .populate('followers')
+            .populate('tournaments');
+
+        console.log(`Search term received: ${searchTerm}`);
+        
+        if (organisers.length === 0) {
+            console.log(`No organisers found for the username: ${searchTerm}`);
+            return res.status(200).json({ message: 'No organisers found', organiser: [] });
+        }
+
+        console.log(`${organisers.length} organisers found.`);
+        res.status(200).json({ organiser: organisers });
+    } catch (error) {
+        console.error('Error fetching organisers:', error);
+        res.status(500).json({ error: 'Error fetching organisers', details: error.message });
+>>>>>>> Stashed changes
     }
 
     res.status(200).json({ organiser });
@@ -259,28 +281,30 @@ exports.getOrganiserDashboard = async (req, res) => {
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
+          console.log(organiser.tournaments);
          const isOwner = loggedInUserId.equals(organiser._id);   // Common details
         const totalTournaments = organiser.tournaments.length;
         const followerCount = organiser.followers.length;
-        const tournaments = await Tournament.find({ organizer: organiser._id });
+        const tournamentList = await Tournament.find({ organizer: organiser._id });
+        console.log('Tournaments fetched are'+ organiser.tournaments);
 
-        const totalPrizePool = tournaments.reduce(
+        const totalPrizePool = tournamentList.reduce(
             (sum, tournament) => sum + tournament.prizePool,
             0
         );
 
         const currentDate = new Date();
 
-        const completedTournaments = tournaments.filter(
+        const completedTournaments = tournamentList.filter(
             (t) => t.endDate < currentDate && t.status === "Completed"
         );
-        const ongoingTournaments = tournaments.filter(
+        const ongoingTournaments = tournamentList.filter(
             (t) =>
                 t.startDate <= currentDate &&
                 t.endDate >= currentDate &&
                 t.status === "Approved"
         );
-        const upcomingTournaments = tournaments.filter(
+        const upcomingTournaments = tournamentList.filter(
             (t) => t.startDate > currentDate && t.status !== "Completed"
         );
 
@@ -312,6 +336,30 @@ exports.getOrganiserDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
     }
 };
+exports.getMyOrganisers = async (req, res) => {
+    const { _id } = req.user; // Player ID
+
+    try {
+        const player = await Player.findById(_id).populate({
+            path: 'following', // Assuming this is the field in Player model
+            model: 'Organiser',
+            populate: {
+                path: 'tournaments', // Assuming each organiser has a tournaments field
+                model: 'Tournament' // Replace with your actual tournament model name
+            }
+        });
+
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        res.status(200).json(player.following); // Return the followed organisers
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving followed organisers' });
+    }
+};
+
 
 exports.banTeam = async (req, res) => {
   const { teamId } = req.body;

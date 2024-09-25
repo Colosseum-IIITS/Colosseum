@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Dashboard Visibility</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/updateOrganiserDashboardVisibility.css">
 </head>
 <body>
@@ -29,9 +32,10 @@
             <input type="checkbox" name="followersVisible" <%= organiser.visibilitySettings.followersVisible ? 'checked' : '' %>>
             Show Followers
         </label>
-
+        
         <button type="submit">Update Visibility Settings</button>
     </form>
+    
 
     <!-- Corrected anchor tag to redirect to the specific organiser's dashboard -->
     <a href="/api/organiser/<%= organiser.username %>/dashboard">Back to Dashboard</a>

@@ -1,7 +1,7 @@
 const Tournament = require('../models/Tournament');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');
-const team = require('../models/Team');
+const Team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -99,7 +99,6 @@ exports.searchTournaments = async (req, res) => {
 };
 
 
-// Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
     const { _id } = req.user;
@@ -118,15 +117,32 @@ exports.joinTournament = async (req, res) => {
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
         }
+
+        // Check if the team is banned (assuming you have this logic elsewhere)
         // if(tournament.organiser.bannedTeams.includes(player.team._id)) {
-        //     return res.status(400).json({ message: 'your team is banned' });
+        //     return res.status(400).json({ message: 'Your team is banned' });
         // }
 
         if (tournament.teams.includes(player.team._id)) {
             return res.status(400).json({ message: 'Team is already registered for this tournament' });
         }
 
+        // Fetch the team object using the team ID
+        const team = await Team.findById(player.team._id);
+        if (!team) {
+            return res.status(404).json({ message: 'Team not found' });
+        }
+
+        // Create points table entry for the team
+        const pointsEntry = {
+            ranking: 0, // You can set initial ranking as needed
+            teamName: team.name,
+            totalPoints: 0 // Initialize total points as needed
+        };
+
+        // Update tournament teams and points table
         tournament.teams.push(player.team._id);
+        tournament.pointsTable.push(pointsEntry);
         await tournament.save();
 
         player.tournaments.push({ tournament: tournament._id, won: false });
@@ -138,6 +154,7 @@ exports.joinTournament = async (req, res) => {
         return res.status(500).json({ message: 'Server error', error });
     }
 };
+
 
 // Update username
 exports.updateUsername = async (req, res) => {

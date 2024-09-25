@@ -24,7 +24,6 @@ router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 
 
 router.post('/create', authenticateOrganiser, tournamentController.createTournament);
-router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable)
 
 // router.get("/getReports", async(req,res=>{
 //     const organiserId = req.body.organiserId;

@@ -1,8 +1,10 @@
 const express = require('express');
 const adminController = require('../controllers/adminController');
 const router = express.Router();
+const { authenticateAdmin } = require('../middleware/authMiddleware');
 
-router.get('/dashboard', adminController.getDashboard);
+
+router.get('/dashboard', authenticateAdmin, adminController.getDashboard);
 
 
 router.post('/ban/organiser/:id', adminController.banOrganiser);

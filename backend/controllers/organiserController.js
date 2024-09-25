@@ -33,7 +33,7 @@ exports.getOrganiserByUsername = async (req, res) => {
 
 exports.updateOrganiserSettings = async (req, res) => {
   const { showTournaments, showFollowerCount, showPrizePool } = req.body;
-  const { id } = req.user; // Assume this is coming from authenticated organiser
+  const { id } = req.user;
 
   try {
     const updatedVisibility = {
@@ -373,6 +373,8 @@ exports.banTeam = async (req, res) => {
       .json({ error: "Error banning team", details: error.message });
   }
 };
+
+
 // Route Has Been Tested and Is working successfully
 
 // create update organiserdetails <DONE>

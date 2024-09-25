@@ -103,14 +103,16 @@ exports.fetchOrganiserReportsForAdmin = async (req, res) => {
       const totalBannedPlayers = await Player.countDocuments({ banned: true });
       const totalTournamentsConducted = organisers.reduce((acc, organiser) => acc + organiser.tournamentsConducted, 0);
       const totalBannedOrgs = await Organiser.countDocuments({ banned: true });
+
+      const currentDate = new Date();
       const ongoingTournamentsCount = await Tournament.countDocuments({
-        startDate: { $lte: new Date() },
-        endDate: { $gte: new Date() }
-      });
+        startDate: { $lte: currentDate },
+        endDate: { $gte: currentDate }
+    });
       
       const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
       const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organizer');
-  
+
       res.render('adminDashboard', {
         organisers,
         players,

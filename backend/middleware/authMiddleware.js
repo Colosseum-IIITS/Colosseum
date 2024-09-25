@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Player = require("../models/Player"); // Ensure Player model is imported
 const Organiser = require("../models/Organiser");
+const Admin = require('../models/Admin');
 
 const authenticateToken = async (req, res, next) => {
   const token =
@@ -34,11 +35,9 @@ const authenticateToken = async (req, res, next) => {
       return res.status(403).json({ message: "Invalid token" });
     }
     return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+      .status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 const authenticateOrganiser = async (req, res, next) => {
   const token =
@@ -122,6 +121,43 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, authenticateOrganiser, authenticateUser };
+
+const authenticateAdmin = async (req, res, next) => {
+  const token =
+    req.cookies.admin_jwt || 
+    (req.headers["authorization"] && req.headers["authorization"].split(" ")[1]); // Extract from cookies or Bearer token
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  try {
+    // Verify the JWT and decode it
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Decode the token
+    console.log("Decoded Admin JWT:", decoded);
+
+    // Fetch the admin by the decoded id
+    const admin = await Admin.findById(decoded.id); // Ensure `decoded.id` is present in JWT payload
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Attach the admin object to req.user
+    req.user = admin;
+    next(); // Proceed to the next middleware
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    }
+    if (error.name === "JsonWebTokenError") {
+      return res.status(403).json({ message: "Invalid token" });
+    }
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { authenticateToken, authenticateOrganiser, authenticateUser, authenticateAdmin };
 
 

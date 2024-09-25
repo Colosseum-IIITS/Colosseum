@@ -5,6 +5,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
+
+
 // Import routes
 const playerRoutes = require('./routes/playerRouts');
 const tournamentRoutes = require('./routes/tournamentRoutes');
@@ -49,6 +51,12 @@ app.get('/admin', (req, res) => {
     res.render('adminSignin');
 });
 
+app.get('/admin/create', (req, res) => {
+    res.render('adminSignup');  // Renders the signup form
+});
+
+
+
 app.get('/', (req, res) => {
   res.render('parallax');
 });
@@ -63,7 +71,6 @@ app.use('/api/team', teamRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
-app.use('/api', authRoutes); // This will expose the signin route as /api/player/signin
 
 
 // MongoDB connection

@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="login-card">
-        <form action="/admin/dashboard" method="GET" class="form">
+        <form action="/auth/admin/login" method="POST" class="form">
 
             <img src="/assets/controller.jpg" alt="logo">
             <h2 id="typing-text">Welcome Admin!</h2>
@@ -21,6 +21,10 @@
             <input type="password" placeholder="Password" required class="validate1" autocomplete="off" name="password">
 
             <button class="sig" type="submit">SIGN IN</button>
+
+            <div class="signup-link"></div>
+                <p>Don't have an account? <a class="elseButton" href="/admin/create">SIGN UP</a></p>
+            </div>
         </form>
     </div>
 </body>

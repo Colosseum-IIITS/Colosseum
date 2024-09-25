@@ -118,6 +118,9 @@ exports.joinTournament = async (req, res) => {
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
         }
+        // if(tournament.organiser.bannedTeams.includes(player.team._id)) {
+        //     return res.status(400).json({ message: 'your team is banned' });
+        // }
 
         if (tournament.teams.includes(player.team._id)) {
             return res.status(400).json({ message: 'Team is already registered for this tournament' });
@@ -131,6 +134,7 @@ exports.joinTournament = async (req, res) => {
 
         return res.status(200).json({ message: 'Successfully joined the tournament' });
     } catch (error) {
+        console.error("Error joining tournament:", error);
         return res.status(500).json({ message: 'Server error', error });
     }
 };
@@ -274,6 +278,59 @@ exports.getPlayerRanking = async (req, res) => {
     }
 };
 
+exports.getFollowedOrganisers = async (req, res) => {
+    const { _id } = req.user;
+    try {
+        // Find the player by their ID
+        const player = await Player.findById(_id).populate('following');
+
+        console.log('Player ID from token:', _id);
+
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        const followingOrganisers = player.following;
+
+        res.status(200).json({ followingOrganisers });
+    } catch (error) {
+        console.error('Error fetching organisers followed:', error);
+        res.status(500).json({ error: 'Error fetching organisers followed' });
+    }
+};
 
 
+exports.getHomePage = async (req, res) => {
+    res.status(200).render('homepage'); 
+};
 
+
+exports.getPlayerDashboard = async (req, res) => {
+    const { userId } = req.user._id;
+    try {
+        const player = await Player.findById(userId); 
+        if (!player) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Pass user data to the template
+        res.status(200).render('dashboard', { player });
+    } catch(error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+exports.getTournamentPointsTable = async (req, res) => {
+    const { tournamentId } = req.params;
+
+    try {
+        const tournament = await Tournament.findById(tournamentId).select('name pointsTable');
+        if (!tournament) {
+            return res.status(404).json({ message: 'Tournament not found' });
+        }
+
+        res.render('pointsTable', { pointsTable: tournament.pointsTable });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error', error });
+    }
+};

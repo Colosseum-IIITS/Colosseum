@@ -8,9 +8,8 @@ const Player = require('../models/Player');
 const teamController = require('../controllers/teamControllers');
 const tournmentController = require('../controllers/tournmentController');
 const organiser = require('../models/Organiser');
-router.get('/homepage', authenticateToken, (req, res) => {
-    res.render('homepage'); 
-});
+
+
 router.get('/searchTournaments', authenticateToken, playerController.searchTournaments); // w
 router.post('/followOrganiser', authenticateToken, playerController.followOrganiser); // w
 router.post('/unFollowOrganiser', authenticateToken, playerController.unfollowOrganiser); // w
@@ -24,24 +23,11 @@ router.get('/ranking', authenticateToken, playerController.getPlayerRanking); //
 router.get('/searchOrganisers',authenticateToken, organiserController.getOrganiserByUsername);
 router.post('/report-team', authenticateToken, reportController.reportTeam);
 router.post('/report-organiser', authenticateToken, reportController.reportOrganiser);
-router.get('/dashboard', authenticateToken, async (req, res) => {
-    const userId = req.user._id; // Get user ID from authenticated request
-    try {
-        const user = await Player.findById(userId); // Assuming you are using the Player model
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        // Pass user data to the template
-        res.render('dashboard', { user });
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-router.post('/joinTeam', authenticateToken,teamController.joinTeam);
-router.get('/searchTeam', teamController.getTeamsByName);
-router.get('/getEnrolledTeams', authenticateToken, teamController.getEnrolledTeams);
-router.get('/getEnrolledTournaments', authenticateToken, tournmentController.getEnrolledTournaments);
-router.get('/myOrganisers', authenticateToken, organiserController.getMyOrganisers);
+router.get('/dashboard', authenticateToken, playerController.getPlayerDashboard);
+
+router.get('/tournament/:tournamentId/points', authenticateToken, playerController.getPlayerDashboard);
+
+router.get('/homepage', authenticateToken, playerController.getHomePage);
+
 
 module.exports = router;

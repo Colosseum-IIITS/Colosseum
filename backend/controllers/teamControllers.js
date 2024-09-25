@@ -91,24 +91,22 @@ exports.getTeamsByName = async (req, res) => {
   const { searchTerm } = req.query;
 
   if (!searchTerm) {
-    return res.status(400).json({ message: 'Search term is required' });
+      return res.status(400).json({ message: 'Search term is required' });
   }
 
   try {
-    const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
-      .populate('players')
-      .populate('captain');
+      const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
+          .populate('players')
+          .populate('captain');
 
-    if (!teams.length) {
-      return res.status(404).json({ message: 'No teams found' });
-    }
-
-    res.status(200).json({ teams });
+      // Always return a teams property in the response
+      res.status(200).json({ teams: teams || [] });
   } catch (error) {
-    console.error('Error fetching teams:', error);
-    res.status(500).json({ error: 'Error fetching teams', details: error.message });
+      console.error('Error fetching teams:', error);
+      res.status(500).json({ error: 'Error fetching teams', details: error.message });
   }
 };
+
 
 
 
@@ -152,3 +150,14 @@ exports.updateTeamName = async (req, res) => {
 
 
 
+exports.getEnrolledTeams = async (req, res) => {
+  const { _id: playerId } = req.user; // Extract playerId from JWT token
+
+  try {
+    // Find teams where the player is in the players array
+    const teams = await Team.find({ players: playerId }); // Correctly reference the 'players' array
+    res.json({ teams });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching enrolled teams", error: error.message });
+  }
+};

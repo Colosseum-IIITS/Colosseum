@@ -217,7 +217,7 @@ exports.updateVisibilitySettings = async (req, res) => {
       return res.status(404).json({ message: "Organiser not found" });
     }
 
-    res.status(200).json({ message: "Visibility settings updated", organiser });
+    res.status(200).redirect(`/api/organiser/${organiser.username}/dashboard`);
   } catch (error) {
     console.error("Error updating visibility settings:", error);
     res.status(500).json({

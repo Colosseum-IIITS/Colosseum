@@ -23,28 +23,6 @@ body {
   font-weight: bold;
 }
 
-.navbar-nav {
-  display: flex;
-  list-style: none;
-}
-
-.navbar-nav li {
-  margin-right: 20px;
-}
-
-.navbar-nav li a {
-  text-decoration: none;
-  color: #000;
-  font-size: 18px;
-  padding: 5px 10px;
-}
-
-.navbar-nav li a:hover {
-  background-color: #ddd;
-  border-radius: 5px;
-}
-
-/* For right-side alignment (Search + Profile) */
 .search-profile {
   display: flex;
   align-items: center;
@@ -87,112 +65,71 @@ body {
   cursor: pointer;
 }
 
-/* Main content container */
-.maincontent {
+/* Main container for the layout */
+.main-container {
   display: flex;
-  justify-content: space-evenly;
-  align-items: flex-start;
-  margin-top: 6%;
-  height: auto; /* Let it grow with content */
-  padding: 3%;
+  justify-content: space-between;
+  padding: 20px;
 }
 
-/* Middle side (tournament section) */
-.middleSide {
-  width: 450px;
-  height: 850px;
-  flex: 1;
-  overflow-y: scroll;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  background-color: #231d2e;
-}
-
-.middleSide .heading {
-  text-align: center;
-  font-weight: bold;
-  font-size: 30px;
-  color: white;
-  margin-top: 4%;
-}
-
-/* Right and left side configuration */
-.rightSide, .leftSide {
-  width: 450px;
-  min-height: 450px; /* Ensure they don't collapse */
-  overflow: hidden;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-}
-
-.rightSide {
-  background-color: #330e3a;
-}
-
-.leftSide {
-  background-color: #2086ce;
-}
-
-/* Container for both sides */
-.RightTotal {
+/* Left Column */
+.left-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: auto;
-  margin-top: 7px;
-  margin-bottom: 85%;
+  width: 60%;
 }
 
-/* Additional styling for headings */
+/* Right Column */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  width: 35%;
+}
+
+/* Search result container styles */
+.searchResults {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .heading {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: bold;
-  text-align: center;
-  color: white;
+  color: black;
+  margin-bottom: 10px;
+}
+
+/* Style for input box and buttons */
+.searchForm input {
+  width: calc(100% - 20px);  /* Full width minus button space */
   padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-/* Tournament Info Box Styling */
-.tournamentInfo {
-  display: flex;
-  flex-direction: column;
-  width: 24rem;
-  height: 12rem;
-  margin-left: 11%;
-  margin-top: 10%;
-  background: #29292c;
-  border-radius: 1rem;
-  overflow: hidden;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  font-size: 16px;
-  position: relative;
+.searchForm button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-/* Tournament Info Glows */
-.tournamentInfo .notiglow,
-.tournamentInfo .notiborderglow {
-  position: absolute;
-  width: 20rem;
-  height: 20rem;
-  background: radial-gradient(circle closest-side at center, white, transparent);
-  opacity: 0;
-  transition: opacity 300ms ease;
-  z-index: 1;
+.searchForm button:hover {
+  background-color: #0056b3;
 }
 
-.tournamentInfo:hover .notiglow,
-.tournamentInfo:hover .notiborderglow {
-  opacity: 0.1;
-}
-
-.tournamentInfo .notititle {
-  color: #32a6ff;
-  padding: 0.65rem 0.25rem 0.4rem 1.25rem;
-  font-weight: 500;
-  font-size: 1.1rem;
-}
-
-.tournamentInfo .notibody {
-  color: #99999d;
-  padding: 0 1.25rem;
+/* Container for reloaded data */
+#loaded-tournament-data, #loaded-team-data {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e8e8e8;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }

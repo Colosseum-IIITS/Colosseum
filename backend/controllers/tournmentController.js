@@ -114,3 +114,41 @@ exports.updateWinner = async (req, res) => {
     res.status(500).json({ error: "Error updating winner" });
   }
 };
+
+// In your controller function
+exports.getEnrolledTournaments = async (req, res) => {
+  const { id: playerId } = req.user; // Extract playerId from JWT token
+  console.log('Fetching tournaments for player:', playerId); // Log player ID
+
+  try {
+      const player = await Player.findById(playerId).populate('team'); // Ensure you have the player's team populated
+      if (!player || !player.team) {
+          return res.status(404).json({ message: 'Player or team not found' });
+      }
+
+      // Find tournaments that the player's team is enrolled in
+      const tournaments = await Tournament.find({ teams: player.team._id }).populate('teams', 'name'); // Populate the teams with only the name
+
+      console.log('Tournaments Found:', tournaments); // Log the tournaments found
+
+      if (tournaments.length > 0) {
+          // If tournaments are found, send them back along with a message
+          res.json({ 
+              tournaments: tournaments.map(tournament => ({
+                  tournamentId: tournament._id,
+                  tournamentName: tournament.name,
+                  teams: tournament.teams, // This will now include the populated team details
+              })),
+              message: "You are already enrolled in the following tournaments." 
+          });
+      } else {
+          // If no tournaments are found
+          res.json({ 
+              tournaments: [], 
+              message: "You are not enrolled in any tournaments." 
+          });
+      }
+  } catch (error) {
+      res.status(500).json({ message: "Error fetching enrolled tournaments", error: error.message });
+  }
+};

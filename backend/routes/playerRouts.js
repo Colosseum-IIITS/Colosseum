@@ -5,6 +5,8 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 const organiserController = require('../controllers/organiserController');
 const reportController = require('../controllers/reportController');
 const Player = require('../models/Player');
+const teamController = require('../controllers/teamControllers');
+const tournmentController = require('../controllers/tournmentController');
 const organiser = require('../models/Organiser');
 router.get('/homepage', authenticateToken, (req, res) => {
     res.render('homepage'); 
@@ -36,6 +38,10 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
+router.post('/joinTeam', authenticateToken,teamController.joinTeam);
+router.get('/searchTeam', teamController.getTeamsByName);
+router.get('/getEnrolledTeams', authenticateToken, teamController.getEnrolledTeams);
+router.get('/getEnrolledTournaments', authenticateToken, tournmentController.getEnrolledTournaments);
+router.get('/myOrganisers', authenticateToken, organiserController.getMyOrganisers);
 
 module.exports = router;

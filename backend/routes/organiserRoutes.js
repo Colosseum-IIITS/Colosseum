@@ -3,8 +3,8 @@ const router = express.Router();
 const organiserController = require("../controllers/organiserController");
 const teamController = require("../controllers/teamControllers");
 const reportController = require("../controllers/reportController");
+const tournamentController = require("../controllers/tournmentController");
 const { authenticateToken, authenticateOrganiser,authenticateUser} = require("../middleware/authMiddleware");
-
 
 
 // Route to search the Organiser
@@ -22,6 +22,9 @@ router.get('/:username/dashboard', authenticateUser,organiserController.getOrgan
 router.post("/dashboardVisibility",authenticateOrganiser,organiserController.updateVisibilitySettings);
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 
+
+router.post('/create', authenticateOrganiser, tournamentController.createTournament);
+router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable)
 
 // router.get("/getReports", async(req,res=>{
 //     const organiserId = req.body.organiserId;

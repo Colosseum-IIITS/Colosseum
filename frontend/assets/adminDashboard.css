@@ -4,8 +4,8 @@ body {
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
-    background: rgb(15, 15, 15);
-    background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 0%, rgba(3,47,0,1) 44%, rgba(0,0,0,1) 100%);
+    background: rgb(0,0,0);
+background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 11%, rgba(64,64,64,1) 51%, rgba(0,0,0,1) 89%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,9 +101,11 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    backdrop-filter: blur(10px) saturate(47%);
-    -webkit-backdrop-filter: blur(10px) saturate(47%);
-    background-color: rgba(17, 25, 40, 0.54);
+
+    /* glassMorphism */
+    backdrop-filter: blur(25px) saturate(188%);
+    -webkit-backdrop-filter: blur(25px) saturate(188%);
+    background-color: rgba(252, 252, 252, 0.08);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.125);
 }
@@ -123,9 +125,9 @@ h1 {
     padding-left: 40px;
     padding-right: 50px;
     margin-left: 17px;
-    backdrop-filter: blur(11px) saturate(102%);
-    -webkit-backdrop-filter: blur(11px) saturate(102%);
-    background-color: rgba(126, 211, 33, 0.14);
+    backdrop-filter: blur(16px) saturate(103%);
+    -webkit-backdrop-filter: blur(16px) saturate(103%);
+    background-color: rgba(5, 5, 5, 1);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.125);
 }

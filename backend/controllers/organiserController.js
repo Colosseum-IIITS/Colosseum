@@ -259,28 +259,30 @@ exports.getOrganiserDashboard = async (req, res) => {
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
+          console.log(organiser.tournaments);
          const isOwner = loggedInUserId.equals(organiser._id);   // Common details
         const totalTournaments = organiser.tournaments.length;
         const followerCount = organiser.followers.length;
-        const tournaments = await Tournament.find({ organizer: organiser._id });
+        const tournamentList = await Tournament.find({ organizer: organiser._id });
+        console.log('Tournaments fetched are'+ organiser.tournaments);
 
-        const totalPrizePool = tournaments.reduce(
+        const totalPrizePool = tournamentList.reduce(
             (sum, tournament) => sum + tournament.prizePool,
             0
         );
 
         const currentDate = new Date();
 
-        const completedTournaments = tournaments.filter(
+        const completedTournaments = tournamentList.filter(
             (t) => t.endDate < currentDate && t.status === "Completed"
         );
-        const ongoingTournaments = tournaments.filter(
+        const ongoingTournaments = tournamentList.filter(
             (t) =>
                 t.startDate <= currentDate &&
                 t.endDate >= currentDate &&
                 t.status === "Approved"
         );
-        const upcomingTournaments = tournaments.filter(
+        const upcomingTournaments = tournamentList.filter(
             (t) => t.startDate > currentDate && t.status !== "Completed"
         );
 

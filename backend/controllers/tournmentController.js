@@ -1,6 +1,7 @@
 const Tournament = require("../models/Tournament");
 const Player = require("../models/Player");
 const Team = require("../models/Team");
+const { findOneAndUpdate } = require("../models/Organiser");
 
 // Create a new tournament
 //working
@@ -15,6 +16,7 @@ exports.createTournament = async (req, res) => {
     organizer,
     description,
   } = req.body;
+  const {_id}=req.user;
 
   try {
     // Check if tournament ID is unique

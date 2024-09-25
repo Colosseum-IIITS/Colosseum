@@ -6,30 +6,29 @@ const bcrypt = require("bcrypt");
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
+  const { searchTerm } = req.query; 
 
-    const { searchTerm } = req.query; 
+  try {
+      const organisers = await Organiser.find({ username: { $regex: new RegExp(searchTerm, 'i') } })
+          .populate('followers')
+          .populate('tournaments');
 
-    try {
-        const organisers = await Organiser.find({ username: { $regex: new RegExp(searchTerm, 'i') } })
-            .populate('followers')
-            .populate('tournaments');
+      console.log(`Search term received: ${searchTerm}`);
+      
+      if (organisers.length === 0) {
+          console.log(`No organisers found for the username: ${searchTerm}`);
+          return res.status(200).json({ message: 'No organisers found', organiser: [] });
+      }
 
-        console.log(`Search term received: ${searchTerm}`);
-        
-        if (organisers.length === 0) {
-            console.log(`No organisers found for the username: ${searchTerm}`);
-            return res.status(200).json({ message: 'No organisers found', organiser: [] });
-        }
-
-        console.log(`${organisers.length} organisers found.`);
-        res.status(200).json({ organiser: organisers });
-    } catch (error) {
-        console.error('Error fetching organisers:', error);
-        res.status(500).json({ error: 'Error fetching organisers', details: error.message });
-    }
-
-
+      console.log(`${organisers.length} organisers found.`);
+      return res.status(200).json({ organiser: organisers });
+      
+  } catch (error) {
+      console.error('Error fetching organisers:', error);
+      return res.status(500).json({ error: 'Error fetching organisers', details: error.message });
+  }
 };
+
 
 exports.updateOrganiserSettings = async (req, res) => {
   const { showTournaments, showFollowerCount, showPrizePool } = req.body;

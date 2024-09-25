@@ -60,6 +60,15 @@ app.get('/admin/create', (req, res) => {
 app.get('/', (req, res) => {
   res.render('parallax');
 });
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard'); // Render 'dashboard.ejs'
+  });
+
+  app.get('/profile', (req, res) => {
+    console.log(req.user); // Check what is being passed
+    res.render('profile', { user: req.user || null });
+});
+
 
     
 

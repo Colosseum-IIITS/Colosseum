@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings</title>
+    <link rel="stylesheet" href="/assets/profile.css">
+</head>
+<body>
+    <div class="container">
+        <div class="profile-container">
+            <form id="profileForm" method="POST" action="/api/player/updateProfile" >
+                <div class="form-group">
+                    <label for="name">Username</label>
+                    <input type="text" id="username" name="username" value="<%= user ? user.username : '' %>" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Public Email</label>
+                    <input type="email" id="email" name="email" value="<%= user ? user.email : '' %>" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter your current password" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" placeholder="Enter your new password">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="save-button" id="saveButton">Save</button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+
+    <!-- Hidden file input for image upload -->
+    <input type="file" id="file-input" style="display: none;" accept="image/*">
+
+    <!-- Modal for Image Options -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button type="button" class="change-picture" id="changePictureButton">Change Picture</button><br>
+            <button type="button" class="remove-picture" id="removePictureButton">Remove Picture</button><br>
+            <button type="button" class="close" id="closeModalButton">Close</button>
+        </div>
+    </div>

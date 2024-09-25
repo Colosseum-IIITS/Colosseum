@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    color: #00ff00; /* Bright green text for gamer aesthetic */
+    background-color: #121212; /* Dark background */
+    overflow: hidden; /* Prevent scrolling due to circles */
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 2.5em;
+}
+
+form {
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black for form */
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 300px; /* Fixed width for the form */
+    box-shadow: 0 4px 20px rgba(0, 255, 0, 0.5); /* Green shadow */
+}
+
+label {
+    display: block;
+    margin: 15px 0;
+    font-size: 1.2em; /* Increase font size for labels */
+}
+
+input[type="checkbox"] {
+    margin-right: 10px; /* Space between checkbox and label */
+}
+
+button {
+    background-color: #00ff00; /* Bright green button */
+    color: #121212; /* Dark text on button */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #1aff1a; /* Lighter green on hover */
+}
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #00ff00; /* Green text for links */
+    text-decoration: none;
+    font-size: 1.2em; /* Increase font size for links */
+}
+
+a:hover {
+    color: #1aff1a; /* Lighter green on hover */
+}
+
+/* Gradient circles in the background */
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: float 6s ease-in-out infinite;
+}
+
+.circle:nth-child(1) {
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(0,255,0,1) 0%, rgba(0,0,0,0) 100%);
+    top: 20%;
+    left: 10%;
+    animation-duration: 7s;
+}
+
+.circle:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0,255,0,1) 0%, rgba(0,0,0,0) 100%);
+    top: 50%;
+    left: 25%;
+    animation-duration: 5s;
+}
+
+.circle:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(0,255,0,1) 0%, rgba(0,0,0,0) 100%);
+    top: 70%;
+    left: 50%;
+    animation-duration: 8s;
+}
+
+.circle:nth-child(4) {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(0,255,0,1) 0%, rgba(0,0,0,0) 100%);
+    top: 40%;
+    left: 70%;
+    animation-duration: 6s;
+}
+
+.circle:nth-child(5) {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,255,0,1) 0%, rgba(0,0,0,0) 100%);
+    top: 10%;
+    left: 80%;
+    animation-duration: 9s;
+}
+

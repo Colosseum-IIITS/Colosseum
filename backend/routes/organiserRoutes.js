@@ -3,7 +3,7 @@ const router = express.Router();
 const organiserController = require("../controllers/organiserController");
 const teamController = require("../controllers/teamControllers");
 const reportController = require("../controllers/reportController");
-const { authenticateToken, authenticateOrganiser } = require("../middleware/authMiddleware");
+const { authenticateToken, authenticateOrganiser,authenticateUser} = require("../middleware/authMiddleware");
 
 
 
@@ -14,7 +14,12 @@ router.post("/updateEmail",authenticateOrganiser,organiserController.updateEmail
 router.post("/updatePassword",authenticateOrganiser,organiserController.updatePassword);
 router.post("/updateDescription",authenticateOrganiser,organiserController.updateDescription);
 router.post("/updateProfilePhoto",authenticateOrganiser,organiserController.updateProfilePhoto);
-router.get("/fetchDashboard",authenticateOrganiser,organiserController.getOrganiserDashboard);
+router.get('/UpdateProfile', authenticateOrganiser, (req, res) => {
+    res.render('updateOrganiserProfile', { organiser: req.user });  // Assuming req.user contains organiser data
+});
+router.get("/update-visibility", authenticateOrganiser, organiserController.renderUpdateVisibilitySettings);
+router.get('/:username/dashboard', authenticateUser,organiserController.getOrganiserDashboard);
+router.post("/dashboardVisibility",authenticateOrganiser,organiserController.updateVisibilitySettings);
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 
 

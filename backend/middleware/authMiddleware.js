@@ -41,7 +41,7 @@ const authenticateToken = async (req, res, next) => {
 
 module.exports = { authenticateToken };
 
-const authenticateOrganiser =  async (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
   const token =
     req.cookies.user_jwt ||
     (req.headers["authorization"] &&
@@ -56,15 +56,23 @@ const authenticateOrganiser =  async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Decode the token
     console.log("Decoded JWT:", decoded);
 
-    // Fetch the player by the decoded id
-    const organiser = await Organiser.findById(decoded.id); // Ensure `decoded.id` is present in JWT payload
-    if (!organiser) {
-      return res.status(404).json({ message: "Organiser not found" });
+    // Attempt to find the organiser
+    const organiser = await Organiser.findById(decoded.id);
+    if (organiser) {
+      req.user = organiser; // If found, assign to req.user
+      return next(); // Proceed to the next middleware
     }
 
-    // Attach the player object to req.user
-    req.user = organiser;
-    next(); // Proceed to the next middleware
+    // If organiser not found, attempt to find the player
+    const player = await Player.findById(decoded.id);
+    if (player) {
+      req.user = player; // If found, assign to req.user
+      return next(); // Proceed to the next middleware
+    }
+
+    // If neither organiser nor player is found
+    return res.status(404).json({ message: "User Not Found" });
+
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
@@ -72,12 +80,10 @@ const authenticateOrganiser =  async (req, res, next) => {
     if (error.name === "JsonWebTokenError") {
       return res.status(403).json({ message: "Invalid token" });
     }
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-module.exports = { authenticateToken, authenticateOrganiser };
+module.exports = { authenticateToken, authenticateOrganiser, authenticateUser };
 
 

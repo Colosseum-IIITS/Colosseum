@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= organiser.username %> - Dashboard</title>
+    <link rel="stylesheet" href="/assets/css/organiserDashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Organiser Dashboard</h1>
+            <h2><%= organiser.username %>'s Profile</h2>
+        </header>
+
+        <section class="profile-section">
+            <% if (visibilitySettings.profilePhotoVisible) { %>
+                <img src="<%= organiser.profilePhoto || '/assets/images/default-avatar.png' %>" alt="<%= organiser.username %>'s profile photo" class="profile-photo">
+            <% } %>
+            <% if (visibilitySettings.descriptionVisible && organiser.description) { %>
+                <p class="description"><%= organiser.description %></p>
+            <% } %>
+        </section>
+
+        <section class="stats-section">
+            <% if (visibilitySettings.showFollowers) { %>
+                <div class="stat">
+                    <h3>Followers</h3>
+                    <p><%= followerCount || 'No followers' %></p>
+                </div>
+            <% } %>
+
+            <% if (visibilitySettings.showTournaments) { %>
+                <div class="stat">
+                    <h3>Total Tournaments Conducted</h3>
+                    <p><%= totalTournaments || 'No tournaments conducted' %></p>
+                </div>
+                <div class="stat">
+                    <h3>Total Prize Pool</h3>
+                    <p><%= totalPrizePool || 'No prize pool available' %></p>
+                </div>
+            <% } %>
+        </section>
+
+        <% if (visibilitySettings.showTournaments) { %>
+            <section class="tournaments-section">
+                <h3>Ongoing Tournaments</h3>
+                <% if (ongoingTournaments.length) { %>
+                    <ul>
+                        <% ongoingTournaments.forEach(tournament => { %>
+                            <li><%= tournament.name %> (Prize Pool: <%= tournament.prizePool %>)</li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <p>No ongoing tournaments</p>
+                <% } %>
+            </section>
+
+            <section class="tournaments-section">
+                <h3>Upcoming Tournaments</h3>
+                <% if (upcomingTournaments.length) { %>
+                    <ul>
+                        <% upcomingTournaments.forEach(tournament => { %>
+                            <li><%= tournament.name %> (Prize Pool: <%= tournament.prizePool %>)</li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <p>No upcoming tournaments</p>
+                <% } %>
+            </section>
+
+            <section class="tournaments-section">
+                <h3>Completed Tournaments</h3>
+                <% if (completedTournaments.length) { %>
+                    <ul>
+                        <% completedTournaments.forEach(tournament => { %>
+                            <li><%= tournament.name %> (Prize Pool: <%= tournament.prizePool %>)</li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <p>No completed tournaments</p>
+                <% } %>
+            </section>
+        <% } %>
+
+        <% if (isOwner) { %>
+            <a href="/api/organiser/update-visibility">Edit Visibility Settings</a>
+        <% } %>
+    </div>
+</body>
+</html>

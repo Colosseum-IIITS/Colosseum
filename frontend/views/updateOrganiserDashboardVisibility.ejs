@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Dashboard Visibility</title>
+    <link rel="stylesheet" href="/assets/css/updateOrganiserDashboardVisibility.css">
+</head>
+<body>
+    <h1>Update Dashboard Visibility Settings</h1>
+
+    <form id="visibilityForm" action="/api/organiser/DashboardVisibility" method="POST">
+        <label>
+            <input type="checkbox" name="descriptionVisible" <%= organiser.visibilitySettings.descriptionVisible ? 'checked' : '' %>>
+            Show Description
+        </label>
+
+        <label>
+            <input type="checkbox" name="profilePhotoVisible" <%= organiser.visibilitySettings.profilePhotoVisible ? 'checked' : '' %>>
+            Show Profile Photo
+        </label>
+
+        <label>
+            <input type="checkbox" name="tournamentsVisible" <%= organiser.visibilitySettings.tournamentsVisible ? 'checked' : '' %>>
+            Show Tournaments
+        </label>
+
+        <label>
+            <input type="checkbox" name="followersVisible" <%= organiser.visibilitySettings.followersVisible ? 'checked' : '' %>>
+            Show Followers
+        </label>
+
+        <button type="submit">Update Visibility Settings</button>
+    </form>
+
+    <!-- Corrected anchor tag to redirect to the specific organiser's dashboard -->
+    <a href="/api/organiser/<%= organiser.username %>/dashboard">Back to Dashboard</a>
+
+</body>
+</html>

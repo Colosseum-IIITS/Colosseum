@@ -1,35 +1,18 @@
-const express = require("express");
+const express = require('express');
+const adminController = require('../controllers/adminController');
 const router = express.Router();
-const adminController = require("../controllers/adminController");
-const reportController = require("../controllers/reportController");
-const { authenticateToken } = require("../middleware/authMiddleware");
 
-// Ban an organiser
-router.put("/ban-organiser/:id", adminController.banOrganiser);
+router.get('/dashboard', adminController.getDashboard);
 
-// Delete an organiser
-router.delete("/delete-organiser/:id", adminController.deleteOrganiser);
 
-// Ban a player
-router.put("/ban-player/:id", adminController.banPlayer);
+router.post('/ban/organiser/:id', adminController.banOrganiser);
+router.post('/unban/organiser/:id', adminController.unBanOrganiser);
+router.post('/delete/organiser/:id', adminController.deleteOrganiser);
 
-// Delete a player
-router.delete("/delete-player/:id", adminController.deletePlayer);
-
-// Approve a tournament
-router.put("/approve-tournament/:id", adminController.approveTournament);
-
-router.get(
-  "/reported-organisers",
-  authenticateToken,
-  reportController.getReportedOrganisers
-);
-
-// Organiser routes to see reported teams
-router.get(
-  "/reported-teams",
-  authenticateToken,
-  reportController.getReportedTeams
-);
+router.post('/ban/player/:id', adminController.banPlayer);
+router.post('/unban/player/:id', adminController.unBanPlayer);
+router.post('/delete/player/:id', adminController.deletePlayer);
+router.post('/approve/tournament/:id', adminController.approveTournament);
+router.post('/delete/tournament/:id', adminController.deleteTournament);
 
 module.exports = router;

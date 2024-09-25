@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
     <link rel="stylesheet" href="/assets/dashboard.css">
-
-</head>
+    <script src="/assets/dashboard.js" defer></script> <!-- Ensure the leading slash is included -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar">
             <ul>
-                <li><a href="#" class="menu-item"><img src="cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
-                <li><a href="profile.html" class="menu-item"><img src="dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
-                <li><a href="settings.html" class="menu-item"><img src="settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
+                <li><a href="#" class="menu-item"><img src="/assets/cross.png" alt="Menu" width="20" height="20">Close Menu</a></li> 
+                <li><a href="" class="menu-item active"><img src="/assets/dashboard.svg" alt="Profile" width="20" height="20">Profile</a></li>
+                <li><a href="settings.html" class="menu-item"><img src="/assets/settings.svg" alt="Settings" width="20" height="20">Settings</a></li>
             </ul>
         </div>
 
@@ -32,7 +31,6 @@
                     <div class="profile-text">
                         <p class="player-name">Spikyy</p>
                         <p class="player-email">spikeyy@gmail.com</p>
-                       
                     </div>
                     
                     <!-- TeamFooL Card -->
@@ -45,53 +43,61 @@
                         </div>
                     </div>
                 </div>
-                
 
-            <div class="stats">
-                <!-- Tournaments Won -->
-                <div class="stat-card " id="u1">
-                    <div>
-                    <h3>Tournaments Won</h3></div>
-                    <div>
-                    <p id="tournaments-won">Loading...</p>
-                </div>
-                </div>
-                <!-- Tournaments Played -->
+                <div class="stats">
+                    <!-- global rank -->
+                    <div class="stat-card" id="u1">
+                        <div>
+                            <h3>Global Rank</h3>
+                        </div>
+                        <div>
+                            <p id="Global-rank" class="stat-value Global-rank">Loading...</p>
+                        </div>
+                    </div>
+                   <!-- Tournaments won -->
                 <div class="stat-card" id="u2">
                     <div>
-                    <h3>Tournaments played</h3></div>
+                        <h3>Tournaments Won</h3>
+                    </div>
                     <div>
-                    <p id="tournaments-played">Loading...</p>
+                        <p id="tournaments-Won" class="stat-value tournament-won">Loading...</p> <!-- Value will be replaced here -->
+                    </div>
                 </div>
-                </div>
-                <!-- Global Rank -->
+
+                 <!-- Tournaments played -->
                 <div class="stat-card" id="u3">
                     <div>
-                    <h3>Global rank</h3></div>
+                        <h3>Tournaments Played</h3>
+                    </div>
                     <div>
-                    <p id="global-rank">Loading...</p>
+                        <p id="Tournaments-played" class="stat-value tournament-played">Loading...</p> <!-- Value will be replaced here -->
+                    </div>
                 </div>
-                </div>
-                <!-- Win Percentage (Circular Chart) -->
-                <div class="stat-card" id="u4">
-                    <div>
-                    <h3>Games Played</h3></div>
-                    <div>
-                    <p id="winPercentageChart">Loading...</p>
-                </div>
-                </div>
-                <!-- Monthly Games Played (Bar Graph) -->
-                <div class="stat-card" id="u5">
-                    <div>
-                    <h3>Win Percentage</h3></div>
-                    <div>
-                    <p id="gamesPlayedChart">Loading...</p>
-                </div>
+                    <!--games played -->
+                    <div class="stat-card" id="u4">
+                        <div>
+                            <h3>Games played</h3>
+                        </div>
+                        <div>
+                            <p id="gamesPlayedChart" class="stat-value Games-played">Loading...</p>
+                        </div>
+                    </div>
+                    <!-- win percentage -->
+                     
+                    <div class="stat-card" id="u5">
+                        <div>
+                            <h3>Win Percentage</h3>
+                        </div>
+                        <div>
+                            <canvas id="winPercentageChartCanvas" width="150" height="150"></canvas>
+                            <p id="winPercentageValue" class="stat-value win-percentage">Loading...</p>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="/assets/dashboard.js"></script>
 </body>
-</html>
+
+

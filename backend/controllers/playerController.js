@@ -5,11 +5,10 @@ const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user;
+    const { _id } = req.user; // Assuming _id is player's ID
 
     try {
         const player = await Player.findOne({ _id });
@@ -22,13 +21,16 @@ exports.followOrganiser = async (req, res) => {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
+        // Check if player is already following this organiser
         if (player.following.includes(organiserId)) {
-            return res.status(400).json({ message: 'Player is already following this organiser' });
+            return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
+        // Add organiser to player's following list
         player.following.push(organiserId);
         await player.save();
 
+        // Add player to organiser's followers list
         organiser.followers.push(player._id);
         await organiser.save();
 
@@ -37,6 +39,7 @@ exports.followOrganiser = async (req, res) => {
         res.status(500).json({ error: 'Error following organiser' });
     }
 };
+
 
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
@@ -70,7 +73,6 @@ exports.unfollowOrganiser = async (req, res) => {
     }
 };
 
-
 // Func: Search tournaments by tid or name
 // searchController.js
 
@@ -95,12 +97,6 @@ exports.searchTournaments = async (req, res) => {
         res.status(500).json({ error: 'Error searching tournaments' });
     }
 };
-
-
-
-
-
-
 
 
 // Func: Join Tournament
@@ -239,6 +235,7 @@ exports.getTournamentsPlayed = async (req, res) => {
 };
 
 // Fetch number of tournaments won by the player
+// backend/controllers/playerController.js
 exports.getTournamentsWon = async (req, res) => {
     const { _id } = req.user;
 
@@ -277,5 +274,23 @@ exports.getPlayerRanking = async (req, res) => {
     }
 };
 
+exports.getFollowedOrganisers = async (req, res) => {
+    const { _id } = req.user;
+    try {
+        // Find the player by their ID
+        const player = await Player.findById(_id).populate('following');
 
+        console.log('Player ID from token:', _id);
 
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        const followingOrganisers = player.following;
+
+        res.status(200).json({ followingOrganisers });
+    } catch (error) {
+        console.error('Error fetching organisers followed:', error);
+        res.status(500).json({ error: 'Error fetching organisers followed' });
+    }
+};

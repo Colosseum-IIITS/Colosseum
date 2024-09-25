@@ -12,6 +12,7 @@ const organiserRoutes = require('./routes/organiserRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Import the tournament controller
 const playerController = require('./controllers/playerController');
@@ -43,12 +44,14 @@ app.get('/signup', (req, res) => {
     const role = req.query.role;
     res.render('signup', { role });
 });
+
+app.get('/admin', (req, res) => {
+    res.render('adminSignin');
+});
+
 app.get('/', (req, res) => {
   res.render('parallax');
 });
-// app.get('/homepage', (req, res) => {
-//   res.render('homepage', { role });
-// });
 
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication
@@ -58,6 +61,7 @@ app.use('/api/organiser', organiserRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
 app.use('/api', authRoutes); // This will expose the signin route as /api/player/signin
 
 
@@ -70,7 +74,7 @@ mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
-const PORT = process.env.PORT || 3000; // Use PORT from .env if available
+const PORT = process.env.PORT || 3010; 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

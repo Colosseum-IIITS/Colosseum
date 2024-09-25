@@ -1,7 +1,6 @@
-
 body {
    font-family: Arial, sans-serif;
-   background-color: #1f1f2e;
+   background-color: #010105;
    color: #fff;
    margin: 0;
    padding: 0;
@@ -114,62 +113,103 @@ grid-gap: 20px;
 }
 
 .stat-card {
-background-color: #292d42;
-padding: 20px;
-border-radius: 10px;
-text-align: center;
-margin-top: 50px;
-box-shadow: 0 0 70px rgba(0, 0, 0, 0.2);
-}
+   background-color: #292d42;
+   padding: 20px;
+   border-radius: 10px;
+   text-align: center;
+   margin-top: 25px;
+   box-shadow: 0 0 70px rgba(0, 0, 0, 0.2);
+ }
+ canvas {
+   margin-top: 50px;
+   width: 90% !important;
+   height: 250px !important;
+   }
 
 .stat-card.large-card {
 grid-column: span 2;
 }
-
 .stat-card h3 {
-margin-bottom: 10px;
-color: #9ba8fc;
-}
+   margin-bottom: 10px;
+   color: #9ba8fc;
+ }
 
-.stat-card p {
-font-size: 24px;
-}
-.stat-card .u1{
-height: 50%;
-width: 50%;
-}
+ .stat-value {
+   font-size: 40px; /* Larger size for better visibility */
+   color: #e5e5e5; /* Light color to contrast with the background */
+   font-weight: bold; /* Emphasize the digits */
+   letter-spacing: 2px; /* Spacing between digits */
+   margin-top: 25px;
+ }
+ 
+ .stat-card .Global-rank {
+   color: #53ff53; /* Green color for tournaments won */
+   font-size: 2.25rem;
+   font-weight: bold;
+   margin-top: 45px;
+ }
+ /* Specific styles for the "tournaments won" and "tournaments played" */
+ .stat-card .tournament-won {
+   color: #53ff53; /* Green color for tournaments won */
+   font-size: 2.25rem;
+ }
+ 
+ .stat-card .tournament-played {
+   color: #ff5353; /* Red color for tournaments played */
+   font-size: 2.25rem;
+ }
+
+ .stat-card .Games-played {
+   color: #53ff53; /* Green color for tournaments won */
+   font-size: 2.25rem;
+   font-weight: bold;
+   margin-top: 45px;
+ }
+
+ .stat-card .win-percentage {
+   color: #53ff53; /* Green color for tournaments won */
+   font-size: 2.25rem;
+   font-weight: bold;
+   margin-top: 45px;
+ }
+ 
+ 
+ /* Adding hover effect on the stat-value digits */
+ .stat-card .stat-value:hover {
+   transform: scale(1.1);
+   transition: transform 0.3s ease;
+ }
+
+
 #u1{
-height: 95%;
-width: 53%;
-margin-left: 59%;
+height: 80%;
+width: 98%;
+transform: translateX( 55% );
 }
 #u2{
-height: 95%;
-width: 53%;
-margin-left: 22%;
+height: 80%;
+width: 40%;
+margin-left: 64%;
 }
 #u3{
-height: 95%;
-width: 90%;
-transform: translateX(-15%);
+   height: 80%;
+width: 40%;
+margin-left: 11%;
 }
 #u4{
-height: 95%;
-width: 120%;
+height: 80%;
+width: 98%;
 margin-left: 59%;
-margin-top: 20%;
+margin-top: 5%;
 }
 #u5{
-height: 95%;
-width: 90%;
-margin-left: 90%;
-margin-top: 20%;
+height: 80%;
+width: 91%;
+margin-left: 64%;
+margin-top: 5%;
 }
 
-canvas {
-max-width: 100%;
-height: auto;
-}
+
 .Player{
 font-family: 'Press Start 2P', cursive; /* Fallback to cursive if the font fails to load */
 font-size: 20px;
@@ -199,11 +239,11 @@ align-items: center; /* Vertically center items */
 background-color: #292d42; /* Background color for the box */
 padding: 40px; /* Space inside the box */
 border-radius: 10px; /* Rounded corners */
-box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+box-shadow: 0 0 90px rgba(0, 0, 0, 0.2); /* Shadow for depth */
 margin-left: 250px; /* Space from the left */
-margin-top: 40px; /* Space from the top */
-height: 300px;
-width: 70%;
+margin-top: 60px; /* Space from the top */
+
+width: 62%;
 }
 
 .profile-circle {

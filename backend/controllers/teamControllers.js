@@ -86,29 +86,30 @@ exports.leaveTeam = async (req, res) => {
   }
 };
 
-
-
 // search a Team by name
 exports.getTeamsByName = async (req, res) => {
-  const { searchTerm } = req.query;  // Search term will be passed as a query parameter
+  const { searchTerm } = req.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ message: 'Search term is required' });
+  }
 
   try {
-      // Perform a case-insensitive search on team names
-      const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
-          .populate('players')  // Populate player details
-          .populate('captain');  // Populate captain details
+    const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
+      .populate('players')
+      .populate('captain');
 
-      // Check if any teams are found
-      if (!teams.length) {
-          return res.status(404).json({ message: 'No teams found' });
-      }
+    if (!teams.length) {
+      return res.status(404).json({ message: 'No teams found' });
+    }
 
-      res.status(200).json({ teams });
+    res.status(200).json({ teams });
   } catch (error) {
-      console.error('Error fetching teams:', error);
-      res.status(500).json({ error: 'Error fetching teams', details: error.message });
+    console.error('Error fetching teams:', error);
+    res.status(500).json({ error: 'Error fetching teams', details: error.message });
   }
 };
+
 
 
 // Update team name (only by captain)
@@ -117,20 +118,28 @@ exports.updateTeamName = async (req, res) => {
   const { _id: captainId } = req.user;  // Extract captainId from JWT token
 
   try {
+    // Fetch the team by teamId
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    if (team.captain.toString() !== captainId) {
+    // Debugging: log captainId and team.captain for comparison
+    console.log('Captain ID from token:', captainId.toString());
+    console.log('Team Captain ID from DB:', team.captain.toString());
+
+    // Check if the current user is the captain of the team
+    if (team.captain.toString() !== captainId.toString()) {
       return res.status(403).json({ message: 'Only the captain can update the team name' });
     }
 
+    // Check if a team with the new name already exists
     const existingTeam = await Team.findOne({ name: newName });
     if (existingTeam) {
       return res.status(400).json({ message: 'Team name already exists' });
     }
 
+    // Update the team name
     team.name = newName;
     await team.save();
 
@@ -140,5 +149,6 @@ exports.updateTeamName = async (req, res) => {
     res.status(500).json({ error: 'Error updating team name', details: error.message });
   }
 };
+
 
 

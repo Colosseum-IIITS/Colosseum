@@ -12,7 +12,7 @@ exports.createPlayer = async (req, res) => {
     console.log('Request Body:', req.body); // Log the request body
 
     if (!username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
+        return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Invalid Details'});
     }
 
     try {
@@ -20,12 +20,12 @@ exports.createPlayer = async (req, res) => {
 
         let existingPlayer = await Player.findOne({ email });
         if (existingPlayer) {
-            return res.status(400).json({ message: 'Email already exists' });
+            return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Email already taken!!'});
         }
 
         existingPlayer = await Player.findOne({ username });
         if (existingPlayer) {
-            return res.status(400).json({ message: 'Username already exists' });
+            return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Username already Exists!!'});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,23 +48,27 @@ exports.createPlayer = async (req, res) => {
         // Instead of returning JSON, redirect to the signin page
         res.redirect('/signin?role=player'); // Redirect to /signin
     } catch (error) {
-        console.error('Error during player creation:', error);
-        res.status(500).json({ error: 'Error creating player', details: error.message });
+        console.error('Error during player creation:', error, error.message);
+        res.status(500).render( 'error' , {statusCode:'400' ,errorMessage: 'Internal Server Error!!'});
     }
 };
-
 
 exports.loginPlayer = async (req, res) => {
     const { username, password } = req.body;
     try {
         const player = await Player.findOne({ username });
         if (!player) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Player not found'});
         }
 
         const isPasswordValid = await bcrypt.compare(password, player.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
+        }
+
+        const banStatus = player.banned;
+        if(banStatus) {
+            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You are Banned'});
         }
 
         const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
@@ -72,28 +76,27 @@ exports.loginPlayer = async (req, res) => {
         res.redirect('homepage');
     } catch (error) {
         console.error('Error during player login:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).render( 'error' , {statusCode:'500' ,errorMessage:'Internal server error'});
     }
 };
-
 
 // Create a new organizer          
 exports.createOrganiser = async (req, res) => {
     console.log('Organiser signup request:', req.body);
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
+        return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Invalid Details'});
     }
 
     try {
         let existingOrg = await Organiser.findOne({ email });
         if (existingOrg) {
-            return res.status(400).json({ message: 'Email already exists' });
+            return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Email already taken!!'});
         }
 
         existingOrg = await Organiser.findOne({ username });
         if (existingOrg) {
-            return res.status(400).json({ message: 'Username already exists' });
+            return res.status(400).render( 'error' , {statusCode:'400' ,errorMessage:'Username already Exists!!'});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -116,7 +119,7 @@ exports.createOrganiser = async (req, res) => {
         res.redirect('/signin?role=organiser');
     } catch (error) {
         console.error('Error during organiser creation:', error);
-        res.status(500).json({ error: 'Error creating organiser', details: error.message });
+        res.status(500).render( 'error' , {statusCode:'400' ,errorMessage: 'Internal Server Error!!'});
     }
 };
 
@@ -130,14 +133,19 @@ exports.loginOrganiser = async (req, res) => {
 
         if (!organiser) {
             console.log('Organiser not found');
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Organiser not found'});
         }
 
         const isPasswordValid = await bcrypt.compare(password, organiser.password);
         console.log('Password valid:', isPasswordValid);
 
+        const banStatus = organiser.banned;
+        if(banStatus) {
+            return res.status(308).render( 'error' , {statusCode:'308' ,errorMessage:'Ohh!!, You are Banned'});
+        }
+
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
         }
 
         const token = jwt.sign({ id: organiser._id }, process.env.JWT_SECRET_KEY, {
@@ -153,8 +161,27 @@ exports.loginOrganiser = async (req, res) => {
         res.status(200).json({ message: 'Login successful', organiser });
     } catch (error) {
         console.error('Error during organiser login:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).render( 'error' , {statusCode:'500' ,errorMessage:'Internal server error'});
     }
 };
 
+exports.loginAdmin = async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const admin = await Admin.findOne({ username });
+        if (!admin) {
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
+        }
 
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+        if (!isPasswordValid) {
+            return res.status(401).render( 'error' , {statusCode:'401' ,errorMessage:'Invalid username or password'});
+        }
+
+        res.redirect('/admin/dashboard');
+
+    } catch (error) {
+        console.error('Error during admin login:', error);
+        return res.status(500).render( 'error' , {statusCode:'500' ,errorMessage:'Internal server error'});
+    }
+};

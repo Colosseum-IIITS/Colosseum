@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
-    color: #00ff00; /* Bright green text for gamer aesthetic */
+    color: #fbfbfc; /* Bright green text for gamer aesthetic */
     background-color: #121212; /* Dark background */
     overflow: hidden; /* Prevent scrolling due to circles */
     position: relative;
@@ -11,22 +11,48 @@ body {
 h1 {
     text-align: center;
     margin-top: 20px;
-    font-size: 2.5em;
+    font-size: 2.0em;
+    font-family: 'Press Start 2P', cursive; /* Gaming font for heading */
 }
 
 form {
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black for form */
-    border-radius: 10px;
-    padding: 20px;
+    background-color: #292d42; /* Darker background for form */
+    border-radius: 20px; /* Base border radius for smooth edges */
+    padding: 40px; /* Increased padding for spacing */
     margin: 20px auto;
-    width: 300px; /* Fixed width for the form */
-    box-shadow: 0 4px 20px rgba(0, 255, 0, 0.5); /* Green shadow */
+    margin-top: 8%;
+    width: 340px; /* Increased width */
+    height: 300px; /* Increased height */
+    position: relative;
+    clip-path: polygon(
+        0% 0%,        /* Top left corner */
+        76% 0%,       /* Top edge slanted */
+        84% 8%,       /* Top right small cut */
+        100% 8%,       /* Sharp indent */
+        100% 10%,     /* Right edge cut */
+        100% 88%,     /* Bottom right main edge */
+        74% 88%,     /* Bottom right diagonal cut */
+        33% 88%,      /* Bottom right extended cut */
+        21% 100%,     /* Bottom left diagonal */
+        0% 100%,       /* Bottom left smaller cut */
+        0% 75%        /* Left side slanted */
+    ); /* More complex polygon for multiple edge cuts */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* Box shadow for depth */
+
+    /* Center content */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+
 label {
-    display: block;
-    margin: 15px 0;
-    font-size: 1.2em; /* Increase font size for labels */
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    color: #fff; /* White text for labels */
 }
 
 input[type="checkbox"] {
@@ -39,14 +65,16 @@ button {
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
-    font-size: 1em;
+    font-size: 1.2em;
     cursor: pointer;
-    transition: background-color 0.3s; /* Smooth transition */
+    transition: background-color 0.3s;
+    margin-top: 20px;
 }
 
 button:hover {
     background-color: #1aff1a; /* Lighter green on hover */
 }
+
 
 a {
     display: block;

@@ -76,6 +76,34 @@ exports.createTournament = async (req, res) => {
 };
 
 
+exports.didPlayerJoin = async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+    const playerId = req.user._id;
+
+    // Check if the tournament exists
+    const tournament = await Tournament.findById(tournamentId).populate('teams');
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    // Find the player's team in the tournament
+    const playerInTournament = await Player.findById(playerId)
+      .populate({
+        path: 'team',
+        match: { _id: { $in: tournament.teams } } // Check if player's team is part of the tournament
+      });
+
+    if (playerInTournament.team) {
+      return res.status(200).json({ message: 'Player is in the tournament', joined: true });
+    } else {
+      return res.status(200).json({ message: 'Player is not in the tournament', joined: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 //added new EditTournamentFucntion, similar to this
 // Update an existing tournament
 exports.updateTournament = async (req, res) => {
@@ -223,6 +251,7 @@ exports.getEnrolledTournaments = async (req, res) => {
   }
 };
 
+
 exports.getTournamentById = async (req, res) => {
   try {
     const tournament = await Tournament.findOne({ tid: req.params.tournamentId })
@@ -232,9 +261,31 @@ exports.getTournamentById = async (req, res) => {
     if (!tournament) {
       return res.status(404).send('Tournament not found');
     }
+
     console.log(req.user.role);
-    // Pass the tournament and user role to the view
-    res.render('tournamentDetails', { tournament, userRole: req.user.role , username :req.user.username });
+
+    // Check if the current user is a player and has joined the tournament
+    let isPlayerInTournament = false;
+
+    if (req.user.role === 'player') {
+      const player = await Player.findById(req.user._id).populate({
+        path: 'team',
+        match: { _id: { $in: tournament.teams } } // Check if player's team is part of the tournament
+      });
+
+      // If the player has a team and that team is part of the tournament, set the flag
+      if (player && player.team) {
+        isPlayerInTournament = true;
+      }
+    }
+
+    // Pass the tournament, user role, username, and isPlayerInTournament flag to the view
+    res.render('tournamentDetails', { 
+      tournament, 
+      userRole: req.user.role, 
+      username: req.user.username, 
+      isPlayerInTournament 
+    });
 
   } catch (error) {
     console.error('Error fetching tournament:', error);
@@ -294,7 +345,7 @@ exports.editTournament = async (req, res) => {
 };
 
 exports.joinTournament = async (req, res) => {
-    const { tournamentId } = req.body;
+    const { tournamentId } = req.params;
     const { _id } = req.user;
 
     try {
@@ -307,7 +358,7 @@ exports.joinTournament = async (req, res) => {
             return res.status(400).json({ message: 'Player must be part of a team' });
         }
 
-        const tournament = await Tournament.findById(tournamentId);
+        const tournament = await Tournament.findOne({tid:tournamentId});
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
         }
@@ -332,4 +383,41 @@ exports.joinTournament = async (req, res) => {
     }
 };
 
+exports.leaveTournament = async (req, res) => {
+  try {
+    const tournamentId = req.params.tournamentId;
+    const playerId = req.user._id; // Assuming user is logged in and their ID is in req.user
 
+    // Fetch the tournament
+    const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
+
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    // Check if the player is part of any team in the tournament
+    const team = tournament.teams.find(team => team.players.includes(playerId));
+
+    if (!team) {
+      return res.status(400).json({ message: 'Player is not part of any team in this tournament' });
+    }
+
+    // Check if the player is the team captain
+    if (team.captain.toString() !== playerId.toString()) {
+      return res.status(403).json({
+        message: 'Only the team captain can leave the tournament. Please contact your team captain.'
+      });
+    }
+
+    // Remove the team from the tournament
+    tournament.teams = tournament.teams.filter(t => t._id.toString() !== team._id.toString());
+
+    await tournament.save();
+
+    res.status(200).json({ message: 'You have successfully left the tournament' });
+
+  } catch (error) {
+    console.error('Error while leaving tournament:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};

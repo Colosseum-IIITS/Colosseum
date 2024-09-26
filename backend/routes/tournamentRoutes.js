@@ -13,6 +13,7 @@ router.post('/join/:tournamentId',authenticateToken,tournamentController.joinTou
 router.post('/leave/:tournamentId',authenticateToken,tournamentController.leaveTournament);
 // Route to update an existing tournament
 router.post('/update/:tournamentId', tournamentController.updateTournament);
+router.post('/updatePointsTable',tournamentController.updateTournament);
 
 // Route to update the winner by the Organiser of the tournamne
 router.put('/updateWinner', tournamentController.updateWinner);

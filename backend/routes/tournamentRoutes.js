@@ -10,6 +10,7 @@ router.get('/:tournamentId', authenticateUser, tournamentController.getTournamen
 
 router.get('/edit/:tournamentId', authenticateOrganiser, tournamentController.getTournamentEditPage );
 router.post('/join/:tournamentId',authenticateToken,tournamentController.joinTournament);
+router.post('/leave/:tournamentId',authenticateToken,tournamentController.leaveTournament);
 // Route to update an existing tournament
 router.post('/update/:tournamentId', tournamentController.updateTournament);
 

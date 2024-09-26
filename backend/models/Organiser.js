@@ -16,6 +16,7 @@ const toSchema = new mongoose.Schema(
     visibilitySettings: {
       descriptionVisible: { type: Boolean, default: true },
       profilePhotoVisible: { type: Boolean, default: true },
+      prizePoolVisible: { type: Boolean, default: true },
       tournamentsVisible: { type: Boolean, default: true },
       followersVisible: { type: Boolean, default: true },
     },

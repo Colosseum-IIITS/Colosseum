@@ -6,43 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Details</title>
 
-<style>
-    /* Add these styles */
-    .status-box {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 5px;
-        color: white;
-        font-weight: bold;
-    }
+    <style>
+        .status-box {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
 
-    .status-box.approved {
-        background-color: green;
-    }
+        .status-box.approved {
+            background-color: green;
+        }
 
-    .status-box.pending {
-        background-color: yellow;
-        color: black; /* Ensure text is readable against yellow background */
-    }
+        .status-box.pending {
+            background-color: yellow;
+            color: black;
+        }
 
-    .status-box.completed {
-        background-color: red;
-    }
-</style>
+        .status-box.completed {
+            background-color: red;
+        }
+    </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Tournament Details</h1>
 
-        <!-- Role-based greeting -->
+        <!-- Role-based greeting and action buttons -->
         <% if (userRole === 'player') { %>
             <div class="alert alert-info">
                 <p class="mb-0">Hi player!</p>
-                <!-- Join Tournament button for players -->
-                <form action="/api/tournament/join/<%= tournament.tid %>" method="POST">
-                    <button type="submit" class="btn btn-primary mt-2">Join Tournament</button>
-                </form>
+
+                <!-- Conditional Button Rendering -->
+                <% if (isPlayerInTournament) { %>
+                    <!-- Leave Tournament button if the player is in the tournament -->
+                    <form action="/api/tournament/leave/<%= tournament.tid %>" method="POST">
+                        <button type="submit" class="btn btn-danger mt-2">Leave Tournament</button>
+                    </form>
+                <% } else { %>
+                    <!-- Join Tournament button if the player is not in the tournament -->
+                    <form action="/api/tournament/join/<%= tournament.tid %>" method="POST">
+                        <button type="submit" class="btn btn-primary mt-2">Join Tournament</button>
+                    </form>
+                <% } %>
             </div>
         <% } else if (userRole === 'organiser') { %>
             <div class="alert alert-success">
@@ -59,26 +67,27 @@
             </div>
         <% } %>
 
-        
-<div class="tournament-details mb-4 p-3 border rounded bg-light">
-    <h2 class="mt-3"><%= tournament.name %></h2>
-    <p><strong>ID:</strong> <%= tournament.tid %></p>
-    <p><strong>Start Date:</strong> <%= tournament.startDate.toDateString() %></p>
-    <p><strong>End Date:</strong> <%= tournament.endDate.toDateString() %></p>
-    <p><strong>Entry Fee:</strong> $<%= tournament.entryFee %></p>
-    <p><strong>Prize Pool:</strong> $<%= tournament.prizePool %></p>
-    <!-- Status Box -->
-    <p>
-        <strong>Status:</strong> 
-        <div class="status-box <%= tournament.status.toLowerCase() %>">
-            <%= tournament.status %>
+        <!-- Tournament Details -->
+        <div class="tournament-details mb-4 p-3 border rounded bg-light">
+            <h2 class="mt-3"><%= tournament.name %></h2>
+            <p><strong>ID:</strong> <%= tournament.tid %></p>
+            <p><strong>Start Date:</strong> <%= tournament.startDate.toDateString() %></p>
+            <p><strong>End Date:</strong> <%= tournament.endDate.toDateString() %></p>
+            <p><strong>Entry Fee:</strong> $<%= tournament.entryFee %></p>
+            <p><strong>Prize Pool:</strong> $<%= tournament.prizePool %></p>
+            <!-- Status Box -->
+            <p>
+                <strong>Status:</strong> 
+                <div class="status-box <%= tournament.status.toLowerCase() %>">
+                    <%= tournament.status %>
+                </div>
+            </p>
+            <p><strong>Organiser:</strong> <%= tournament.organiser.username %></p>
+            <p><strong>Description:</strong> <%= tournament.description %></p>
+            <p><strong>Winner:</strong> <%= tournament.winner %></p>
         </div>
-    </p>
-    <p><strong>Organiser:</strong> <%= tournament.organiser.username %></p>
-    <p><strong>Description:</strong> <%= tournament.description %></p>
-    <p><strong>Winner:</strong> <%= tournament.winner %></p>
-</div>
         
+        <!-- Teams Section -->
         <h3>Teams</h3>
         <ul class="list-group mb-4">
             <% tournament.teams.forEach(function(team) { %>
@@ -86,6 +95,7 @@
             <% }); %>
         </ul>
 
+        <!-- Points Table Section -->
         <h3>Points Table</h3>
         <table class="table table-striped">
             <thead class="thead-dark">
@@ -106,6 +116,7 @@
             </tbody>
         </table>
 
+        <!-- Back to Dashboard Button -->
         <a href="/api/<%= userRole %>/<%= username %>/dashboard" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 

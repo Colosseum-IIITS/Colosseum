@@ -28,15 +28,21 @@
             <div id="joined-tournaments">
                 <% if (joinedTournaments.length > 0) { %>
                     <h3>Your Joined Tournaments:</h3>
-                    <ul>
+                    <div class="tournament-list">
                         <% joinedTournaments.forEach(tournament => { %>
-                            <li>Tournament ID: <%= tournament._id.toString() %></li>
+                            <div class="tournament-item" onclick="window.location.href='/tournament/<%= tournament._id.toString() %>'">
+                                <h4><%= tournament.name %></h4> <!-- Tournament Name -->
+                                <p>Description: <%= tournament.description %></p> <!-- Tournament Description -->
+                                <p>Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
+                            </div>
                         <% }); %>
-                    </ul>
+                    </div>
                 <% } else { %>
                     <p>You have not joined any tournaments.</p>
                 <% } %>
             </div>
+        </div>
+        
                     
                     <script>
                         // Optionally, you can show this section after a successful join

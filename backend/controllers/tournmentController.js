@@ -7,7 +7,7 @@ const Organiser = require("../models/Organiser");
 // Create a new tournament
 exports.createTournamentForm=async(req,res)=>{
     res.render('createTournament',{organiser:req.user});
-}
+};
 //working
 
 exports.createTournament = async (req, res) => {
@@ -32,6 +32,11 @@ exports.createTournament = async (req, res) => {
     if (existingTournament) {
       return res.status(400).json({ message: "Tournament ID already exists" });
     }
+
+    if (new Date(startDate) >= new Date(endDate)) {
+      return res.status(400).json({ message: "Start date must be earlier than end date" });
+  }
+  
 
     // Create a new tournament
     const tournament = new Tournament({

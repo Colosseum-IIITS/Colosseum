@@ -67,8 +67,9 @@ app.get('/', (req, res) => {
     console.log(req.user); // Check what is being passed
     res.render('profile', { user: req.user || null });
 });
+app.get('/homepage', playerController.getHomePage);
 
-    
+
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication
 app.use('/api/player', playerRoutes);

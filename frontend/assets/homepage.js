@@ -1,77 +1,35 @@
-async function handleSearch(event) {
-    event.preventDefault(); // Prevent the form from submitting
-
-    const searchInput = document.getElementById('search-input').value.trim(); // Get the input value
-
-    // Check if input is empty or just whitespace
-    if (!searchInput) {
+function preprocessSearchInput() {
+    const searchInput = document.getElementById('search-input');
+    const inputValue = searchInput.value.trim(); // Get the input value
+    
+    // Check if input is empty
+    if (!inputValue) {
         alert("Please enter a search term.");
-        return;
+        return false; // Prevent form submission
     }
 
-    // Reset results visibility
-    document.getElementById('tournament-results').style.display = 'none';
-    document.getElementById('team-results').style.display = 'none';
-   
-
-    // Disable the search button to prevent multiple submissions
-    const searchButton = event.target.querySelector('button[type="submit"]');
-    searchButton.disabled = true;
-
-    try {
-        // Determine the type of search based on the first character
-        if (searchInput.startsWith('?')) {
-            const searchTerm = searchInput.slice(1); // Remove '?' for tournament search
-            await searchTournaments(searchTerm);
-        } else if (searchInput.startsWith('>')) {
-            const searchTerm = searchInput.slice(1); // Remove '>' for team search
-            await searchTeams(searchTerm);
-        } else {
-            alert("Invalid search format. Use '?' for tournaments and '>' for teams.");
-        }
-    } catch (error) {
-        console.error('Error during search:', error);
-        alert('An error occurred while searching. Please try again.');
-    } finally {
-        // Re-enable the search button after operations complete
-        searchButton.disabled = false;
+    // Determine the type of search based on the first character
+    if (inputValue.startsWith('?')) {
+        // Remove '?' for tournament search
+        searchInput.value = inputValue.slice(1); // Set the cleaned value back to input
+        document.querySelector('.search-form').action = '/api/player/searchTournaments'; // Set action for tournament search
+    } else if (inputValue.startsWith('>')) {
+        // Remove '>' for team search
+        searchInput.value = inputValue.slice(1); // Set the cleaned value back to input
+        document.querySelector('.search-form').action = '/api/player/teamName'; // Set action for team search
+    } else {
+        alert("Invalid search format. Use '?' for tournaments and '>' for teams.");
+        return false; // Prevent form submission
     }
+
+    return true; // Allow form submission
 }
-
-async function searchTournaments(searchTerm) {
-    try {
-        const response = await fetch(`/api/player/searchTournaments?searchTerm=${encodeURIComponent(searchTerm)}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure token is valid
-            }
-        });
-        
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
-        }
-
-        const result = await response.json();
-        
-        // Debugging: Log the result to check its structure
-        console.log('Search Tournaments Result:', result);
-
-        // Directly display the result as it's already filtered by the backend
-        displayTournamentResults(result);
-    } catch (error) {
-        console.error('Error searching for tournaments:', error);
-        document.getElementById('tournament-results').innerText = 'An error occurred while searching for tournaments.';
-    }
-}
-
 
 function displayTournamentResults(tournaments) {
     const resultsContainer = document.getElementById('tournament-results');
     resultsContainer.style.display = 'block';
     resultsContainer.innerHTML = '';
 
-    // Defensive coding to handle undefined or null values
     if (!Array.isArray(tournaments) || tournaments.length === 0) {
         resultsContainer.innerText = 'No tournaments found.';
         return;
@@ -80,8 +38,12 @@ function displayTournamentResults(tournaments) {
     tournaments.forEach(tournament => {
         const tournamentDiv = document.createElement('div');
         tournamentDiv.classList.add('tournament-item');
+
+        // Add more details or functionality if needed
         tournamentDiv.innerHTML = `
             <h3>${tournament.name}</h3>
+            <p>Organizer: ${tournament.organizer.name}</p>
+            <p>Teams Participating: ${tournament.teams.length}</p>
             <button onclick="joinTournament('${tournament._id}')">Join Tournament</button>
         `;
         resultsContainer.appendChild(tournamentDiv);
@@ -89,27 +51,6 @@ function displayTournamentResults(tournaments) {
 }
 
 
-async function searchTeams(searchTerm) {
-    try {
-        const response = await fetch(`/api/player/searchTeam?searchTerm=${encodeURIComponent(searchTerm)}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure token is valid
-            }
-        });
-
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
-        }
-
-        const result = await response.json();
-        displayTeamResults(result.teams);
-    } catch (error) {
-        console.error('Error searching for teams:', error);
-        document.getElementById('team-results').innerText = 'An error occurred while searching for teams.';
-    }
-}
 
 function displayTeamResults(teams) {
     const resultsContainer = document.getElementById('team-results');
@@ -271,6 +212,8 @@ function displayEnrolledTournaments(tournaments, message) {
     });
 }
 
+
+
 window.onload = () => {
     fetchEnrolledTeams();
     fetchEnrolledTournaments();
@@ -313,33 +256,7 @@ async function handleOrganizerSearch(event) {
 }
 
 // Example function to search for organizers (you might already have this defined)
-async function searchOrganisers(searchTerm) {
-    try {
-        const response = await fetch(`/api/player/searchOrganisers?searchTerm=${encodeURIComponent(searchTerm)}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure token is valid
-            }
-        });
 
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
-        }
-
-        const result = await response.json();
-        console.log('Search Organisers Result:', result);
-
-        // Check if the result is an array and pass it to the display function
-        const organisers = Array.isArray(result.organiser) ? result.organiser : [result.organiser];
-        displayOrganiserResults(organisers);
-    } catch (error) {
-        console.error('Error searching for organisers:', error);
-        const resultsContainer = document.getElementById('organization-results');
-        resultsContainer.style.display = 'block'; // Ensure the container is visible
-        resultsContainer.innerText = 'An error occurred while searching for organisers.';
-    }
-}
 
 // Function to display organizer search results (if you haven't defined it yet)
 function displayOrganiserResults(organisers) {

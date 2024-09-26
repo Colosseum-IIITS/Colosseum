@@ -1,10 +1,9 @@
 const Tournament = require('../models/Tournament');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');
-const Team = require('../models/Team');
+const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
@@ -79,82 +78,86 @@ exports.unfollowOrganiser = async (req, res) => {
 
 exports.searchTournaments = async (req, res) => {
     try {
-        const { searchTerm } = req.query;
+        const { searchTerm } = req.query || '';
         console.log('Search Term:', searchTerm); // Debugging line
 
-        // Query to find tournaments that are approved (status: "Approved")
-        const tournaments = await Tournament.find({
-            status: "Approved", // Only include tournaments with status "Approved"
-            $or: [
-                { tid: new RegExp(searchTerm, 'i') }, // Search by tournament ID (tid)
-                { name: new RegExp(searchTerm, 'i') } // Search by tournament name
-            ]
+        let tournaments = [];
+
+        if (searchTerm) {
+            // Perform search only if a searchTerm is provided
+            tournaments = await Tournament.find({
+                $or: [
+                    { tid: new RegExp(searchTerm, 'i') },
+                    { name: new RegExp(searchTerm, 'i') }
+                ]
+            });
+        }
+
+        console.log('Tournaments Found:', tournaments); // Debugging line
+
+        // Render the search results page
+        res.render('searchResults', {
+            results: tournaments, // Pass the found tournaments
+            searchTerm: searchTerm || '', // Pass the search term to the template
         });
-
-        console.log('Approved Tournaments Found:', tournaments); // Debugging line
-
-        // Return a 200 status with the found tournaments
-        res.status(200).json(tournaments);
     } catch (error) {
         console.error('Error searching tournaments:', error); // Log the error
-        res.status(500).json({ error: 'Error searching tournaments' });
+        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error searching tournaments' });
     }
 };
 
+
+
+
+
+// Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
-    const { _id } = req.user;
+    const { _id } = req.user;  // Assuming req.user contains logged-in user info
 
     try {
         const player = await Player.findOne({ _id }).populate('team');
         if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
+            return res.status(404).render('error', {statusCode: '404', message: 'Player not found' });
         }
 
         if (!player.team) {
-            return res.status(400).json({ message: 'Player must be part of a team' });
+            return res.status(400).render('error', {statusCode: '400', message: 'Player must be part of a team' });
         }
 
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
-            return res.status(404).json({ message: 'Tournament not found' });
+            return res.status(404).render('error', { statusCode: '404', message: 'Tournament not found' });
         }
 
-        // if(tournament.organiser.bannedTeams.includes(player.team._id)) {
-        //     return res.status(400).json({ message: 'Your team is banned' });
-        // }
+        // Debugging: Log the tournament object
+        console.log("Tournament details:", tournament);
 
+        // Check if the team is already registered
         if (tournament.teams.includes(player.team._id)) {
-            return res.status(400).json({ message: 'Team is already registered for this tournament' });
+            return res.status(400).render('error', { statusCode: '400' ,errorMessage: 'Team is already registered for this tournament' });
         }
+        
 
-        // Fetch the team object using the team ID
-        const team = await Team.findById(player.team._id);
-        if (!team) {
-            return res.status(404).json({ message: 'Team not found' });
-        }
-
-        // Create points table entry for the team
-        const pointsEntry = {
-            ranking: 0, // You can set initial ranking as needed
-            teamName: team.name,
-            totalPoints: 0 // Initialize total points as needed
-        };
-
-        // Update tournament teams and points table
+        // Add the team to the tournament
         tournament.teams.push(player.team._id);
-        tournament.pointsTable.push(pointsEntry);
         await tournament.save();
 
+        // Add the tournament to the player's list of joined tournaments
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
 
-        return res.status(200).json({ message: 'Successfully joined the tournament' });
+        // Fetch the updated list of tournaments the player has joined
+        const joinedTournaments = await Tournament.find({ teams: player.team._id });
+
+        // Render the homepage and pass the joined tournaments to be displayed
+        return res.render('homepage', { joinedTournaments });
     } catch (error) {
         console.error("Error joining tournament:", error);
-        return res.status(500).json({ message: 'Server error', error });
+        return res.status(500).render('error', { statusCode: '500', errorMessage: 'Server error', error });
     }
 };
+
 
 
 // Update username
@@ -240,7 +243,6 @@ exports.updateEmail = async (req, res) => {
 };
 
 
-
 exports.updateProfile = async (req, res) => {
     const { username, email, currentPassword, newPassword } = req.body;
     console.log("rithvik hot" ,req.body);
@@ -291,31 +293,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 
-exports.getEnrolledTournaments = async (req, res) => {
-    const { _id } = req.user;
 
-    try {
-        const player = await Player.findById({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        // Fetch the tournament details for enrolled tournaments with status 'Approved'
-        const tournaments = await Tournament.find({
-            _id: { $in: player.tournaments.map(t => t.tournament) }, // Assuming 'tournaments' array holds tournament IDs
-            status: 'Approved'
-        });
-
-        return res.status(200).json({ enrolledTournaments: tournaments });
-    } catch (error) {
-        console.error("Error retrieving enrolled tournaments:", error);
-        return res.status(500).json({ message: 'Server error', error });
-    }
-};
-
-exports.getEnrolledTeams = async (req, res) => {
-    const { _id } = req.user;
-}
 
 
 // Fetch number of tournaments played by the player
@@ -400,9 +378,76 @@ exports.getFollowedOrganisers = async (req, res) => {
 };
 
 
+// Example route for search results rendering the homepage
 exports.getHomePage = async (req, res) => {
-    res.status(200).render('homepage'); 
+    try {
+        // Fetch all tournaments, players, and organisers
+        const tournaments = await Tournament.find().catch(err => {
+            console.error('Error fetching tournaments:', err);
+            return [];
+        });
+
+        const players = await Player.find().catch(err => {
+            console.error('Error fetching players:', err);
+            return [];
+        });
+
+        const organisers = await Organiser.find().catch(err => {
+            console.error('Error fetching organisers:', err);
+            return [];
+        });
+
+        let followedOrganisers = [];
+        let joinedTournaments = [];
+
+        // Check if the user is logged in and is a player
+        if (req.user && req.user._id) {
+            const { _id } = req.user;
+
+            const player = await Player.findById(_id)
+                .populate({
+                    path: 'following',
+                    model: 'Organiser',
+                    populate: {
+                        path: 'tournaments',
+                        model: 'Tournament'
+                    }
+                })
+                .populate({
+                    path: 'tournaments.tournament',
+                    model: 'Tournament' // Assuming you store tournament references here
+                })
+                .catch(err => {
+                    console.error('Error fetching player data:', err);
+                    return null;
+                });
+
+            if (player) {
+                followedOrganisers = player.following || [];
+                joinedTournaments = player.tournaments.map(t => t.tournament) || []; // Get the tournaments the player has joined
+            }
+        }
+
+        // Render the homepage and pass necessary data
+        res.render('homepage', {
+            results: tournaments || [], // List of tournaments
+            players: players || [], // List of players
+            searchTerm: '', // Empty as it's the default homepage
+            organisers: organisers || [], // List of organisers
+            followedOrganisers, // Organisers followed by the player
+            organisationResults: [], // Initialize this as an empty array
+            joinedTournaments // Pass the joined tournaments to the view
+        });
+    } catch (error) {
+        console.error('Error in getHomePage:', error);
+        res.status(500).render('error', {
+            statusCode: '500',
+            errorMessage: 'Error fetching data for the homepage'
+        });
+    }
 };
+
+
 
 
 exports.getTournamentPointsTable = async (req, res) => {

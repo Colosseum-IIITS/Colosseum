@@ -39,7 +39,7 @@ exports.deleteTournament = async (req, res) => {
 };
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
-  const { searchTerm } = req.query; 
+  const { searchTerm } = req.query;
 
   try {
       const organisers = await Organiser.find({ username: { $regex: new RegExp(searchTerm, 'i') } })

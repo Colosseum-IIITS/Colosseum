@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/assets/colosseumLogo.png" type="image/x-icon">
     <title>Tournament</title>
-    <link rel="stylesheet" href="/styles.css"> <!-- Optional: Link to your CSS -->
+    <link rel="stylesheet" href="/assets/css/pointsTable.css"> <!-- Optional: Link to your CSS -->
 </head>
 <body>
+    <h1><%= tournamentName %></h1> <!-- Display the tournament name -->
     <div class="PointsTable">
         <div class="header">
             <p>Position</p>
             <p>Team</p>
             <p>Total Points</p>
         </div>
+    
         <div class="data">
-            <% if (pointsTable.length > 0) { %>
+            <% if (pointsTable && pointsTable.length > 0) { %> <!-- Added a null check for pointsTable -->
                 <% pointsTable.forEach(entry => { %>
                     <div class="row">
                         <p><%= entry.ranking %></p>
@@ -28,5 +30,6 @@
             <% } %>
         </div>
     </div>
+    
 </body>
 </html>

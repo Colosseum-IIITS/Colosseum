@@ -176,36 +176,40 @@ exports.updateWinner = async (req, res) => {
 };
 
 // Button per team
+
 exports.updatePointsTable = async (req, res) => {
-  const { tournamentId, teamName, additionalPoints } = req.body;
-  const organiserId = req.user._id; // Extracted from JWT token
+  const organiserId = req.user._id;
+  const { tournamentId, teamName, additionalPoints } = req.body; // Extract relevant data
 
   try {
-      const tournament = await Tournament.findById(tournamentId);
-      if (!tournament) {
-          return res.status(404).json({ message: 'Tournament not found' });
-      }
+    // Find the tournament by ID
+    const tournament = await Tournament.findById(tournamentId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
 
+    // Check if the requester is the organizer of the tournament
+    if (tournament.organiser.toString() !== organiserId.toString()) {
+      return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
+    }
 
-      // Check if the requester is the organiser of the tournament
-      if (tournament.organiser.toString() !== organiserId.toString()) {
-          return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
-      }
+    // Find the team in the points table
+    const teamEntry = tournament.pointsTable.find(entry => entry.teamName === teamName);
+    if (!teamEntry) {
+      return res.status(404).json({ message: 'Team not found in points table' });
+    }
 
-      const teamEntry = tournament.pointsTable.find(entry => entry.teamName === teamName);
-      if (!teamEntry) {
-          return res.status(404).json({ message: 'Team not found in points table' });
-      }
+    // Update the team's total points
+    teamEntry.totalPoints += additionalPoints;
 
-      teamEntry.totalPoints += additionalPoints;
-
-      await tournament.save();
-      return res.status(200).json({ message: 'Points updated successfully', tournament });
+    // Save the updated tournament
+    await tournament.save();
+    
+    return res.status(200).json({ message: 'Points updated successfully', tournament });
   } catch (error) {
-      return res.status(500).json({ message: 'Internal server error', error });
+    return res.status(500).json({ message: 'Internal server error', error });
   }
 };
-
 // In your controller function
 exports.getEnrolledTournaments = async (req, res) => {
   const { id: playerId } = req.user; // Extract playerId from JWT token
@@ -382,6 +386,31 @@ exports.joinTournament = async (req, res) => {
         return res.status(500).json({ message: 'Server error', error });
     }
 };
+
+exports.getPointsTable = async (req, res) => {
+  const { tournamentId } = req.params;
+  try {
+      // Fetch tournament details by ID
+      const tournament = await Tournament.findById(tournamentId).populate('teams');
+
+      if (!tournament) {
+          return res.status(404).render('error', { message: 'Tournament not found' });
+      }
+
+      const tournamentName = tournament.name;
+      const pointsTable = tournament.pointsTable || []; // If pointsTable is missing, default to an empty array
+
+      // Render pointsTable.ejs with tournament details
+      res.render('pointsTable', {
+          tournamentName,
+          pointsTable
+      });
+  } catch (error) {
+      console.error('Error fetching tournament details:', error);
+      return res.status(500).render('error', { message: 'Server error' });
+  }
+};
+
 
 exports.leaveTournament = async (req, res) => {
   try {

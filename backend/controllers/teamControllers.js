@@ -73,7 +73,7 @@ exports.joinTeam = async (req, res) => {
 
 // Leave a team
 exports.leaveTeam = async (req, res) => {
-  const { _id: playerId } = req.user;  // Extract playerId from JWT token
+  const { _id: playerId } = req.user;
 
   try {
     const player = await Player.findById(playerId);
@@ -88,7 +88,7 @@ exports.leaveTeam = async (req, res) => {
     player.team = null;
     await player.save();
 
-    res.status(200).json({ message: 'Left team successfully' });
+    res.status(200).redirect('/dashboard');
   } catch (error) {
     res.status(500).json({ error: 'Error leaving team' });
   }

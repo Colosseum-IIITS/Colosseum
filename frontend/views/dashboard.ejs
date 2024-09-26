@@ -25,8 +25,11 @@
         <div class="main-content">
             <button class="menu-toggle" id="menu-toggle">&#9776;</button> <!-- Hamburger Menu Icon -->
             <div class="header">
-                <h1 class="Player ani">Player Statistics</h1>
+                
                 <div class="completeContainer">
+                    <div class="navBar">
+                        <h1 class="headerText">Player Statistics</h1>
+                    </div>
                     <div class="profile-box">
                         
                     <div class="profile-circle"></div>
@@ -48,7 +51,7 @@
                 
                 <div class="stats">
                     <!-- global rank -->
-                    <div class="stat-card" id="u1">
+                    <div class="stat-card stats shadow" id="u1">
                         <div>
                             <h3>Global Rank</h3>
                         </div>
@@ -58,7 +61,7 @@
                     </div>
 
                     <!-- Tournaments won -->
-                    <div class="stat-card" id="u2">
+                    <div class="stat-card stats shadow" id="u2">
                         <div>
                             <h3>Tournaments Won</h3>
                         </div>
@@ -68,7 +71,7 @@
                     </div>
 
                     <!-- Tournaments played -->
-                    <div class="stat-card" id="u3">
+                    <div class="stat-card stats shadow" id="u3">
                         <div>
                             <h3>Tournaments Played</h3>
                         </div>
@@ -81,7 +84,7 @@
                 <div class="stats row2">
                         <div class = "statsRow2Column1">
                             <!--games played -->
-                            <div class="stat-card" id="u4">
+                            <div class="stat-card stats shadow" id="u4">
                                 <div>
                                     <h3>No of Orgs Follwoing</h3>
                                 </div>
@@ -89,7 +92,7 @@
                                     <p id="gamesPlayedChart" class="stat-value Games-played"><%= player.noOfOrgsFollowing %></p>
                                 </div>
                             </div>
-                            <div class="stat-card" id="u6">
+                            <div class="stat-card stats shadow" id="u6">
                                 <div>
                                     <h3>On-Going Tournaments</h3>
                                 </div>
@@ -99,7 +102,7 @@
                             </div>
                         </div>
                     <!-- win percentage -->
-                        <div class="stat-card" id="u5">
+                        <div class="stat-card stats shadow" id="u5">
                             <div>
                                 <h3>Win Percentage</h3>
                             </div>
@@ -110,9 +113,9 @@
                         </div>
                     
                 </div>
-            </div>
+                </div>
             
-        </div>
+            </div>
         </div>
     </div>
 </body>

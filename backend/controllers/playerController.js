@@ -492,7 +492,7 @@ exports.getDashboard = async (req, res) => {
         const tournamentsPlayed = player.tournaments.length;
 
         let winPercentage = 0;
-        if (tournamentsPlayed !== 0) {
+        if (tournamentsPlayed != 0) {
             winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
         }
 

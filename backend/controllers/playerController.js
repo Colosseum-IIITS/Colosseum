@@ -148,7 +148,7 @@ exports.joinTournament = async (req, res) => {
 
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
-
+        
         return res.status(200).json({ message: 'Successfully joined the tournament' });
     } catch (error) {
         console.error("Error joining tournament:", error);

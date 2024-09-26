@@ -159,7 +159,7 @@ exports.loginOrganiser = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
-        const redirectUrl = `http://localhost:3010/api/organiser/${username}/dashboard`;
+        const redirectUrl = `http://localhost:3000/api/organiser/${username}/dashboard`;
         res.redirect(redirectUrl);
     } catch (error) {
         console.error('Error during organiser login:', error);

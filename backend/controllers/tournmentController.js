@@ -62,11 +62,8 @@ exports.createTournament = async (req, res) => {
     }
 
     // Respond with success
-    res.status(201).json({
-      message: "Tournament created successfully and appended to organiser's list",
-      tournament: savedTournament,
-      organiser: organiserUpdate,
-    });
+    const redirectUrl = `http://localhost:3000/api/organiser/${req.user.username}/dashboard`;
+    res.redirect(redirectUrl);
   } catch (error) {
     res.status(500).json({ error: "Error creating tournament" });
     console.error("Error creating tournament:", error);
@@ -150,8 +147,6 @@ exports.updatePointsTable = async (req, res) => {
   const { tournamentId, teamName, additionalPoints } = req.body;
   const organiserId = req.user._id; // Extracted from JWT token
 
-  console.log("rithvik hot",req.body);
-  console.log("rithvik hot" , req.user._id);
   try {
       const tournament = await Tournament.findById(tournamentId);
       if (!tournament) {

@@ -5,13 +5,28 @@ body {
     color: #ffffff;
 }
 
-.navbar {
+.navBar {
+    backdrop-filter: blur(4px) saturate(124%);
+    -webkit-backdrop-filter: blur(12px) saturate(123%);
+    background-color: rgba(130, 130, 130, 0.308);
+    border-radius: 12px;    
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    margin-top: 2%;
+    width: 80%;
+    height: 80px;
     display: flex;
-    justify-content: space-between;
+    margin-bottom: 1%;
     align-items: center;
-    padding: 20px;
-    background-color: #1f1f1f;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    justify-content:center;
+    padding-left: 40px;
+    border-bottom: 1px, white, solid;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 14px;
+    margin-left: 9%;
+}
+
+.navBar:hover {   
+    background-color: rgba(17, 25, 40, 0.55);
 }
 
 .navbar-brand {

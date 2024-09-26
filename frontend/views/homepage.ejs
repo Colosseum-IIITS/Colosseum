@@ -70,17 +70,17 @@
             </div>
         </div>
         
-        <!-- Right Column for organizer and team results -->
+        <!-- Right Column for organiser and team results -->
         <div class="right-column">
             <div class="searchResults" id="searchOrg">
                 <div class="heading">Organization Results</div>
                 
-                <form class="searchForm" method="GET" action="/api/player/searchOrganisers" onsubmit="return handleOrganizerSearch()">
-                    <input type="text" name="searchTerm" id="organizer-search-input" placeholder="Search Organizations" required aria-label="Search organizations">
+                <form class="searchForm" method="GET" action="/api/player/searchOrganisers" onsubmit="return handleOrganiserSearch()">
+                    <input type="text" name="searchTerm" id="organiser-search-input" placeholder="Search Organizations" required aria-label="Search organizations">
                     <button type="submit">Search Organizations</button>
                 </form>
                 <div id="organization-results" style="display:block;">
-                    <h2>Organizer Results</h2>
+                    <h2>Organiser Results</h2>
                     <% if (organisationResults && organisationResults.length > 0) { %>
                         <ul>
                             <% organisationResults.forEach(organiser => { %>
@@ -88,7 +88,7 @@
                                     <strong>Name:</strong> <%= organiser.username %> (ID: <%= organiser._id %>)
                                     <form action="/api/player/followOrganiser" method="POST" style="display:inline;">
                                         <input type="hidden" name="organiserId" value="<%= organiser._id %>">
-                                        <button type="submit" class="followButton">Follow Organizer</button>
+                                        <button type="submit" class="followButton">Follow Organiser</button>
                                     </form>
                                     <br>
                                     <strong>Tournaments:</strong>
@@ -101,19 +101,13 @@
                             <% }); %>
                         </ul>
                     <% } else { %>
-                        <p>No organizers found matching your search.</p>
+                        <p>No organisers found matching your search.</p>
                     <% } %>
                 </div>
                 
                 <div id="followed-organisers"></div>
             </div>
 
-            
-            <div class="searchResults" id="searchTeam">
-                <div class="heading">Team Results</div>
-                <div id="team-results" style="display:none;"></div>
-                <div id="loaded-team-data" style="display:none;"></div>
-            </div>
         </div>
     </div>
     

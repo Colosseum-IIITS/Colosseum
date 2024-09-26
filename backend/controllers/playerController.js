@@ -82,6 +82,7 @@ exports.searchTournaments = async (req, res) => {
         console.log('Search Term:', searchTerm); // Debugging line
 
         let tournaments = [];
+        let joinedTournaments = [];
 
         if (searchTerm) {
             // Perform search only if a searchTerm is provided
@@ -93,12 +94,22 @@ exports.searchTournaments = async (req, res) => {
             });
         }
 
+        // Fetch joined tournaments if the user is logged in
+        if (req.user && req.user._id) {
+            const player = await Player.findById(req.user._id).populate('tournaments.tournament');
+            if (player) {
+                joinedTournaments = player.tournaments.map(t => t.tournament);
+            }
+        }
+
         console.log('Tournaments Found:', tournaments); // Debugging line
+        console.log('Joined Tournaments:', joinedTournaments); // Debugging line
 
         // Render the search results page
         res.render('searchResults', {
             results: tournaments, // Pass the found tournaments
             searchTerm: searchTerm || '', // Pass the search term to the template
+            joinedTournaments: joinedTournaments || [] // Pass the joined tournaments
         });
     } catch (error) {
         console.error('Error searching tournaments:', error); // Log the error
@@ -113,50 +124,46 @@ exports.searchTournaments = async (req, res) => {
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
-    const { _id } = req.user;  // Assuming req.user contains logged-in user info
+    const { _id } = req.user;
 
     try {
         const player = await Player.findOne({ _id }).populate('team');
         if (!player) {
-            return res.status(404).render('error', {statusCode: '404', message: 'Player not found' });
+            return res.status(404).render('error', { statusCode: '404', errorMessage: 'Player not found' });
         }
 
         if (!player.team) {
-            return res.status(400).render('error', {statusCode: '400', message: 'Player must be part of a team' });
+            return res.status(400).render('error', { statusCode: '400', errorMessage: 'Player must be part of a team' });
         }
 
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
-            return res.status(404).render('error', { statusCode: '404', message: 'Tournament not found' });
+            return res.status(404).render('error', { statusCode: '404', errorMessage: 'Tournament not found' });
         }
 
-        // Debugging: Log the tournament object
-        console.log("Tournament details:", tournament);
-
-        // Check if the team is already registered
         if (tournament.teams.includes(player.team._id)) {
-            return res.status(400).render('error', { statusCode: '400' ,errorMessage: 'Team is already registered for this tournament' });
+            return res.status(400).render('error', { statusCode: '400', errorMessage: 'Team is already registered for this tournament' });
         }
-        
 
-        // Add the team to the tournament
         tournament.teams.push(player.team._id);
         await tournament.save();
 
-        // Add the tournament to the player's list of joined tournaments
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
 
-        // Fetch the updated list of tournaments the player has joined
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
-        // Render the homepage and pass the joined tournaments to be displayed
-        return res.render('homepage', { joinedTournaments });
+        return res.render('homepage', {
+            joinedTournaments,
+            results: joinedTournaments, // Ensure 'results' is passed here
+            searchTerm: null
+        });
     } catch (error) {
         console.error("Error joining tournament:", error);
         return res.status(500).render('error', { statusCode: '500', errorMessage: 'Server error', error });
     }
 };
+
 
 
 

@@ -116,11 +116,11 @@ exports.updateWinner = async (req, res) => {
       return res.status(404).json({ message: "Tournament not found" });
     }
 
-    // Check if the requester is the organizer
-    if (!tournament.organizer.equals(req.user.id)) {
+    // Check if the requester is the organiser
+    if (!tournament.organiser.equals(req.user.id)) {
       return res
         .status(403)
-        .json({ message: "Only the organizer can update the winner" });
+        .json({ message: "Only the organiser can update the winner" });
     }
 
     // Update the winner in the tournament
@@ -164,9 +164,9 @@ exports.updatePointsTable = async (req, res) => {
       }
 
 
-      // Check if the requester is the organizer of the tournament
+      // Check if the requester is the organiser of the tournament
       if (tournament.organiser.toString() !== organiserId.toString()) {
-          return res.status(403).json({ message: 'Unauthorized: You are not the organizer of this tournament' });
+          return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
       }
 
       const teamEntry = tournament.pointsTable.find(entry => entry.teamName === teamName);

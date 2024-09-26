@@ -42,7 +42,7 @@ function displayTournamentResults(tournaments) {
         // Add more details or functionality if needed
         tournamentDiv.innerHTML = `
             <h3>${tournament.name}</h3>
-            <p>Organizer: ${tournament.organizer.name}</p>
+            <p>Organiser: ${tournament.organiser.name}</p>
             <p>Teams Participating: ${tournament.teams.length}</p>
             <button onclick="joinTournament('${tournament._id}')">Join Tournament</button>
         `;
@@ -220,10 +220,10 @@ window.onload = () => {
     fetchFollowedOrganisers(); // Call the function to fetch tournaments
 };
 
-async function handleOrganizerSearch(event) {
+async function handleOrganiserSearch(event) {
     event.preventDefault(); // Prevent the form from submitting
 
-    const searchInput = document.getElementById('organizer-search-input').value.trim(); // Get the input value
+    const searchInput = document.getElementById('organiser-search-input').value.trim(); // Get the input value
 
     // Check if input is empty or just whitespace
     if (!searchInput) {
@@ -239,15 +239,15 @@ async function handleOrganizerSearch(event) {
     searchButton.disabled = true;
 
     try {
-        // Check if the input starts with ':' for organizer search
+        // Check if the input starts with ':' for organiser search
         if (searchInput.startsWith(':')) {
-            const searchTerm = searchInput.slice(1); // Remove ':' for organizer search
-            await searchOrganisers(searchTerm); // Call the function to search for organizers
+            const searchTerm = searchInput.slice(1); // Remove ':' for organiser search
+            await searchOrganisers(searchTerm); // Call the function to search for organisers
         } else {
             alert("Invalid search format. Use ':' for searching organizations.");
         }
     } catch (error) {
-        console.error('Error during organizer search:', error);
+        console.error('Error during organiser search:', error);
         alert('An error occurred while searching. Please try again.');
     } finally {
         // Re-enable the search button after operations complete
@@ -255,10 +255,10 @@ async function handleOrganizerSearch(event) {
     }
 }
 
-// Example function to search for organizers (you might already have this defined)
+// Example function to search for organisers (you might already have this defined)
 
 
-// Function to display organizer search results (if you haven't defined it yet)
+// Function to display organiser search results (if you haven't defined it yet)
 function displayOrganiserResults(organisers) {
     const resultsContainer = document.getElementById('organization-results');
     resultsContainer.innerHTML = ''; // Clear previous results

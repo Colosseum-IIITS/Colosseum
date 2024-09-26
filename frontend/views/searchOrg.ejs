@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organiser Search Results</title>
+    <link rel="stylesheet" href="/assets/homePage.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">MyWebsite</div>
+        <div id="welcome-message"></div>
+        <div class="search-profile">
+            <a href="/dashboard">
+            <img src="/assets/user.png" alt="Profile" class="profile-pic"></a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h1>Organiser Search Results</h1>
+        <% if (organisationResults.length > 0) { %>
+            <% organisationResults.forEach(organiser => { %>
+                <div>
+                    <h2>Organiser Name: <%= organiser.username %></h2>
+                    <p><strong>Email:</strong> <%= organiser.email %></p>
+                    <p><strong>Followers:</strong> <%= organiser.followers.length %></p>
+
+                    <strong>Tournaments Organized:</strong>
+                    <ul>
+                        <% if (organiser.tournaments.length > 0) { %>
+                            <% organiser.tournaments.forEach(tournament => { %>
+                                <li>Tournament ID: <%= tournament.toString() %></li>
+                            <% }); %>
+                        <% } else { %>
+                            <li>No tournaments organized yet</li>
+                        <% } %>
+                    </ul>
+
+                    <!-- Follow Button that submits directly to the controller -->
+                    <form action="/api/player/followOrganiser" method="POST" style="display:inline;" id="follow-form-<%= organiser._id %>">
+                        <input type="hidden" name="organiserId" value="<%= organiser._id %>">
+                        <button type="submit" class="followButton">Follow Organiser</button>
+                    </form>
+                    
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No organisers found matching your search.</p>
+        <% } %>
+    </div>
+</body>
+</html>

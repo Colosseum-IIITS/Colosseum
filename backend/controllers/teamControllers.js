@@ -52,6 +52,12 @@ exports.joinTeam = async (req, res) => {
       return res.status(404).json({ message: 'Team not found' });
     }
 
+    // Check if the player is already in the team (optional)
+    if (team.players.includes(playerId)) {
+      return res.status(400).json({ message: 'You are already a member of this team.' });
+    }
+
+    // Update the player to join the team
     await Player.findByIdAndUpdate(playerId, { team: teamId });
     team.players.push(playerId);
     await team.save();

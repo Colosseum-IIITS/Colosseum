@@ -35,7 +35,7 @@ exports.followOrganiser = async (req, res) => {
         organiser.followers.push(player._id);
         await organiser.save();
 
-        res.status(200).json({ message: 'Organiser followed successfully', player, organiser });
+        res.redirect('/api/player/homepage');
     } catch (error) {
         res.status(500).json({ error: 'Error following organiser' });
     }
@@ -154,11 +154,12 @@ exports.joinTournament = async (req, res) => {
 
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
-        return res.render('homepage', {
-            joinedTournaments,
-            results: joinedTournaments, // Ensure 'results' is passed here
-            searchTerm: null
-        });
+        // return res.render('homepage', {
+        //     joinedTournaments,
+        //     results: joinedTournaments, // Ensure 'results' is passed here
+        //     searchTerm: null
+        // });
+        res.redirect('/api/player/homepage');
     } catch (error) {
         console.error("Error joining tournament:", error);
         return res.status(500).render('error', { statusCode: '500', errorMessage: 'Server error', error });
@@ -405,8 +406,8 @@ exports.getHomePage = async (req, res) => {
             return [];
         });
 
-        let followedOrganisers = [];
-        let joinedTournaments = [];
+        let followedOrganisers = []; // Initialize followedOrganisers as an empty array
+        let joinedTournaments = []; // Initialize joinedTournaments as an empty array
 
         // Check if the user is logged in and is a player
         if (req.user && req.user._id) {
@@ -431,7 +432,7 @@ exports.getHomePage = async (req, res) => {
                 });
 
             if (player) {
-                followedOrganisers = player.following || [];
+                followedOrganisers = player.following || []; // Get the followed organisers
                 joinedTournaments = player.tournaments.map(t => t.tournament) || []; // Get the tournaments the player has joined
             }
         }
@@ -442,8 +443,7 @@ exports.getHomePage = async (req, res) => {
             players: players || [], // List of players
             searchTerm: '', // Empty as it's the default homepage
             organisers: organisers || [], // List of organisers
-            followedOrganisers, // Organisers followed by the player
-            organisationResults: [], // Initialize this as an empty array
+            followedOrganisers, // Pass followed organisers to the view
             joinedTournaments // Pass the joined tournaments to the view
         });
     } catch (error) {

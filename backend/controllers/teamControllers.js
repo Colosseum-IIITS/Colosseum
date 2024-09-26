@@ -33,7 +33,7 @@ exports.createTeam = async (req, res) => {
     player.team = team._id;
     await player.save();
 
-    res.status(201).json({ message: 'Team created successfully', team });
+    res.status(201).redirect('/dashboard');
   } catch (error) {
     console.error('Error creating team:', error);
     res.status(500).json({ error: 'Error creating team', details: error.message });
@@ -125,22 +125,27 @@ exports.getTeamsByName = async (req, res) => {
 
 // Update team name (only by captain)
 exports.updateTeamName = async (req, res) => {
-  const { teamId, newName } = req.body;
-  const { _id: captainId } = req.user;  // Extract captainId from JWT token
+  const { newName } = req.body;
+  const { _id: playerId } = req.user;  // Extract playerId from JWT token
 
   try {
-    // Fetch the team by teamId
-    const team = await Team.findById(teamId);
-    if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
+    // Fetch the player to get the team ID
+    const player = await Player.findById(playerId).populate('team');
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
     }
 
-    // Debugging: log captainId and team.captain for comparison
-    console.log('Captain ID from token:', captainId.toString());
+    const team = player.team; // Get the team from the player document
+    if (!team) {
+      return res.status(404).json({ message: 'Player is not in a team' });
+    }
+
+    // Debugging: log playerId and team.captain for comparison
+    console.log('Player ID from token:', playerId.toString());
     console.log('Team Captain ID from DB:', team.captain.toString());
 
     // Check if the current user is the captain of the team
-    if (team.captain.toString() !== captainId.toString()) {
+    if (team.captain.toString() !== playerId.toString()) {
       return res.status(403).json({ message: 'Only the captain can update the team name' });
     }
 
@@ -154,12 +159,13 @@ exports.updateTeamName = async (req, res) => {
     team.name = newName;
     await team.save();
 
-    res.status(200).json({ message: 'Team name updated successfully', team });
+    res.status(200).redirect('/dashboard');
   } catch (error) {
     console.error('Error updating team name:', error);
     res.status(500).json({ error: 'Error updating team name', details: error.message });
   }
 };
+
 
 
 

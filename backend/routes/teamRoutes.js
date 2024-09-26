@@ -18,7 +18,7 @@ router.get('/search', teamController.getTeamsByName);
 
 // Route to update team name (only by captain)
 // working
-router.put('/updateTeamName', authenticateToken, teamController.updateTeamName);
+router.post('/updateTeamName', authenticateToken, teamController.updateTeamName);
 
 
 module.exports = router;

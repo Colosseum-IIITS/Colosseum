@@ -49,7 +49,9 @@ body {
 .navBar:hover {   
     background-color: rgba(17, 25, 40, 0.55);
 }
-
+a{
+    text-decoration: none;
+}
 .adminDashText{
     font-family: 'Press Start 2P', cursive;
     font-size: 27px;

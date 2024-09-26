@@ -411,6 +411,7 @@ exports.getHomePage = async (req, res) => {
         let followedOrganisers = [];
         let joinedTournaments = [];
 
+        const playerName= req.user.username;
         if (req.user && req.user._id) {
             const { _id } = req.user;
 
@@ -450,7 +451,8 @@ exports.getHomePage = async (req, res) => {
             searchTerm: '',
             organisers: organisers || [],
             followedOrganisers,
-            joinedTournaments
+            joinedTournaments,
+            playerName
         });
     } catch (error) {
         console.error('Error in getHomePage:', error);

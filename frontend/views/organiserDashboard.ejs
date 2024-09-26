@@ -56,44 +56,49 @@
         </section>
 
         <!-- All Tournaments List -->
-        <% if (visibilitySettings.tournamentsVisible) { %>
-            <section class="tournaments-section">
-                <div class="tournament-list">
-                    <h3>All Tournaments</h3>
-                    <% if (tournamentList.length > 0) { %>
-                        <ul>
-                            <% tournamentList.forEach(function(tournament) { %>
-                                <li>
-                                    <strong><%= tournament.name %></strong>
-                                    <p>Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p>
-                                    <p>End Date: <%= new Date(tournament.endDate).toLocaleDateString() %></p>
-                                    <p>Prize Pool: $<%= tournament.prizePool %></p>
-                                    <p>Status: <%= tournament.status %></p>
-                                    <% if (tournament.status === "Completed") { %>
-                                        <p>Winner: <%= tournament.winner || 'TBD' %></p>
-                                    <% } %>
-                                    <button onclick="window.location.href='/api/tournament/<%= tournament.tid %>'">View Details</button>
-
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <p>No tournaments available</p>
-                    <% } %>
-                </div>
-            </section>
-            
-        <% } %>
-        console.log(isOwner);
+        
+<!-- All Tournaments List -->
+<% if (visibilitySettings.tournamentsVisible) { %>
+    <section class="tournaments-section">
+        <div class="tournament-list">
+            <h3>All Tournaments</h3>
+            <% if (tournamentList.length > 0) { %>
+                <ul>
+                    <% tournamentList.forEach(function(tournament) { %>
+                        <li>
+                            <strong><%= tournament.name %></strong>
+                            <p>Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p>
+                            <p>End Date: <%= new Date(tournament.endDate).toLocaleDateString() %></p>
+                            <p>Prize Pool: $<%= tournament.prizePool %></p>
+                            <!-- Status Box -->
+                            <div class="status-box <%= tournament.status.toLowerCase() %>">
+                                <%= tournament.status %>
+                            </div>
+                            <% if (tournament.status === "Completed") { %>
+                                <p>Winner: <%= tournament.winner || 'TBD' %></p>
+                            <% } %>
+                            <button onclick="window.location.href='/api/tournament/<%= tournament.tid %>'">View Details</button>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No tournaments available</p>
+            <% } %>
+        </div>
+    </section>
+<% } %>
         <!-- Owner Controls (if the logged-in user is the organiser) -->
-        <% if (isOwner) { %>
-            <section class="owner-controls">
-                <h3>Organiser Controls</h3>
-                <button onclick="window.location.href='/api/tournament/create'">Create New Tournament</button>
-                <a href='/api/organiser/update-visibility'>Update-Visibility Settings</a>
-                
-            </section>
-        <% } %>
+       <% if (isOwner) { %>
+    <section class="owner-controls">
+        <h3>Organiser Controls</h3>
+        <button onclick="window.location.href='/api/tournament/create'">Create New Tournament</button>
+        <a href='/api/organiser/update-visibility'>Update Visibility Settings</a>
+        <!-- New button for updating profile -->
+        <button onclick="window.location.href='http://localhost:3000/api/organiser/UpdateProfile'">
+            Update Profile
+        </button>
+    </section>
+<% } %>
 
     </div>
 </body>

@@ -5,6 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Details</title>
+
+<style>
+    /* Add these styles */
+    .status-box {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .status-box.approved {
+        background-color: green;
+    }
+
+    .status-box.pending {
+        background-color: yellow;
+        color: black; /* Ensure text is readable against yellow background */
+    }
+
+    .status-box.completed {
+        background-color: red;
+    }
+</style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -35,18 +59,25 @@
             </div>
         <% } %>
 
-        <div class="tournament-details mb-4 p-3 border rounded bg-light">
-            <h2 class="mt-3"><%= tournament.name %></h2>
-            <p><strong>ID:</strong> <%= tournament.tid %></p>
-            <p><strong>Start Date:</strong> <%= tournament.startDate.toDateString() %></p>
-            <p><strong>End Date:</strong> <%= tournament.endDate.toDateString() %></p>
-            <p><strong>Entry Fee:</strong> $<%= tournament.entryFee %></p>
-            <p><strong>Prize Pool:</strong> $<%= tournament.prizePool %></p>
-            <p><strong>Status:</strong> <%= tournament.status %></p>
-            <p><strong>Organiser:</strong> <%= tournament.organiser.username %></p>
-            <p><strong>Description:</strong> <%= tournament.description %></p>
-            <p><strong>Winner:</strong> <%= tournament.winner %></p>
+        
+<div class="tournament-details mb-4 p-3 border rounded bg-light">
+    <h2 class="mt-3"><%= tournament.name %></h2>
+    <p><strong>ID:</strong> <%= tournament.tid %></p>
+    <p><strong>Start Date:</strong> <%= tournament.startDate.toDateString() %></p>
+    <p><strong>End Date:</strong> <%= tournament.endDate.toDateString() %></p>
+    <p><strong>Entry Fee:</strong> $<%= tournament.entryFee %></p>
+    <p><strong>Prize Pool:</strong> $<%= tournament.prizePool %></p>
+    <!-- Status Box -->
+    <p>
+        <strong>Status:</strong> 
+        <div class="status-box <%= tournament.status.toLowerCase() %>">
+            <%= tournament.status %>
         </div>
+    </p>
+    <p><strong>Organiser:</strong> <%= tournament.organiser.username %></p>
+    <p><strong>Description:</strong> <%= tournament.description %></p>
+    <p><strong>Winner:</strong> <%= tournament.winner %></p>
+</div>
         
         <h3>Teams</h3>
         <ul class="list-group mb-4">

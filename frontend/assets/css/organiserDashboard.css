@@ -11,6 +11,27 @@ body {
     flex-direction: column;
 }
 
+/* Add these styles to organiserDashboard.css */
+.status-box {
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.status-box.approved {
+    background-color: green;
+}
+
+.status-box.pending {
+    background-color: yellow;
+    color: black; /* Ensure text is readable against yellow background */
+}
+
+.status-box.completed {
+    background-color: red;
+}
 .dashboard-container {
     width: 80%;
     margin: 0 auto;

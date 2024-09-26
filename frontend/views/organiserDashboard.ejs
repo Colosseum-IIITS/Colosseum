@@ -64,7 +64,7 @@
                                     <% if (tournament.status === "Completed") { %>
                                         <p>Winner: <%= tournament.winner || 'TBD' %></p>
                                     <% } %>
-                                    <button onclick="window.location.href='/api/tournament/<%= tournament.tid %>'">View Details</button>
+                                    <button onclick="window.location.href='/api/tournament/<%= tournament._id %>'">View Details</button>
                                 </li>
                             <% }); %>
                         </ul>

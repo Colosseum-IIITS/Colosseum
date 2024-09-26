@@ -30,7 +30,7 @@
             <div id="joined-tournaments">
                 <% if (joinedTournaments.length > 0) { %>
                         <% joinedTournaments.forEach(tournament => { %>
-                            <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/pointsTable/<%= tournament._id.toString() %>'">
+                            <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/<%= tournament._id.toString() %>'">
                              <div class="TName">   <h4><%= tournament.name %></h4> <!-- Tournament Name --></div>
                               <div class="DescT"><p class="tournamentDesc"> Description: <%= tournament.description %></p> <!-- Tournament Description -->
                                 <p class="tournamentDate">Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->

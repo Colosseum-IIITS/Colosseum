@@ -258,10 +258,10 @@ exports.getEnrolledTournaments = async (req, res) => {
 
 exports.getTournamentById = async (req, res) => {
   try {
-    const tournament = await Tournament.findOne({ tid: req.params.tournamentId })
-      .populate('organiser')
+    const tournId=req.params.tournamentId;
+    const tournament = await Tournament.findById(tournId)
       .populate('teams');
-
+    console.log(tournament);
     if (!tournament) {
       return res.status(404).send('Tournament not found');
     }
@@ -282,10 +282,15 @@ exports.getTournamentById = async (req, res) => {
         isPlayerInTournament = true;
       }
     }
+    const organiser = await Organiser.findById(tournament.organiser);
 
+        if (!organiser) {
+            return res.status(404).send({ error: 'Organiser not found.' });
+        }
     // Pass the tournament, user role, username, and isPlayerInTournament flag to the view
     res.render('tournamentDetails', { 
       tournament, 
+      organiser,
       userRole: req.user.role, 
       username: req.user.username, 
       isPlayerInTournament 
@@ -401,7 +406,7 @@ exports.getPointsTable = async (req, res) => {
       const pointsTable = tournament.pointsTable || []; // If pointsTable is missing, default to an empty array
 
       // Render pointsTable.ejs with tournament details
-      res.render('pointsTable', {
+      res.render('tournamentDetails', {
           tournamentName,
           pointsTable
       });

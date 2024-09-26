@@ -156,6 +156,18 @@ exports.joinTournament = async (req, res) => {
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
 
+        const pointsEntry = {
+            ranking: tournament.pointsTable.length + 1, // Set ranking as the current length + 1
+            teamName: player.team.name, // Get team name from the player
+            totalPoints: 0, // Initialize total points to 0
+        };
+
+        // Add the points entry to the tournament's points table
+        tournament.pointsTable.push(pointsEntry);
+
+        // Save the tournament with the new entry
+        await tournament.save();
+
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
         // return res.render('homepage', {
@@ -476,9 +488,9 @@ exports.getTournamentPointsTable = async (req, res) => {
         const tournament = await Tournament.findById(tournamentId).select('name pointsTable');
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
-        }
+        }   
         
-        res.render('pointsTable', { pointsTable: tournament.pointsTable, tournamentName: tournament.name });
+        res.render('tournamentDetails', { pointsTable: tournament.pointsTable, tournamentName: tournament.name });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error });
     }

@@ -466,8 +466,8 @@ exports.getTournamentPointsTable = async (req, res) => {
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
         }
-
-        res.render('pointsTable', { pointsTable: tournament.pointsTable });
+        
+        res.render('pointsTable', { pointsTable: tournament.pointsTable, tournamentName: tournament.name });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error', error });
     }

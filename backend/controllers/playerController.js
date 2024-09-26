@@ -389,7 +389,6 @@ exports.getFollowedOrganisers = async (req, res) => {
 // Example route for search results rendering the homepage
 exports.getHomePage = async (req, res) => {
     try {
-        // Fetch all tournaments, players, and organisers
         const tournaments = await Tournament.find().catch(err => {
             console.error('Error fetching tournaments:', err);
             return [];
@@ -405,10 +404,9 @@ exports.getHomePage = async (req, res) => {
             return [];
         });
 
-        let followedOrganisers = []; // Initialize followedOrganisers as an empty array
-        let joinedTournaments = []; // Initialize joinedTournaments as an empty array
+        let followedOrganisers = [];
+        let joinedTournaments = [];
 
-        // Check if the user is logged in and is a player
         if (req.user && req.user._id) {
             const { _id } = req.user;
 
@@ -421,29 +419,34 @@ exports.getHomePage = async (req, res) => {
                         model: 'Tournament'
                     }
                 })
-                .populate({
-                    path: 'tournaments.tournament',
-                    model: 'Tournament' // Assuming you store tournament references here
-                })
+                .populate('team')
                 .catch(err => {
                     console.error('Error fetching player data:', err);
                     return null;
                 });
 
             if (player) {
-                followedOrganisers = player.following || []; // Get the followed organisers
-                joinedTournaments = player.tournaments.map(t => t.tournament) || []; // Get the tournaments the player has joined
+                followedOrganisers = player.following || [];
+
+                // Fetch tournaments from the player's team
+                const team = player.team;
+                if (team) {
+                    joinedTournaments = await Tournament.find({ teams: team._id })
+                        .catch(err => {
+                            console.error('Error fetching tournaments for team:', err);
+                            return [];
+                        });
+                }
             }
         }
 
-        // Render the homepage and pass necessary data
         res.render('homepage', {
-            results: tournaments || [], // List of tournaments
-            players: players || [], // List of players
-            searchTerm: '', // Empty as it's the default homepage
-            organisers: organisers || [], // List of organisers
-            followedOrganisers, // Pass followed organisers to the view
-            joinedTournaments // Pass the joined tournaments to the view
+            results: tournaments || [],
+            players: players || [],
+            searchTerm: '',
+            organisers: organisers || [],
+            followedOrganisers,
+            joinedTournaments
         });
     } catch (error) {
         console.error('Error in getHomePage:', error);
@@ -453,6 +456,7 @@ exports.getHomePage = async (req, res) => {
         });
     }
 };
+
 
 
 
@@ -474,39 +478,49 @@ exports.getTournamentPointsTable = async (req, res) => {
 
 
 
+
 exports.getDashboard = async (req, res) => {
     const _id = req.user._id;
+    const currentDate = new Date();
     try {
-        const player = await Player.findById(_id);
+        const player = await Player.findById(_id).populate('tournaments.tournament');
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        const winPercentage = player.tournamentsPlayed
-            ? (player.tournamentsWon + 1 / player.tournamentsPlayed + 1) * 100
-            : 0;
+        const tournamentsWon = player.tournaments.filter(t => t.won).length;
+        const tournamentsPlayed = player.tournaments.length;
 
+        let winPercentage = 0;
+        if (tournamentsPlayed !== 0) {
+            winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
+        }
 
-            const teamId = player.team; // Get the ObjectId of the team
-            const team = await Team.findById(teamId); // Fetch the team by ID
-            
-            
+        const ongoingTournaments = player.tournaments.filter(t => {
+            const tournament = t.tournament;
+            return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
+        }).length;
 
-        res.render('dashboard', {  // No leading slash
+        const teamId = player.team; 
+        const team = await Team.findById(teamId); 
+
+        res.render('dashboard', {
             player: {
                 username: player.username,
                 email: player.email,
                 globalRank: player.globalRank || 'Unranked',
-                tournamentsWon: player.tournamentsWon || 0,
-                tournamentsPlayed: player.tournamentsPlayed || 0,
+                tournamentsWon: tournamentsWon || 0,
+                tournamentsPlayed: tournamentsPlayed || 0,
                 noOfOrgsFollowing: player.following.length || 0,
                 team,
                 winPercentage: winPercentage.toFixed(2),
+                ongoingTournaments,
             }
         });
-        
+
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching dashboard' });
+        console.error("Error fetching dashboard:", error.message);  // Log the error message
+        res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };
 

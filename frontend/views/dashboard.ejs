@@ -29,66 +29,76 @@
                 <div class="completeContainer">
                     <div class="profile-box">
                         
-                        <div class="profile-circle"></div>
-                        <div class="profile-text">
-                            <p class="player-name"><%= player.username %></p>
-                            <p class="player-email"><%= player.email %></p>
-                            <div class="card">
-                                <div class="img"></div> 
-                                    <div class="textBox">
-                                        <div class="textContent">
-                                            <%= player.team ? player.team.name : 'Not in a team' %>
-                                        </div>
-                                    <div>
+                    <div class="profile-circle"></div>
+                    <div class="profile-text">
+                        <p class="player-name"><%= player.username %></p>
+                        <p class="player-email"><%= player.email %></p>
+                        <div class="card">
+                            <div class="img"></div> 
+                                <div class="textBox">
+                                    <div class="textContent">
+                                        <%= player.team ? player.team.name : 'Not in a team' %>
+                                    </div>
+                                <div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+                <div class="stats">
+                    <!-- global rank -->
+                    <div class="stat-card" id="u1">
+                        <div>
+                            <h3>Global Rank</h3>
+                        </div>
+                        <div>
+                            <p id="Global-rank" class="stat-value Global-rank"><%= player.globalRank %> <!-- Load dynamic rank here --></p>
+                        </div>
+                    </div>
+
+                    <!-- Tournaments won -->
+                    <div class="stat-card" id="u2">
+                        <div>
+                            <h3>Tournaments Won</h3>
+                        </div>
+                        <div>
+                            <p id="tournaments-Won" class="stat-value tournament-won"><%= player.tournamentsWon %> <!-- Load dynamic tournament wins here --></p> 
+                        </div>
+                    </div>
+
+                    <!-- Tournaments played -->
+                    <div class="stat-card" id="u3">
+                        <div>
+                            <h3>Tournaments Played</h3>
+                        </div>
+                        <div>
+                            <p id="Tournaments-played" class="stat-value tournament-played"><%= player.tournamentsPlayed %> <!-- Load dynamic tournaments played here --></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats row2">
+                        <div class = "statsRow2Column1">
+                            <!--games played -->
+                            <div class="stat-card" id="u4">
+                                <div>
+                                    <h3>No of Orgs Follwoing</h3>
+                                </div>
+                                <div>
+                                    <p id="gamesPlayedChart" class="stat-value Games-played"><%= player.noOfOrgsFollowing %></p>
+                                </div>
+                            </div>
+                            <div class="stat-card" id="u6">
+                                <div>
+                                    <h3>On-Going Tournaments</h3>
+                                </div>
+                                <div>
+                                    <p id="gamesPlayedChart" class="stat-value onGoingTournamants"><%= player.ongoingTournaments %></p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    </div>
-                    
-                    <div class="stats">
-                        <!-- global rank -->
-                        <div class="stat-card" id="u1">
-                            <div>
-                                <h3>Global Rank</h3>
-                            </div>
-                            <div>
-                                <p id="Global-rank" class="stat-value Global-rank"><%= player.globalRank %> <!-- Load dynamic rank here --></p>
-                            </div>
-                        </div>
-
-                        <!-- Tournaments won -->
-                        <div class="stat-card" id="u2">
-                            <div>
-                                <h3>Tournaments Won</h3>
-                            </div>
-                            <div>
-                                <p id="tournaments-Won" class="stat-value tournament-won"><%= player.tournamentsWon %> <!-- Load dynamic tournament wins here --></p> 
-                            </div>
-                        </div>
-
-                        <!-- Tournaments played -->
-                        <div class="stat-card" id="u3">
-                            <div>
-                                <h3>Tournaments Played</h3>
-                            </div>
-                            <div>
-                                <p id="Tournaments-played" class="stat-value tournament-played"><%= player.tournamentsPlayed %> <!-- Load dynamic tournaments played here --></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stats">
-                        <!--games played -->
-                        <div class="stat-card" id="u4">
-                            <div>
-                                <h3>No of Orgs Follwoing</h3>
-                            </div>
-                            <div>
-                                <p id="gamesPlayedChart" class="stat-value Games-played"><%= player.noOfOrgsFollowing %></p>
-                            </div>
-                        </div>
-                        <!-- win percentage -->
+                    <!-- win percentage -->
                         <div class="stat-card" id="u5">
                             <div>
                                 <h3>Win Percentage</h3>
@@ -98,8 +108,9 @@
                                 <p id="winPercentageValue" class="stat-value win-percentage"><%= player.winPercentage %></p>
                             </div>
                         </div>
-                    </div>
+                    
                 </div>
+            </div>
             
         </div>
         </div>

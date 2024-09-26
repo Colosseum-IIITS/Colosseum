@@ -9,6 +9,7 @@ exports.createTournamentForm=async(req,res)=>{
     res.render('createTournament',{organiser:req.user});
 }
 //working
+
 exports.createTournament = async (req, res) => {
   const {
     tid,
@@ -19,7 +20,8 @@ exports.createTournament = async (req, res) => {
     prizePool,
     description,
   } = req.body;
-  const organiser  = req.user._id;
+
+  const organiser = req.user._id;
 
   console.log("Request Body:", req.body);
   console.log("User from JWT:", req.user._id);
@@ -30,7 +32,6 @@ exports.createTournament = async (req, res) => {
     if (existingTournament) {
       return res.status(400).json({ message: "Tournament ID already exists" });
     }
-
 
     // Create a new tournament
     const tournament = new Tournament({
@@ -45,16 +46,35 @@ exports.createTournament = async (req, res) => {
       organiser,
     });
     
+    // Save the tournament to the database
+    const savedTournament = await tournament.save();
 
-    await tournament.save();
-    res.status(201).json({ message: "Tournament created successfully", tournament });
+    // Update the organiser to add the new tournament's ID
+    const organiserUpdate = await Organiser.findByIdAndUpdate(
+      organiser,
+      { $push: { tournaments: savedTournament._id } }, // Push new tournament ID to the organiser's tournaments array
+      { new: true } // Return the updated organiser document
+    );
+
+    // If organiser update fails
+    if (!organiserUpdate) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
+
+    // Respond with success
+    res.status(201).json({
+      message: "Tournament created successfully and appended to organiser's list",
+      tournament: savedTournament,
+      organiser: organiserUpdate,
+    });
   } catch (error) {
     res.status(500).json({ error: "Error creating tournament" });
     console.error("Error creating tournament:", error);
-
   }
 };
 
+
+//added new EditTournamentFucntion, similar to this
 // Update an existing tournament
 exports.updateTournament = async (req, res) => {
   const { tournamentId } = req.params; // Tournament ID from the URL params
@@ -202,3 +222,114 @@ exports.getEnrolledTournaments = async (req, res) => {
       });
   }
 };
+
+exports.getTournamentById = async (req, res) => {
+  try {
+    const tournament = await Tournament.findOne({ tid: req.params.tournamentId })
+      .populate('organiser')
+      .populate('teams');
+
+    if (!tournament) {
+      return res.status(404).send('Tournament not found');
+    }
+    console.log(req.user.role);
+    // Pass the tournament and user role to the view
+    res.render('tournamentDetails', { tournament, userRole: req.user.role , username :req.user.username });
+
+  } catch (error) {
+    console.error('Error fetching tournament:', error);
+    return res.status(500).send('Server error');
+  }
+};
+
+exports.getTournamentEditPage = async (req, res) => {
+  try {
+    // Fetch the tournament by its 'tid' parameter
+    const tournament = await Tournament.findOne({ tid: req.params.tournamentId });
+
+    if (!tournament) {
+      return res.status(404).send('Tournament not found');
+    }
+
+    // Render the 'tournamentEdit' EJS view and pass the tournament data
+    res.render('tournamentEditPage', { tournament });
+  } catch (error) {
+    console.error('Error fetching tournament for editing:', error);
+    return res.status(500).send('Server error');
+  }
+};
+
+exports.editTournament = async (req, res) => {
+  const { name, startDate, endDate, entryFee, prizePool, status, description, winner } = req.body;
+  const { tournamentId } = req.params;
+
+  try {
+      // Find the tournament by ID and update it
+      const updatedTournament = await Tournament.findOneAndUpdate(
+          { tid: tournamentId }, // Match by TID
+          {
+              name,
+              startDate,
+              endDate,
+              entryFee,
+              prizePool,
+              status,
+              description,
+              winner,
+          },
+          { new: true, runValidators: true } // Return the updated document and apply validators
+      );
+
+      // Check if the tournament was found and updated
+      if (!updatedTournament) {
+          return res.status(404).send('Tournament not found');
+      }
+
+      // Redirect to the updated tournament's details page
+      res.redirect(`/api/tournament/${updatedTournament.tid}`);
+  } catch (error) {
+      console.error('Error updating tournament:', error);
+      return res.status(500).send('Server error');
+  }
+};
+
+exports.joinTournament = async (req, res) => {
+    const { tournamentId } = req.body;
+    const { _id } = req.user;
+
+    try {
+        const player = await Player.findOne({ _id }).populate('team');
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        if (!player.team) {
+            return res.status(400).json({ message: 'Player must be part of a team' });
+        }
+
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ message: 'Tournament not found' });
+        }
+        // if(tournament.organiser.bannedTeams.includes(player.team._id)) {
+        //     return res.status(400).json({ message: 'your team is banned' });
+        // }
+
+        if (tournament.teams.includes(player.team._id)) {
+            return res.status(400).json({ message: 'Team is already registered for this tournament' });
+        }
+
+        tournament.teams.push(player.team._id);
+        await tournament.save();
+
+        player.tournaments.push({ tournament: tournament._id, won: false });
+        await player.save();
+
+        return res.status(200).json({ message: 'Successfully joined the tournament' });
+    } catch (error) {
+        console.error("Error joining tournament:", error);
+        return res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+

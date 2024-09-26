@@ -159,7 +159,8 @@ exports.loginOrganiser = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
-        res.status(200).json({ message: 'Login successful', organiser });
+        const redirectUrl = `http://localhost:3010/api/organiser/${username}/dashboard`;
+        res.redirect(redirectUrl);
     } catch (error) {
         console.error('Error during organiser login:', error);
         return res.status(500).render( 'error' , {statusCode:'500' ,errorMessage:'Internal server error'});

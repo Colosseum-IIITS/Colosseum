@@ -247,9 +247,8 @@ exports.renderUpdateVisibilitySettings = async (req, res) => {
 
 
 exports.getOrganiserDashboard = async (req, res) => {
-    const { username } = req.params;  // Organiser's username passed in the URL
-     // Assume role passed as query, default is player
-    const loggedInUserId = req.user._id;
+    const { username } = req.params; // Organiser's username passed in the URL
+    const loggedInUserId = req.user._id; // Get the logged-in user's ID
 
     try {
         // Find the organiser by username
@@ -260,32 +259,16 @@ exports.getOrganiserDashboard = async (req, res) => {
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
-          console.log(organiser.tournaments);
-         const isOwner = loggedInUserId.equals(organiser._id);   // Common details
+
+        const isOwner = loggedInUserId.equals(organiser._id); // Check if logged-in user is the organiser
+        console.log("DEBUG:ISOWNER:"+isOwner+"lOGGEDINID:"+loggedInUserId+"ORGID:"+organiser._id);
         const totalTournaments = organiser.tournaments.length;
         const followerCount = organiser.followers.length;
-        const tournamentList = await Tournament.find({ organizer: organiser._id });
-        console.log('Tournaments fetched are'+ organiser.tournaments);
 
-        const totalPrizePool = tournamentList.reduce(
-            (sum, tournament) => sum + tournament.prizePool,
-            0
-        );
+        // Fetch all tournaments organized by the organiser
+        const tournamentList = await Tournament.find({ organiser: organiser._id });
 
-        const currentDate = new Date();
-
-        const completedTournaments = tournamentList.filter(
-            (t) => t.endDate < currentDate && t.status === "Completed"
-        );
-        const ongoingTournaments = tournamentList.filter(
-            (t) =>
-                t.startDate <= currentDate &&
-                t.endDate >= currentDate &&
-                t.status === "Approved"
-        );
-        const upcomingTournaments = tournamentList.filter(
-            (t) => t.startDate > currentDate && t.status !== "Completed"
-        );
+        const totalPrizePool = tournamentList.reduce((sum, tournament) => sum + tournament.prizePool, 0);
 
         // Handle visibility settings for players
         const visibilitySettings = organiser.visibilitySettings || {
@@ -294,22 +277,16 @@ exports.getOrganiserDashboard = async (req, res) => {
             showTournaments: true
         };
 
-        // Player's view: Apply visibility settings
+        // Render the dashboard with all tournaments in a single list
         res.render('organiserDashboard', {
-                organiser,
-                isOwner,
-                visibilitySettings,
-                followerCount: visibilitySettings.showFollowers ? followerCount : 'Hidden',
-                totalPrizePool: visibilitySettings.showTotalPrizePool ? totalPrizePool : 'Hidden',
-                totalTournaments: visibilitySettings.showTournaments ? totalTournaments : 'Hidden',
-                ongoingTournaments: visibilitySettings.showTournaments ? ongoingTournaments : [],
-                upcomingTournaments: visibilitySettings.showTournaments ? upcomingTournaments : [],
-                completedTournaments: visibilitySettings.showTournaments ? completedTournaments : []
-            });
-
-
-        // Organiser's view: Show everything
-
+            organiser,
+            isOwner,
+            visibilitySettings,
+            followerCount: visibilitySettings.showFollowers ? followerCount : 'Hidden',
+            totalPrizePool: visibilitySettings.showTotalPrizePool ? totalPrizePool : 'Hidden',
+            totalTournaments: visibilitySettings.showTournaments ? totalTournaments : 'Hidden',
+            tournamentList
+        });
     } catch (error) {
         console.error('Error fetching organiser dashboard:', error);
         res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });

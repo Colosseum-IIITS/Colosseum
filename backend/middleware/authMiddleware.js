@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Player = require("../models/Player"); // Ensure Player model is imported
 const Organiser = require("../models/Organiser");
-const Admin = require('../models/Admin');
+const Admin = require("../models/Admin");
 
 const authenticateToken = async (req, res, next) => {
   const token =
@@ -35,7 +35,8 @@ const authenticateToken = async (req, res, next) => {
       return res.status(403).json({ message: "Invalid token" });
     }
     return res
-      .status(500).json({ message: "Server error", error: error.message });
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 
@@ -76,8 +77,6 @@ const authenticateOrganiser = async (req, res, next) => {
   }
 };
 
-
-
 const authenticateUser = async (req, res, next) => {
   const token =
     req.cookies.user_jwt ||
@@ -97,6 +96,7 @@ const authenticateUser = async (req, res, next) => {
     const organiser = await Organiser.findById(decoded.id);
     if (organiser) {
       req.user = organiser; // If found, assign to req.user
+      req.user.role = "organiser";
       return next(); // Proceed to the next middleware
     }
 
@@ -104,12 +104,12 @@ const authenticateUser = async (req, res, next) => {
     const player = await Player.findById(decoded.id);
     if (player) {
       req.user = player; // If found, assign to req.user
+      req.user.role = "player";
       return next(); // Proceed to the next middleware
     }
 
     // If neither organiser nor player is found
     return res.status(404).json({ message: "User Not Found" });
-
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
@@ -117,15 +117,17 @@ const authenticateUser = async (req, res, next) => {
     if (error.name === "JsonWebTokenError") {
       return res.status(403).json({ message: "Invalid token" });
     }
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 
-
 const authenticateAdmin = async (req, res, next) => {
   const token =
-    req.cookies.admin_jwt || 
-    (req.headers["authorization"] && req.headers["authorization"].split(" ")[1]); // Extract from cookies or Bearer token
+    req.cookies.admin_jwt ||
+    (req.headers["authorization"] &&
+      req.headers["authorization"].split(" ")[1]); // Extract from cookies or Bearer token
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -158,6 +160,9 @@ const authenticateAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, authenticateOrganiser, authenticateUser, authenticateAdmin };
-
-
+module.exports = {
+  authenticateToken,
+  authenticateOrganiser,
+  authenticateUser,
+  authenticateAdmin,
+};

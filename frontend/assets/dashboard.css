@@ -337,3 +337,8 @@ font-size: 13px;
   font-weight: lighter;
 }
 
+
+completeContainer {
+  display: flex;
+  flex-direction: column;
+}

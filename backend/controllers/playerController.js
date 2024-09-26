@@ -120,7 +120,6 @@ exports.joinTournament = async (req, res) => {
             return res.status(404).json({ message: 'Tournament not found' });
         }
 
-        // Check if the team is banned (assuming you have this logic elsewhere)
         // if(tournament.organiser.bannedTeams.includes(player.team._id)) {
         //     return res.status(400).json({ message: 'Your team is banned' });
         // }
@@ -160,7 +159,8 @@ exports.joinTournament = async (req, res) => {
 
 // Update username
 exports.updateUsername = async (req, res) => {
-    const { newUsername } = req.body;
+    const { username } = req.body;
+
     const { _id } = req.user;
 
     try {
@@ -169,15 +169,15 @@ exports.updateUsername = async (req, res) => {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        const existingPlayer = await Player.findOne({ username: newUsername });
+        const existingPlayer = await Player.findOne({ username: username });
         if (existingPlayer) {
             return res.status(400).json({ message: 'Username already taken' });
         }
 
-        player.username = newUsername;
+        player.username = username;
         await player.save();
 
-        res.status(200).json({ message: 'Username updated successfully', player });
+        res.status(200).redirect('/dashboard');
     } catch (error) {
         console.error('Error updating username:', error);
         res.status(500).json({ error: 'Error updating username', details: error.message });
@@ -205,7 +205,7 @@ exports.updatePassword = async (req, res) => {
         player.password = hashedPassword;
         await player.save();
 
-        res.status(200).json({ message: 'Password updated successfully' });
+        res.status(200).redirect('/dashboard');
     } catch (error) {
         console.error('Error updating password:', error);
         res.status(500).json({ error: 'Error updating password', details: error.message });
@@ -214,7 +214,7 @@ exports.updatePassword = async (req, res) => {
 
 // Update email
 exports.updateEmail = async (req, res) => {
-    const { newEmail } = req.body;
+    const { email } = req.body; // Extract email from request body
     const { _id } = req.user;
 
     try {
@@ -223,19 +223,22 @@ exports.updateEmail = async (req, res) => {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        const existingEmail = await Player.findOne({ email: newEmail });
-        if (existingEmail) {
-            return res.status(400).json({ message: 'Email is already in use' });
+        // Check if the email is already in use
+        const existingPlayer = await Player.findOne({ email });
+        if (existingPlayer) {
+            return res.status(400).json({ message: 'Email already taken' });
         }
 
-        player.email = newEmail;
+        player.email = email; // Update the player's email
         await player.save();
-        res.status(200).json({ message: 'Email updated successfully' });
+
+        res.status(200).redirect('/dashboard');
     } catch (error) {
-        console.log('Error updating email:', error);
+        console.error('Error updating email:', error);
         res.status(500).json({ error: 'Error updating email', details: error.message });
     }
 };
+
 
 
 exports.updateProfile = async (req, res) => {
@@ -288,7 +291,31 @@ exports.updateProfile = async (req, res) => {
 };
 
 
+exports.getEnrolledTournaments = async (req, res) => {
+    const { _id } = req.user;
 
+    try {
+        const player = await Player.findById({ _id });
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        // Fetch the tournament details for enrolled tournaments with status 'Approved'
+        const tournaments = await Tournament.find({
+            _id: { $in: player.tournaments.map(t => t.tournament) }, // Assuming 'tournaments' array holds tournament IDs
+            status: 'Approved'
+        });
+
+        return res.status(200).json({ enrolledTournaments: tournaments });
+    } catch (error) {
+        console.error("Error retrieving enrolled tournaments:", error);
+        return res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+exports.getEnrolledTeams = async (req, res) => {
+    const { _id } = req.user;
+}
 
 
 // Fetch number of tournaments played by the player
@@ -378,21 +405,6 @@ exports.getHomePage = async (req, res) => {
 };
 
 
-exports.getPlayerDashboard = async (req, res) => {
-    const { userId } = req.user._id;
-    try {
-        const player = await Player.findById(userId); 
-        if (!player) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        // Pass user data to the template
-        res.status(200).render('dashboard', { player });
-    } catch(error) {
-        console.error('Error fetching user data:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-
 exports.getTournamentPointsTable = async (req, res) => {
     const { tournamentId } = req.params;
 
@@ -407,3 +419,32 @@ exports.getTournamentPointsTable = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error });
     }
 };
+
+
+
+exports.getDashboard = async (req, res) => {
+    const _id = req.user._id;
+    try {
+        const player = await Player.findById(_id);
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+        
+        res.render('dashboard', {  // No leading slash
+            player: {
+                username: player.username,
+                email: player.email,
+                globalRank: player.globalRank || 'Unranked',
+                tournamentsWon: player.tournamentsWon || 0,
+                tournamentsPlayed: player.tournamentsPlayed || 0,
+                gamesPlayed: player.gamesPlayed || 0,
+                winPercentage: player.winPercentage || 0
+            }
+        });
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching dashboard' });
+    }
+};
+
+

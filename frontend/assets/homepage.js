@@ -46,7 +46,7 @@ async function searchTournaments(searchTerm) {
                 'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure token is valid
             }
         });
-
+        
         if (!response.ok) {
             const message = await response.json();
             throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
@@ -170,7 +170,6 @@ async function joinTeam(teamId) {
     }
 }
 
-
 // Function to fetch and display enrolled teams
 async function fetchEnrolledTeams() {
     try {
@@ -271,8 +270,6 @@ function displayEnrolledTournaments(tournaments, message) {
         resultsContainer.appendChild(tournamentDiv);
     });
 }
-
-
 
 window.onload = () => {
     fetchEnrolledTeams();
@@ -430,6 +427,7 @@ async function followOrganiser(organiserId) {
         alert('An error occurred while trying to follow the organiser. Please try again.');
     }
 }
+
 async function fetchFollowedOrganisers() {
     try {
         const response = await fetch('/api/player/myOrganisers', {

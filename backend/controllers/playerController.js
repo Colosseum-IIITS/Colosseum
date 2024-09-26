@@ -429,6 +429,11 @@ exports.getDashboard = async (req, res) => {
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
+
+        const winPercentage = player.tournamentsPlayed
+            ? (player.tournamentsWon / player.tournamentsPlayed) * 100
+            : 0;
+
         
         res.render('dashboard', {  // No leading slash
             player: {
@@ -437,8 +442,9 @@ exports.getDashboard = async (req, res) => {
                 globalRank: player.globalRank || 'Unranked',
                 tournamentsWon: player.tournamentsWon || 0,
                 tournamentsPlayed: player.tournamentsPlayed || 0,
-                gamesPlayed: player.gamesPlayed || 0,
-                winPercentage: player.winPercentage || 0
+                noOfOrgsFollowing: player.following.length || 0,
+                teamName: player.team?.name || 'Not in a team',
+                winPercentage: winPercentage.toFixed(2),
             }
         });
         

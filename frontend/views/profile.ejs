@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Settings</title>
-    <link rel="stylesheet" href="/assets/profile.css">
+    <link rel="stylesheet" href="/assets/css/playerProfile.css">
 </head>
 <body>
     <div class="profile-picture-container">
@@ -16,7 +16,7 @@
             <% } %>
             <button type="button" class="edit-button" id="editPictureButton">Edit</button>
         </div>
-          </div>
+    </div>
     <div class="container">
         <div class="profile-container">
             <form id="profileForm" method="POST" action="/api/player/updateUsername" >
@@ -58,10 +58,10 @@
     <input type="file" id="file-input" style="display: none;" accept="image/*">
 
     <!-- Modal for Image Options -->
-    <div class="modal" id="modal">
+    <!-- <div class="modal" id="modal">
         <div class="modal-content">
             <button type="button" class="change-picture" id="changePictureButton">Change Picture</button><br>
             <button type="button" class="remove-picture" id="removePictureButton">Remove Picture</button><br>
             <button type="button" class="close" id="closeModalButton">Close</button>
-        </div>
+        </div> -->
     </div>

@@ -52,6 +52,23 @@
                     <button type="submit" class="save-button" id="saveButton">Save</button>
                 </div>
             </form>
+
+            <form id="createTeamForm" method="POST" action="/api/team/create">
+                <input type="text" name="name" placeholder="Team Name" required />
+                <button type="submit" class="save-button" id="saveButton">Create Team</button>
+            </form>
+            
+            
+            <form id="leaveTeamForm" method="POST" action="/api/team/leave" >
+                <button type="submit" class="save-button" id="saveButton">Leave Team</button>
+            </form>
+            <form id="updateTeamNameForm" method="POST" action="/api/team/updateTeamName">
+                <label for="newName">New Team Name:</label>
+                <input type="text" id="newName" name="newName" required placeholder="Enter New Team Name" />
+            
+                <button type="submit" class="save-button" id="updateButton">Update Team Name</button>
+            </form> 
+            
             
         </div>
     </div>

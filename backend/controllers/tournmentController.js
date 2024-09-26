@@ -387,6 +387,31 @@ exports.joinTournament = async (req, res) => {
     }
 };
 
+exports.getPointsTable = async (req, res) => {
+  const { tournamentId } = req.params;
+  try {
+      // Fetch tournament details by ID
+      const tournament = await Tournament.findById(tournamentId).populate('teams');
+
+      if (!tournament) {
+          return res.status(404).render('error', { message: 'Tournament not found' });
+      }
+
+      const tournamentName = tournament.name;
+      const pointsTable = tournament.pointsTable || []; // If pointsTable is missing, default to an empty array
+
+      // Render pointsTable.ejs with tournament details
+      res.render('pointsTable', {
+          tournamentName,
+          pointsTable
+      });
+  } catch (error) {
+      console.error('Error fetching tournament details:', error);
+      return res.status(500).render('error', { message: 'Server error' });
+  }
+};
+
+
 exports.leaveTournament = async (req, res) => {
   try {
     const tournamentId = req.params.tournamentId;

@@ -20,7 +20,7 @@ router.put('/updateWinner', tournamentController.updateWinner);
 
 
 router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);
-
+router.get('/pointsTable/:tournamentId', authenticateToken, tournamentController.getPointsTable);
 router.post('/edit/:tournamentId', tournamentController.editTournament);
 
 module.exports = router;

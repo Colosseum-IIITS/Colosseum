@@ -20,59 +20,60 @@
             <img src="/assets/user.png" alt="Profile" class="profile-pic"></a>
         </div>
     </nav>
-
-    <!-- Main container for the layout -->
+<div class="entireContent">
+ 
     <div class="main-container">
-        <!-- Left Column for tournaments -->
-        <div class="left-column">
+    
+        <div class="tournamentList">
+            <div class="headTitle">
+            <h3> Joined Tournaments</h3></div>
             <div id="joined-tournaments">
                 <% if (joinedTournaments.length > 0) { %>
-                    <h3>Your Joined Tournaments:</h3>
-                    <div class="tournament-list">
+                   
+                    
                         <% joinedTournaments.forEach(tournament => { %>
-                            <div class="tournament-item" onclick="window.location.href='/tournament/<%= tournament._id.toString() %>'">
-                                <h4><%= tournament.name %></h4> <!-- Tournament Name -->
-                                <p>Description: <%= tournament.description %></p> <!-- Tournament Description -->
-                                <p>Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
+                            <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/pointsTable/<%= tournament._id.toString() %>'">
+                             <div class="TName">   <h4><%= tournament.name %></h4> <!-- Tournament Name --></div>
+                              <div class="DescT"><p class="tournamentDesc"> Description: <%= tournament.description %></p> <!-- Tournament Description -->
+                                <p class="tournamentDate">Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
                             </div>
+                        </div>
                         <% }); %>
-                    </div>
+                  
+                    
                 <% } else { %>
                     <p>You have not joined any tournaments.</p>
                 <% } %>
             </div>
-        </div>
-        
-                    
-                    <script>
-                        // Optionally, you can show this section after a successful join
-                        document.getElementById("loaded-tournament-data").style.display = "block";
-                    </script>
-                    
-            </div>
-        </div>
-        
-        <!-- Right Column for organiser and team results -->
-        <div class="right-column">
+          </div>  
             <div class="searchResults" id="searchOrg">
-                <div class="heading">Organization Results</div>
-                <h2>Followed Organisers</h2>
+                <div class="headTitle" id="orgTitle">
+                <h2>Followed Organisers</h2></div>
                 <div id="followed-organisers">
                     <% if (followedOrganisers.length > 0) { %>
                         <% followedOrganisers.forEach(organiser => { %>
                             <div class="organiser-details">
-                                <h3><%= organiser.username %></h3>
-                                <p><strong>Email:</strong> <%= organiser.email %></p>
-                                <strong>Tournaments Organized:</strong>
-                                <ul>
-                                    <% if (organiser.tournaments && organiser.tournaments.length > 0) { %>
-                                        <% organiser.tournaments.forEach(tournament => { %>
-                                            <li>Tournament ID: <%= tournament._id.toString() %></li>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <li>No tournaments organized yet</li>
-                                    <% } %>
-                                </ul>
+                                <div class="TName">
+                                    <h3 class="OrgName"><%= organiser.username %></h3>
+                                </div>
+                                <div class="DescT">
+                                    <p class="email"><strong>Email:</strong> <%= organiser.email %></p>
+                                    <p class="tournamentsOrg"><strong>Tournaments Organized</strong></p>
+                                    <ul>
+                                        <% if (organiser.tournaments && organiser.tournaments.length > 0) { %>
+                                            <% organiser.tournaments.forEach(tournament => { %>
+                                                <p class="tournamentPara">Tournament ID: <%= tournament._id.toString() %></p>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <p class="tournamentPara">No tournaments organized yet</p>
+                                        <% } %>
+                                    </ul>
+                                    <!-- Unfollow button -->
+                                    <form action="/api/player/unFollowOrganiser" method="POST" style="display:inline;" id="follow-form-<%= organiser._id %>">
+                                        <input type="hidden" name="organiserId" value="<%= organiser._id %>">
+                                        <button type="submit" class="followButton">unFollow</button>
+                                    </form>
+                                </div>
                             </div>
                         <% }); %>
                     <% } else { %>
@@ -80,15 +81,20 @@
                     <% } %>
                 </div>
                 
+                <!-- Hidden form to handle unfollowing -->
+               
+            </div>
+        </div>
+        
+        <!-- Right Column for organiser and team results -->
+
+           
+                
                 </div>
                 
                     </div>
                 </div>
-            </div>
-
-        </div>
-    </div>
-    
+</div> 
     <script src="/assets/homepage.js"></script>
 </body>
 </html>

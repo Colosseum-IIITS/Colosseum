@@ -9,21 +9,20 @@
     <script src="/assets/homepage.js" defer></script>
 </head>
 <body>
-    <a href="/dashboard" class="navLinks">
-    <nav class="navbar">
-        <div class="navbar-brand"><%= playerName %>'s website
-        </div>
-        <div id="welcome-message"></div></a>
-        <div class="search-profile">
-            <form class="search-form" method="GET" action="/api/player/searchTournaments" onsubmit="return preprocessSearchInput()">
-                <input type="text" id="search-input" name="searchTerm" placeholder="'?' for tournaments, '>' for teams, ':' for org" required aria-label="Search tournaments and teams">
-                <button type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
-<div class="entireContent">
+    
+    
+    <div class="entireContent">
  
-    <div class="main-container">
+        <nav class="navbar">
+            <a href="/dashboard" class="navLinks"><div class="navbar-brand"><%= playerName %>'s website</div></a>
+            <div class="search-profile">
+                <form class="search-form" method="GET" action="/api/player/searchTournaments" onsubmit="return preprocessSearchInput()">
+                    <input type="text" id="search-input" name="searchTerm" placeholder="'?' for tournaments, '>' for teams, ':' for org" required aria-label="Search tournaments and teams">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+        <div class="main-container">
     
         <div class="tournamentList">
             <div class="headTitle">
@@ -86,14 +85,7 @@
         </div>
         
         <!-- Right Column for organiser and team results -->
-
-           
-                
-                </div>
-                
-                    </div>
-                </div>
-</div> 
+    </div>
     <script src="/assets/homepage.js"></script>
 </body>
 </html>

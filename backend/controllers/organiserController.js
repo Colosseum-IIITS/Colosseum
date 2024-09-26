@@ -262,12 +262,15 @@ exports.getOrganiserDashboard = async (req, res) => {
         const isOwner = loggedInUserId.equals(organiser._id); // Check if logged-in user is the organiser
         console.log("DEBUG:ISOWNER:"+isOwner+"lOGGEDINID:"+loggedInUserId+"ORGID:"+organiser._id);
         const totalTournaments = organiser.tournaments.length;
+        console.log("Total Tournaments Count Fetched:"+totalTournaments);
         const followerCount = organiser.followers.length;
+        console.log("FollowerCount fetched: "+followerCount);
 
         // Fetch all tournaments organized by the organiser
         const tournamentList = await Tournament.find({ organiser: organiser._id });
 
         const totalPrizePool = tournamentList.reduce((sum, tournament) => sum + tournament.prizePool, 0);
+        console.log(totalPrizePool);
 
         // Handle visibility settings for players
         const visibilitySettings = organiser.visibilitySettings || {
@@ -275,6 +278,7 @@ exports.getOrganiserDashboard = async (req, res) => {
             showTotalPrizePool: true,
             showTournaments: true
         };
+        console.log("Visibility Settings:"+visibilitySettings);
 
         // Render the dashboard with all tournaments in a single list
         res.render('organiserDashboard', {

@@ -179,3 +179,29 @@ a:hover {
     left: 80%;
     animation-duration: 9s;
 }
+
+
+
+.tournament-list {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: 10px; /* Ensure padding on the right for better readability */
+}
+
+.tournament-list ul {
+    padding-right: 10px; /* Prevent content from being too close to the scrollbar */
+}
+
+/* Optional: Customize the scrollbar for a better look */
+.tournament-list::-webkit-scrollbar {
+    width: 8px; /* Adjust width of the scrollbar */
+}
+
+.tournament-list::-webkit-scrollbar-track {
+    background: rgba(20, 20, 20, 0.8); /* Dark background for the scrollbar track */
+}
+
+.tournament-list::-webkit-scrollbar-thumb {
+    background-color: #00ff00; /* Green color for the scrollbar thumb */
+    border-radius: 10px;
+}

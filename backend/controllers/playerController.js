@@ -411,7 +411,9 @@ exports.getHomePage = async (req, res) => {
         let followedOrganisers = [];
         let joinedTournaments = [];
 
-        const playerName= req.user.username;
+        // Ensure the playerName is extracted if user is logged in
+        const playerName = req.user?.username || 'Guest';
+        
         if (req.user && req.user._id) {
             const { _id } = req.user;
 
@@ -433,7 +435,7 @@ exports.getHomePage = async (req, res) => {
             if (player) {
                 followedOrganisers = player.following || [];
 
-                // Fetch tournaments from the player's team
+                // Fetch tournaments for the player's team
                 const team = player.team;
                 if (team) {
                     joinedTournaments = await Tournament.find({ teams: team._id })
@@ -462,6 +464,7 @@ exports.getHomePage = async (req, res) => {
         });
     }
 };
+
 
 
 

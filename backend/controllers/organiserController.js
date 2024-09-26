@@ -50,7 +50,7 @@ exports.getOrganiserByUsername = async (req, res) => {
       
       if (organisers.length === 0) {
           console.log(`No organisers found for the username: ${searchTerm}`);
-          return res.render('homepage', {
+          return res.render('searchOrg', {
               message: 'No organisers found',
               organisationResults: [],
               searchTerm: '',

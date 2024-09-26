@@ -1,7 +1,14 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const jwt = require("jsonwebtoken");
 const Player = require("../models/Player"); // Ensure Player model is imported
 const Organiser = require("../models/Organiser");
 const Admin = require("../models/Admin");
+
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const authenticateToken = async (req, res, next) => {
   const token =

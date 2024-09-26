@@ -17,6 +17,7 @@ router.post('/joinTournament', authenticateToken, playerController.joinTournamen
 router.put('/updateUsername', authenticateToken, playerController.updateUsername); // w
 router.put('/updatePassword', authenticateToken, playerController.updatePassword); // w
 router.put('/updateEmail', authenticateToken, playerController.updateEmail); // w
+router.post('/updateProfile', authenticateToken , playerController.updateProfile);
 router.get('/tournamentsPlayed', authenticateToken, playerController.getTournamentsPlayed); // w
 router.get('/tournamentsWon', authenticateToken, playerController.getTournamentsWon); // w
 router.get('/ranking', authenticateToken, playerController.getPlayerRanking); // w

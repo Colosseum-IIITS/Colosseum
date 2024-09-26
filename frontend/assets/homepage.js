@@ -38,7 +38,6 @@ async function handleSearch(event) {
     }
 }
 
-
 async function searchTournaments(searchTerm) {
     try {
         const response = await fetch(`/api/player/searchTournaments?searchTerm=${encodeURIComponent(searchTerm)}`, {
@@ -58,13 +57,14 @@ async function searchTournaments(searchTerm) {
         // Debugging: Log the result to check its structure
         console.log('Search Tournaments Result:', result);
 
-        // Pass the result directly since it's an array
+        // Directly display the result as it's already filtered by the backend
         displayTournamentResults(result);
     } catch (error) {
         console.error('Error searching for tournaments:', error);
         document.getElementById('tournament-results').innerText = 'An error occurred while searching for tournaments.';
     }
 }
+
 
 function displayTournamentResults(tournaments) {
     const resultsContainer = document.getElementById('tournament-results');

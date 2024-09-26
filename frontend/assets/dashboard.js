@@ -159,4 +159,5 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchGlobalRank(); // Fetch global rank
     fetchTournamentsPlayed(); // Fetch tournaments played
     calculateWinPercentage(); 
+    drawWinPercentageChart();
 });

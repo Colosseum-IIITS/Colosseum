@@ -17,6 +17,8 @@ router.post('/update/:tournamentId', tournamentController.updateTournament);
 router.put('/updateWinner', tournamentController.updateWinner);
 
 
+router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);
+
 router.post('/edit/:tournamentId', tournamentController.editTournament);
 
 module.exports = router;

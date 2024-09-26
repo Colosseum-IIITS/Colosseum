@@ -17,17 +17,27 @@ exports.getOrganiserByUsername = async (req, res) => {
       
       if (organisers.length === 0) {
           console.log(`No organisers found for the username: ${searchTerm}`);
-          return res.status(200).json({ message: 'No organisers found', organiser: [] });
+          return res.render('homepage', {
+              message: 'No organisers found',
+              organisationResults: [],
+              searchTerm: '',
+              results: [] // Ensure results is defined as an empty array
+          });
       }
 
       console.log(`${organisers.length} organisers found.`);
-      return res.status(200).json({ organiser: organisers });
+      return res.render('homepage', {
+          organisationResults: organisers,
+          searchTerm: searchTerm,
+          results: [] // Ensure results is defined as an empty array or pass tournament results as needed
+      });
       
   } catch (error) {
       console.error('Error fetching organisers:', error);
-      return res.status(500).json({ error: 'Error fetching organisers', details: error.message });
+      return res.status(500).render('error', { statusCode: '500', errorMessage: 'Error fetching organisers' });
   }
 };
+
 
 
 exports.updateOrganiserSettings = async (req, res) => {
@@ -291,6 +301,7 @@ exports.getOrganiserDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
     }
 };
+
 exports.getMyOrganisers = async (req, res) => {
     const { _id } = req.user; // Player ID
 

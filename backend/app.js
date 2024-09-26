@@ -67,8 +67,9 @@ app.get('/', (req, res) => {
     console.log(req.user); // Check what is being passed
     res.render('profile', { user: req.user || null });
 });
+app.get('/homepage', playerController.getHomePage);
 
-    
+
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication
 app.use('/api/player', playerRoutes);
@@ -89,7 +90,7 @@ mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
-const PORT = process.env.PORT || 3010; 
+const PORT = process.env.PORT || 30001; 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -23,7 +23,9 @@ router.get('/ranking', authenticateToken, playerController.getPlayerRanking);
 router.get('/searchOrganisers', authenticateToken, organiserController.getOrganiserByUsername);
 router.post('/report-team', authenticateToken, reportController.reportTeam);
 router.post('/report-organiser', authenticateToken, reportController.reportOrganiser);
-// router.get('/dashboard', authenticateToken, playerController.getDashboard);
+router.get('/dashboard', authenticateToken, playerController.getDashboard);
+router.get('/teamName', authenticateToken, teamController.getTeamsByName);
+router.get('/followedOrg',authenticateToken,organiserController.getMyOrganisers);
 router.get('/homepage', authenticateToken, playerController.getHomePage);
 
 

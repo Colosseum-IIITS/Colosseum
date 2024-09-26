@@ -56,9 +56,11 @@ exports.joinTeam = async (req, res) => {
     team.players.push(playerId);
     await team.save();
 
-    res.status(200).json({ message: 'Joined team successfully', team });
+    // Send a JSON response indicating success
+    return res.status(200).json({ message: 'Joined team successfully', team });
   } catch (error) {
-    res.status(500).json({ error: 'Error joining team' });
+    console.error('Error joining team:', error);
+    return res.status(500).json({ error: 'Error joining team' });
   }
 };
 
@@ -86,26 +88,31 @@ exports.leaveTeam = async (req, res) => {
   }
 };
 
-// search a Team by name
+
+// Controller to fetch teams based on search term and render the resultsTeam.ejs view
 exports.getTeamsByName = async (req, res) => {
   const { searchTerm } = req.query;
 
   if (!searchTerm) {
-      return res.status(400).json({ message: 'Search term is required' });
+      return res.status(400).render('resultsTeam', { teams: [], searchTerm: null, error: 'Search term is required' });
   }
 
   try {
       const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
-          .populate('players')
-          .populate('captain');
+          .populate('players', 'name') // Populate only the name field
+          .populate('captain', 'name'); // Populate only the name field
 
-      // Always return a teams property in the response
-      res.status(200).json({ teams: teams || [] });
+      // Log the fetched teams with populated data
+      console.log('Fetched Teams:', JSON.stringify(teams, null, 2));
+
+      // Render resultsTeam.ejs and pass the teams and searchTerm to the view
+      res.render('resultsTeam', { teams, searchTerm, error: null });
   } catch (error) {
       console.error('Error fetching teams:', error);
-      res.status(500).json({ error: 'Error fetching teams', details: error.message });
+      res.status(500).render('resultsTeam', { teams: [], searchTerm, error: 'Error fetching teams' });
   }
 };
+
 
 
 

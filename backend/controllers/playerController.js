@@ -45,10 +45,10 @@ exports.followOrganiser = async (req, res) => {
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user;
+    const { _id: playerId } = req.user; // Extract playerId from JWT token
 
     try {
-        const player = await Player.findOne({ _id });
+        const player = await Player.findById(playerId);
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
@@ -58,19 +58,23 @@ exports.unfollowOrganiser = async (req, res) => {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
+        // Check if player is following the organiser
         if (!player.following.includes(organiserId)) {
             return res.status(400).json({ message: 'Player is not following this organiser' });
         }
 
+        // Remove organiser from player's following list
         player.following.pull(organiserId);
         await player.save();
 
-        organiser.followers.pull(player._id);
+        // Remove player from organiser's followers list
+        organiser.followers.pull(playerId);
         await organiser.save();
 
-        res.status(200).json({ message: 'Organiser unfollowed successfully', player, organiser });
+        res.redirect('/api/player/homepage')
     } catch (error) {
-        res.status(500).json({ error: 'Error unfollowing organiser' });
+        console.error('Error unfollowing organiser:', error);
+        res.status(500).json({ error: 'Error unfollowing organiser', details: error.message });
     }
 };
 
@@ -456,7 +460,6 @@ exports.getHomePage = async (req, res) => {
         });
     }
 };
-
 
 
 

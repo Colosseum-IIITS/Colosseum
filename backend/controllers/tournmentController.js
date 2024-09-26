@@ -7,7 +7,7 @@ const Organiser = require("../models/Organiser");
 // Create a new tournament
 exports.createTournamentForm=async(req,res)=>{
     res.render('createTournament',{organiser:req.user});
-}
+};
 //working
 
 exports.createTournament = async (req, res) => {
@@ -32,6 +32,11 @@ exports.createTournament = async (req, res) => {
     if (existingTournament) {
       return res.status(400).json({ message: "Tournament ID already exists" });
     }
+
+    if (new Date(startDate) >= new Date(endDate)) {
+      return res.status(400).json({ message: "Start date must be earlier than end date" });
+  }
+  
 
     // Create a new tournament
     const tournament = new Tournament({
@@ -62,11 +67,8 @@ exports.createTournament = async (req, res) => {
     }
 
     // Respond with success
-    res.status(201).json({
-      message: "Tournament created successfully and appended to organiser's list",
-      tournament: savedTournament,
-      organiser: organiserUpdate,
-    });
+    const redirectUrl = `http://localhost:3000/api/organiser/${req.user.username}/dashboard`;
+    res.redirect(redirectUrl);
   } catch (error) {
     res.status(500).json({ error: "Error creating tournament" });
     console.error("Error creating tournament:", error);
@@ -111,11 +113,11 @@ exports.updateWinner = async (req, res) => {
       return res.status(404).json({ message: "Tournament not found" });
     }
 
-    // Check if the requester is the organizer
-    if (!tournament.organizer.equals(req.user.id)) {
+    // Check if the requester is the organiser
+    if (!tournament.organiser.equals(req.user.id)) {
       return res
         .status(403)
-        .json({ message: "Only the organizer can update the winner" });
+        .json({ message: "Only the organiser can update the winner" });
     }
 
     // Update the winner in the tournament
@@ -150,8 +152,6 @@ exports.updatePointsTable = async (req, res) => {
   const { tournamentId, teamName, additionalPoints } = req.body;
   const organiserId = req.user._id; // Extracted from JWT token
 
-  console.log("rithvik hot",req.body);
-  console.log("rithvik hot" , req.user._id);
   try {
       const tournament = await Tournament.findById(tournamentId);
       if (!tournament) {
@@ -159,9 +159,9 @@ exports.updatePointsTable = async (req, res) => {
       }
 
 
-      // Check if the requester is the organizer of the tournament
+      // Check if the requester is the organiser of the tournament
       if (tournament.organiser.toString() !== organiserId.toString()) {
-          return res.status(403).json({ message: 'Unauthorized: You are not the organizer of this tournament' });
+          return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
       }
 
       const teamEntry = tournament.pointsTable.find(entry => entry.teamName === teamName);

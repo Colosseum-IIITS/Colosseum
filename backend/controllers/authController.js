@@ -81,7 +81,7 @@ exports.loginPlayer = async (req, res) => {
     }
 };
 
-// Create a new organizer          
+// Create a new organiser          
 exports.createOrganiser = async (req, res) => {
     console.log('Organiser signup request:', req.body);
     const { username, email, password } = req.body;
@@ -159,7 +159,7 @@ exports.loginOrganiser = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
-        const redirectUrl = `http://localhost:3010/api/organiser/${username}/dashboard`;
+        const redirectUrl = `http://localhost:3000/api/organiser/${username}/dashboard`;
         res.redirect(redirectUrl);
     } catch (error) {
         console.error('Error during organiser login:', error);

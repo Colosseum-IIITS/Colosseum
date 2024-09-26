@@ -1,0 +1,27 @@
+<div class="searchResults" id="searchTournament">
+    <h1>Tournament Results</h1>
+
+    <!-- Display search term for clarity -->
+    <% if (searchTerm) { %>
+        <h2>Search Results for "<%= searchTerm %>"</h2>
+    <% } %>
+
+    <!-- Check if there are any results -->
+    <% if (results.length > 0) { %> <!-- This line should use EJS syntax for 'if' -->
+        <ul>
+            <% results.forEach(tournament => { %>
+                <li>
+                    <%= tournament.name %> (ID: <%= tournament.tid %>)
+                    <form action="/api/player/joinTournament" method="POST" style="display:inline;">
+                        <input type="hidden" name="tournamentId" value="<%= tournament._id %>">
+                        <button type="submit" class="joinButton">Join Tournament</button>
+                    </form>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else if (searchTerm) { %>
+        <h3>No tournaments found for "<%= searchTerm %>"</h3>
+    <% } else { %>
+        <h3>Please enter a tournament name to search.</h3>
+    <% } %>
+</div>

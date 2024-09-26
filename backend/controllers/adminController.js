@@ -111,7 +111,7 @@ exports.fetchOrganiserReportsForAdmin = async (req, res) => {
     });
       
       const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
-      const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organizer');
+      const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
 
       res.render('adminDashboard', {
         organisers,

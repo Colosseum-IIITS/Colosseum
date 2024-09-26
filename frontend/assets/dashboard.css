@@ -19,41 +19,41 @@ body {
    display: flex;
    flex-direction: column;
    align-items: center;
-   transition: transform 0.3s ease; /* Smooth transition */
-   transform: translateX(-100%); /* Hide sidebar by default */
-   position: fixed; /* Overlay the content */
+   transition: transform 0.3s ease; 
+   transform: translateX(-100%); 
+   position: fixed; 
    height: 100vh; 
-   z-index: 1000; /* Ensure it's above main content */
+   z-index: 1000; 
 }
 
 .sidebar.open {
-   transform: translateX(0); /* Show sidebar when open */
+   transform: translateX(0); 
 }
 
 .menu-toggle {
-   background: none; /* No background */
-   border: none; /* No border */
-   color: #ffffff; /* Text color */
-   font-size: 24px; /* Adjust size */
-   cursor: pointer; /* Pointer cursor */
-   margin-bottom: 20px; /* Space below */
-   z-index: 1001; /* Ensure it's above the sidebar */
+   background: none; 
+   border: none; 
+   color: #ffffff; 
+   font-size: 24px; 
+   cursor: pointer; 
+   margin-bottom: 20px; 
+   z-index: 1001; 
 }
 
-/* Sidebar heading */
+
 .sidebar h2 {
 color: #fff;
 margin-bottom: 30px;
 }
 
-/* Sidebar navigation list */
+
 .sidebar ul {
 list-style: none;
 padding: 0;
-width: 100%;  /* Ensure it spans the sidebar width */
+width: 100%;  
 }
 
-/* Sidebar navigation items */
+
 .sidebar ul li {
 margin-bottom: 20px;
 }
@@ -70,21 +70,21 @@ border-radius: 6px;
 transition: all 0.3s ease-out;
 }
 
-/* Hover effect for sidebar links */
+
 .sidebar ul li a:hover {
 background-color: #5353ff;
 color: #ffffff;
 transform: translate(1px, -1px);
 }
 
-/* Icon styling inside the sidebar link */
+
 .sidebar ul li a svg {
 width: 20px;
 height: 20px;
 transition: all 0.3s ease-out;
 }
 
-/* Change the icon color when hovering over a link */
+
 .sidebar ul li a:hover svg {
 stroke: #ffffff;
 }
@@ -93,12 +93,12 @@ stroke: #ffffff;
 .main-content {
 flex-grow: 1;
 padding: 20px;
-position: relative; /* Keep it in place */
-z-index: 1; /* Ensure it's below the sidebar */
+position: relative;
+z-index: 1;
 }
 .main-content.shifted {
-transform: translateX(200px); /* Moves the content to the right */
-transition: transform 0.3s ease; /* Adds a smooth transition effect */
+transform: translateX(200px); 
+transition: transform 0.3s ease; 
 }
 
 .header h1 {
@@ -108,6 +108,8 @@ margin-left: 270px;
 
 .stats {
 display: grid;
+min-width: 100%;
+margin-left: -70px;
 grid-template-columns: repeat(3, 1fr);
 grid-gap: 20px;
 }
@@ -135,46 +137,45 @@ grid-column: span 2;
  }
 
  .stat-value {
-   font-size: 40px; /* Larger size for better visibility */
-   color: #e5e5e5; /* Light color to contrast with the background */
-   font-weight: bold; /* Emphasize the digits */
-   letter-spacing: 2px; /* Spacing between digits */
+   font-size: 40px; 
+   color: #e5e5e5;
+   font-weight: bold; 
+   letter-spacing: 2px;
    margin-top: 25px;
  }
  
  .stat-card .Global-rank {
-   color: #53ff53; /* Green color for tournaments won */
+   color: #53ff53; 
    font-size: 2.25rem;
    font-weight: bold;
    margin-top: 45px;
  }
- /* Specific styles for the "tournaments won" and "tournaments played" */
+ 
  .stat-card .tournament-won {
-   color: #53ff53; /* Green color for tournaments won */
+   color: #53ff53;
    font-size: 2.25rem;
  }
  
  .stat-card .tournament-played {
-   color: #ff5353; /* Red color for tournaments played */
+   color: #ff5353; 
    font-size: 2.25rem;
  }
 
  .stat-card .Games-played {
-   color: #53ff53; /* Green color for tournaments won */
+   color: #53ff53; 
    font-size: 2.25rem;
    font-weight: bold;
    margin-top: 45px;
  }
 
  .stat-card .win-percentage {
-   color: #53ff53; /* Green color for tournaments won */
+   color: #53ff53;
    font-size: 2.25rem;
    font-weight: bold;
    margin-top: 45px;
  }
  
  
- /* Adding hover effect on the stat-value digits */
  .stat-card .stat-value:hover {
    transform: scale(1.1);
    transition: transform 0.3s ease;
@@ -189,29 +190,29 @@ transform: translateX( 55% );
 #u2{
 height: 80%;
 width: 40%;
-margin-left: 64%;
+margin-left: 62%;
 }
 #u3{
    height: 80%;
 width: 40%;
-margin-left: 11%;
+margin-left: 8%;
 }
 #u4{
 height: 80%;
-width: 98%;
-margin-left: 59%;
+width: 97.5%;
+margin-left: 58%;
 margin-top: 5%;
 }
 #u5{
 height: 80%;
-width: 91%;
-margin-left: 64%;
+width: 89%;
+margin-left: 62%;
 margin-top: 5%;
 }
 
 
 .Player{
-font-family: 'Press Start 2P', cursive; /* Fallback to cursive if the font fails to load */
+font-family: 'Press Start 2P', cursive;
 font-size: 20px;
 color: #ffffff;
 letter-spacing: 1px;
@@ -220,8 +221,8 @@ text-transform: uppercase;
 
 .ani {
 white-space: nowrap;
-overflow: hidden; /* Hides text until it's revealed */
-animation: typing 4s steps(25), blink-caret .5s step-end infinite; /* Adjust typing duration and steps */
+overflow: hidden;
+animation: typing 4s steps(25), blink-caret .5s step-end infinite; 
 }
 
 @keyframes typing {
@@ -234,16 +235,17 @@ from, to { border-color: transparent; }
 50% { border-color: #fff; }
 }
 .profile-box {
-display: flex; /* Align items side by side */
+display: flex;
 flex-direction: row;
-align-items: center; /* Vertically center items */
-background-color: #292d42; /* Background color for the box */
-padding: 40px; /* Space inside the box */
-border-radius: 10px; /* Rounded corners */
-box-shadow: 0 0 90px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-margin-left: 250px; /* Space from the left */
-margin-top: 60px; /* Space from the top */
+align-items: center; 
+background-color: #292d42;
+padding: 40px;
+border-radius: 10px;
+box-shadow: 0 0 90px rgba(0, 0, 0, 0.2);
+margin-top: 60px; 
 
+padding-top: 60px;
+padding-bottom: 90px;
 width: 62%;
 }
 
@@ -255,38 +257,34 @@ background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv9
 background-size: cover;
 background-position: center;
 margin-left: 140px;
-margin-right: 130px; /* Space between the circle and text */
-border: 3px solid #9ba8fc; /* Optional border */
+margin-right: 130px;
+border: 3px solid #9ba8fc;
 }
 
 
 .profile-info {
-display: flex; /* Use flexbox to align items */
-align-items: center; /* Vertically center items */
-margin-bottom: 30px; /* Add space below */
-}
-
-.profile-text {
-margin-bottom: 11%;
+display: flex; 
+align-items: center; 
+margin-bottom: 30px;
 }
 
 .player-name {
-margin: 26px 0; /* Space between text lines */
-color: #ffffff; /* Text color */
-font-family: 'Press Start 2P', cursive; /* Use the same font */
+margin: 26px 0; 
+color: #ffffff; 
+font-family: 'Press Start 2P', cursive; 
 font-size: 30px;
 }
 .player-email{
-margin: 20px 0; /* Space between text lines */
-color: #ffffff; /* Text color */
+margin: 20px 0; 
+color: #ffffff; 
 font-family: 'Press Start 2P', cursive;
 font-size: 13px;
 }
 
 
 .card {
-  width: 100%;
-  max-width: 290px;
+  width: 80%;
+  max-width: 100%;
   height: 70px;
   background: #353535;
   border-radius: 20px;
@@ -311,10 +309,7 @@ font-size: 13px;
 }
 
 .textBox {
-  width: calc(100% - 90px);
-  margin-left: 10px;
-  color: white;
-  font-family: 'Poppins' sans-serif;
+  padding: 10px;
 }
 
 .textContent {
@@ -337,3 +332,10 @@ font-size: 13px;
   font-weight: lighter;
 }
 
+
+.completeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Tournament</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Edit Tournament</h1>
+
+        <!-- Display Tournament ID (tid) which is unchangeable -->
+        <div class="alert alert-info">
+            <strong>Tournament ID (TID):</strong> <%= tournament.tid %>
+        </div>
+
+        <!-- Tournament Edit Form -->
+        <form action="/api/tournament/edit/<%= tournament.tid %>" method="POST">
+            <input type="hidden" name="_method" value="PUT"> <!-- Hidden method field -->
+            
+            <div class="form-group">
+                <label for="name">Tournament Name:</label>
+                <input type="text" id="name" name="name" class="form-control" value="<%= tournament.name %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" class="form-control" value="<%= tournament.startDate.toISOString().split('T')[0] %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" class="form-control" value="<%= tournament.endDate.toISOString().split('T')[0] %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="entryFee">Entry Fee:</label>
+                <input type="number" id="entryFee" name="entryFee" class="form-control" value="<%= tournament.entryFee %>">
+            </div>
+
+            <div class="form-group">
+                <label for="prizePool">Prize Pool:</label>
+                <input type="number" id="prizePool" name="prizePool" class="form-control" value="<%= tournament.prizePool %>">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status" class="form-control" required>
+                    <option value="Pending" <%= tournament.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Approved" <%= tournament.status === 'Approved' ? 'selected' : '' %>>Approved</option>
+                    <option value="Completed" <%= tournament.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" class="form-control" required><%= tournament.description %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="winner">Winner:</label>
+                <input type="text" id="winner" name="winner" class="form-control" value="<%= tournament.winner %>">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Update Tournament</button>
+        </form>
+
+        <a href="/api/tournament/<%= tournament.tid %>" class="btn btn-secondary mt-3">Back to Tournaments List</a>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 
     <div class="form-card">
         <!-- Form to update username -->
-        <form action="/organiser/update-username" method="POST">
+        <form action="/api/organiser/updateUsername" method="POST">
             <label for="username">New Username:</label>
             <input type="text" id="username" name="newUsername" value="<%= organiser.username %>" required>
             <button type="submit">Update Username</button>
@@ -12,7 +12,7 @@
 
     <div class="form-card">
         <!-- Form to update email -->
-        <form action="/organiser/update-email" method="POST">
+        <form action="/api/organiser/updateEmail" method="POST">
             <label for="email">New Email:</label>
             <input type="email" id="email" name="newEmail" value="<%= organiser.email %>" required>
             <button type="submit">Update Email</button>
@@ -21,7 +21,7 @@
 
     <div class="form-card">
         <!-- Form to update description -->
-        <form action="/organiser/update-description" method="POST">
+        <form action="/api/organiser/updateDescription" method="POST">
             <label for="description">New Description:</label>
             <textarea id="description" name="newDescription" required><%= organiser.description %></textarea>
             <button type="submit">Update Description</button>
@@ -30,7 +30,7 @@
 
     <div class="form-card">
         <!-- Form to update profile photo -->
-        <form action="/organiser/update-profile-photo" method="POST">
+        <form action="/api/organiser/updateProfilePhoto" method="POST">
             <label for="profilePhoto">New Profile Photo URL:</label>
             <input type="text" id="profilePhoto" name="newProfilePhoto" value="<%= organiser.profilePhoto %>" required>
             <button type="submit">Update Profile Photo</button>
@@ -39,7 +39,7 @@
 
     <div class="form-card">
         <!-- Form to update password -->
-        <form action="/organiser/update-password" method="POST">
+        <form action="/api/organiser/updatePassword" method="POST">
             <label for="currentPassword">Current Password:</label>
             <input type="password" id="currentPassword" name="currentPassword" required>
 
@@ -50,5 +50,5 @@
         </form>
     </div>
 
-    <a href="/organiser/dashboard">Back to Dashboard</a>
+    <a href="/api/organiser/<%= organiser.username %>/dashboard">Back to Dashboard</a>
 </body>

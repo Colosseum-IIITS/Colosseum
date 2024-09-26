@@ -4,6 +4,39 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const bcrypt = require("bcrypt");
 
+
+
+// Delete a tournament by tid (custom string identifier)
+exports.deleteTournament = async (req, res) => {
+    const { tournamentId } = req.params; // `tournamentId` refers to `tid` here
+
+    try {
+        // Find the tournament by `tid` (not by `_id`)
+        const tournament = await Tournament.findOne({ tid: tournamentId });
+
+        if (!tournament) {
+            return res.status(404).json({ message: "Tournament not found" });
+        }
+
+        // Check if the user is the organiser of the tournament
+        if (!tournament.organiser.equals(req.user._id)) {
+            return res.status(403).json({ message: "You are not authorized to delete this tournament" });
+        }
+
+        // Remove the tournament from the organiser's tournament list
+        await Organiser.findByIdAndUpdate(tournament.organiser, {
+            $pull: { tournaments: tournament._id } // Use tournament._id here, not tid
+        });
+
+        // Finally, delete the tournament
+        await Tournament.findOneAndDelete({ tid: tournamentId });
+
+        res.status(200).json({ message: "Tournament deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting tournament:", error);
+        res.status(500).json({ message: "Error deleting tournament", error });
+    }
+};
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query; 
@@ -17,17 +50,27 @@ exports.getOrganiserByUsername = async (req, res) => {
       
       if (organisers.length === 0) {
           console.log(`No organisers found for the username: ${searchTerm}`);
-          return res.status(200).json({ message: 'No organisers found', organiser: [] });
+          return res.render('homepage', {
+              message: 'No organisers found',
+              organisationResults: [],
+              searchTerm: '',
+              results: [] // Ensure results is defined as an empty array
+          });
       }
 
       console.log(`${organisers.length} organisers found.`);
-      return res.status(200).json({ organiser: organisers });
+      return res.render('homepage', {
+          organisationResults: organisers,
+          searchTerm: searchTerm,
+          results: [] // Ensure results is defined as an empty array or pass tournament results as needed
+      });
       
   } catch (error) {
       console.error('Error fetching organisers:', error);
-      return res.status(500).json({ error: 'Error fetching organisers', details: error.message });
+      return res.status(500).render('error', { statusCode: '500', errorMessage: 'Error fetching organisers' });
   }
 };
+
 
 
 exports.updateOrganiserSettings = async (req, res) => {
@@ -246,9 +289,8 @@ exports.renderUpdateVisibilitySettings = async (req, res) => {
 
 
 exports.getOrganiserDashboard = async (req, res) => {
-    const { username } = req.params;  // Organiser's username passed in the URL
-     // Assume role passed as query, default is player
-    const loggedInUserId = req.user._id;
+    const { username } = req.params; // Organiser's username passed in the URL
+    const loggedInUserId = req.user._id; // Get the logged-in user's ID
 
     try {
         // Find the organiser by username
@@ -259,32 +301,19 @@ exports.getOrganiserDashboard = async (req, res) => {
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
-          console.log(organiser.tournaments);
-         const isOwner = loggedInUserId.equals(organiser._id);   // Common details
+
+        const isOwner = loggedInUserId.equals(organiser._id); // Check if logged-in user is the organiser
+        console.log("DEBUG:ISOWNER:"+isOwner+"lOGGEDINID:"+loggedInUserId+"ORGID:"+organiser._id);
         const totalTournaments = organiser.tournaments.length;
+        console.log("Total Tournaments Count Fetched:"+totalTournaments);
         const followerCount = organiser.followers.length;
-        const tournamentList = await Tournament.find({ organizer: organiser._id });
-        console.log('Tournaments fetched are'+ organiser.tournaments);
+        console.log("FollowerCount fetched: "+followerCount);
 
-        const totalPrizePool = tournamentList.reduce(
-            (sum, tournament) => sum + tournament.prizePool,
-            0
-        );
+        // Fetch all tournaments organized by the organiser
+        const tournamentList = await Tournament.find({ organiser: organiser._id });
 
-        const currentDate = new Date();
-
-        const completedTournaments = tournamentList.filter(
-            (t) => t.endDate < currentDate && t.status === "Completed"
-        );
-        const ongoingTournaments = tournamentList.filter(
-            (t) =>
-                t.startDate <= currentDate &&
-                t.endDate >= currentDate &&
-                t.status === "Approved"
-        );
-        const upcomingTournaments = tournamentList.filter(
-            (t) => t.startDate > currentDate && t.status !== "Completed"
-        );
+        const totalPrizePool = tournamentList.reduce((sum, tournament) => sum + tournament.prizePool, 0);
+        console.log(totalPrizePool);
 
         // Handle visibility settings for players
         const visibilitySettings = organiser.visibilitySettings || {
@@ -292,28 +321,24 @@ exports.getOrganiserDashboard = async (req, res) => {
             showTotalPrizePool: true,
             showTournaments: true
         };
+        console.log("Visibility Settings:"+visibilitySettings);
 
-        // Player's view: Apply visibility settings
+        // Render the dashboard with all tournaments in a single list
         res.render('organiserDashboard', {
-                organiser,
-                isOwner,
-                visibilitySettings,
-                followerCount: visibilitySettings.showFollowers ? followerCount : 'Hidden',
-                totalPrizePool: visibilitySettings.showTotalPrizePool ? totalPrizePool : 'Hidden',
-                totalTournaments: visibilitySettings.showTournaments ? totalTournaments : 'Hidden',
-                ongoingTournaments: visibilitySettings.showTournaments ? ongoingTournaments : [],
-                upcomingTournaments: visibilitySettings.showTournaments ? upcomingTournaments : [],
-                completedTournaments: visibilitySettings.showTournaments ? completedTournaments : []
-            });
-
-
-        // Organiser's view: Show everything
-
+            organiser,
+            isOwner,
+            visibilitySettings,
+            followerCount: visibilitySettings.showFollowers ? followerCount : 'Hidden',
+            totalPrizePool: visibilitySettings.showTotalPrizePool ? totalPrizePool : 'Hidden',
+            totalTournaments: visibilitySettings.showTournaments ? totalTournaments : 'Hidden',
+            tournamentList
+        });
     } catch (error) {
         console.error('Error fetching organiser dashboard:', error);
         res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
     }
 };
+
 exports.getMyOrganisers = async (req, res) => {
     const { _id } = req.user; // Player ID
 

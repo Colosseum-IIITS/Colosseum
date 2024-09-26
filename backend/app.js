@@ -90,7 +90,7 @@ mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
-const PORT = process.env.PORT || 30001; 
+const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

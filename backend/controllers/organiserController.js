@@ -4,6 +4,39 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const bcrypt = require("bcrypt");
 
+
+
+// Delete a tournament by tid (custom string identifier)
+exports.deleteTournament = async (req, res) => {
+    const { tournamentId } = req.params; // `tournamentId` refers to `tid` here
+
+    try {
+        // Find the tournament by `tid` (not by `_id`)
+        const tournament = await Tournament.findOne({ tid: tournamentId });
+
+        if (!tournament) {
+            return res.status(404).json({ message: "Tournament not found" });
+        }
+
+        // Check if the user is the organiser of the tournament
+        if (!tournament.organiser.equals(req.user._id)) {
+            return res.status(403).json({ message: "You are not authorized to delete this tournament" });
+        }
+
+        // Remove the tournament from the organiser's tournament list
+        await Organiser.findByIdAndUpdate(tournament.organiser, {
+            $pull: { tournaments: tournament._id } // Use tournament._id here, not tid
+        });
+
+        // Finally, delete the tournament
+        await Tournament.findOneAndDelete({ tid: tournamentId });
+
+        res.status(200).json({ message: "Tournament deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting tournament:", error);
+        res.status(500).json({ message: "Error deleting tournament", error });
+    }
+};
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query; 

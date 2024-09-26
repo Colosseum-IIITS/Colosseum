@@ -18,6 +18,7 @@ router.get('/UpdateProfile', authenticateOrganiser, (req, res) => {
     res.render('updateOrganiserProfile', { organiser: req.user });  // Assuming req.user contains organiser data
 });
 router.get("/update-visibility", authenticateOrganiser, organiserController.renderUpdateVisibilitySettings);
+router.post('/delete/:tournamentId', authenticateOrganiser,organiserController.deleteTournament);
 router.get('/:username/dashboard', authenticateUser,organiserController.getOrganiserDashboard);
 router.post("/dashboardVisibility",authenticateOrganiser,organiserController.updateVisibilitySettings);
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);

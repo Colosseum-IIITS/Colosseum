@@ -30,192 +30,192 @@ function preprocessSearchInput() {
     return true; // Allow form submission
 }
 
-function displayTournamentResults(tournaments) {
-    const resultsContainer = document.getElementById('tournament-results');
-    resultsContainer.style.display = 'block';
-    resultsContainer.innerHTML = '';
+// function displayTournamentResults(tournaments) {
+//     const resultsContainer = document.getElementById('tournament-results');
+//     resultsContainer.style.display = 'block';
+//     resultsContainer.innerHTML = '';
 
-    if (!Array.isArray(tournaments) || tournaments.length === 0) {
-        resultsContainer.innerText = 'No tournaments found.';
-        return;
-    }
+//     if (!Array.isArray(tournaments) || tournaments.length === 0) {
+//         resultsContainer.innerText = 'No tournaments found.';
+//         return;
+//     }
 
-    tournaments.forEach(tournament => {
-        const tournamentDiv = document.createElement('div');
-        tournamentDiv.classList.add('tournament-item');
+//     tournaments.forEach(tournament => {
+//         const tournamentDiv = document.createElement('div');
+//         tournamentDiv.classList.add('tournament-item');
 
-        // Add more details or functionality if needed
-        tournamentDiv.innerHTML = `
-            <h3>${tournament.name}</h3>
-            <p>Organiser: ${tournament.organiser.name}</p>
-            <p>Teams Participating: ${tournament.teams.length}</p>
-            <button onclick="joinTournament('${tournament._id}')">Join Tournament</button>
-        `;
-        resultsContainer.appendChild(tournamentDiv);
-    });
-}
+//         // Add more details or functionality if needed
+//         tournamentDiv.innerHTML = `
+//             <h3>${tournament.name}</h3>
+//             <p>Organiser: ${tournament.organiser.name}</p>
+//             <p>Teams Participating: ${tournament.teams.length}</p>
+//             <button onclick="joinTournament('${tournament._id}')">Join Tournament</button>
+//         `;
+//         resultsContainer.appendChild(tournamentDiv);
+//     });
+// }
 
 
 
-function displayTeamResults(teams) {
-    const resultsContainer = document.getElementById('team-results');
-    resultsContainer.style.display = 'block';
-    resultsContainer.innerHTML = '';
+// function displayTeamResults(teams) {
+//     const resultsContainer = document.getElementById('team-results');
+//     resultsContainer.style.display = 'block';
+//     resultsContainer.innerHTML = '';
 
-    if (teams.length === 0) {
-        resultsContainer.innerText = 'No teams found.';
-        return;
-    }
+//     if (teams.length === 0) {
+//         resultsContainer.innerText = 'No teams found.';
+//         return;
+//     }
 
-    teams.forEach(team => {
-        const teamDiv = document.createElement('div');
-        teamDiv.classList.add('team-item');
-        teamDiv.innerHTML = `
-            <h3>${team.name}</h3>
-            <button onclick="joinTeam('${team._id}')">Join Team</button>
-        `;
-        resultsContainer.appendChild(teamDiv);
-    });
-}
+//     teams.forEach(team => {
+//         const teamDiv = document.createElement('div');
+//         teamDiv.classList.add('team-item');
+//         teamDiv.innerHTML = `
+//             <h3>${team.name}</h3>
+//             <button onclick="joinTeam('${team._id}')">Join Team</button>
+//         `;
+//         resultsContainer.appendChild(teamDiv);
+//     });
+// }
 
-async function joinTournament(tournamentId) {
-    try {
-        const response = await fetch('/api/player/joinTournament', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ tournamentId })
-        });
+// async function joinTournament(tournamentId) {
+//     try {
+//         const response = await fetch('/api/player/joinTournament', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${localStorage.getItem('token')}`
+//             },
+//             body: JSON.stringify({ tournamentId })
+//         });
 
-        const message = await response.json();
-        alert(message.message); // Display success or error message
-    } catch (error) {
-        console.error('Error joining tournament:', error);
-        alert('An error occurred while trying to join the tournament.');
-    }
-}
+//         const message = await response.json();
+//         alert(message.message); // Display success or error message
+//     } catch (error) {
+//         console.error('Error joining tournament:', error);
+//         alert('An error occurred while trying to join the tournament.');
+//     }
+// }
 
-async function joinTeam(teamId) {
-    try {
-        const response = await fetch('/api/player/joinTeam', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ teamId })
-        });
+// async function joinTeam(teamId) {
+//     try {
+//         const response = await fetch('/api/player/joinTeam', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${localStorage.getItem('token')}`
+//             },
+//             body: JSON.stringify({ teamId })
+//         });
 
-        const message = await response.json();
-        alert(message.message); // Display success or error message
-    } catch (error) {
-        console.error('Error joining team:', error);
-        alert('An error occurred while trying to join the team.');
-    }
-}
+//         const message = await response.json();
+//         alert(message.message); // Display success or error message
+//     } catch (error) {
+//         console.error('Error joining team:', error);
+//         alert('An error occurred while trying to join the team.');
+//     }
+// }
 
-// Function to fetch and display enrolled teams
-async function fetchEnrolledTeams() {
-    try {
-        const response = await fetch('/api/player/getEnrolledTeams', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Use the token for authentication
-            }
-        });
+// // Function to fetch and display enrolled teams
+// async function fetchEnrolledTeams() {
+//     try {
+//         const response = await fetch('/api/player/getEnrolledTeams', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bearer ${localStorage.getItem('token')}` // Use the token for authentication
+//             }
+//         });
 
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
-        }
+//         if (!response.ok) {
+//             const message = await response.json();
+//             throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
+//         }
 
-        const result = await response.json();
-        displayEnrolledTeams(result.teams);
-    } catch (error) {
-        console.error('Error fetching enrolled teams:', error);
-    }
-}
+//         const result = await response.json();
+//         displayEnrolledTeams(result.teams);
+//     } catch (error) {
+//         console.error('Error fetching enrolled teams:', error);
+//     }
+// }
 
-function displayEnrolledTeams(teams) {
-    const resultsContainer = document.getElementById('loaded-team-data'); // Make sure this ID matches
-    resultsContainer.style.display = 'block';
-    resultsContainer.innerHTML = ''; // Clear previous results
+// function displayEnrolledTeams(teams) {
+//     const resultsContainer = document.getElementById('loaded-team-data'); // Make sure this ID matches
+//     resultsContainer.style.display = 'block';
+//     resultsContainer.innerHTML = ''; // Clear previous results
 
-    if (teams.length === 0) {
-        resultsContainer.innerText = 'You are not enrolled in any teams.';
-        return;
-    }
+//     if (teams.length === 0) {
+//         resultsContainer.innerText = 'You are not enrolled in any teams.';
+//         return;
+//     }
 
-    teams.forEach(team => {
-        const teamDiv = document.createElement('div');
-        teamDiv.classList.add('team-item');
+//     teams.forEach(team => {
+//         const teamDiv = document.createElement('div');
+//         teamDiv.classList.add('team-item');
 
-        // Render as 'Joined' instead of a button for already enrolled teams
-        teamDiv.innerHTML = `
-            <h3>${team.name}</h3>
-            <button disabled>Joined</button> <!-- Disable the button for already joined teams -->
-        `;
+//         // Render as 'Joined' instead of a button for already enrolled teams
+//         teamDiv.innerHTML = `
+//             <h3>${team.name}</h3>
+//             <button disabled>Joined</button> <!-- Disable the button for already joined teams -->
+//         `;
         
-        resultsContainer.appendChild(teamDiv);
-    });
-}
+//         resultsContainer.appendChild(teamDiv);
+//     });
+// }
 
-async function fetchEnrolledTournaments() {
-    try {
-        const response = await fetch('/api/player/getEnrolledTournaments', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+// async function fetchEnrolledTournaments() {
+//     try {
+//         const response = await fetch('/api/player/getEnrolledTournaments', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bearer ${localStorage.getItem('token')}`
+//             }
+//         });
 
-        if (!response.ok) {
-            const message = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
-        }
+//         if (!response.ok) {
+//             const message = await response.json();
+//             throw new Error(`HTTP error! status: ${response.status}, message: ${message.message}`);
+//         }
 
-        const result = await response.json();
-        console.log('Fetched Tournaments:', result); // Log the result to inspect
-        displayEnrolledTournaments(result.tournaments, result.message);
-    } catch (error) {
-        console.error('Error fetching enrolled tournaments:', error);
-    }
-}
+//         const result = await response.json();
+//         console.log('Fetched Tournaments:', result); // Log the result to inspect
+//         displayEnrolledTournaments(result.tournaments, result.message);
+//     } catch (error) {
+//         console.error('Error fetching enrolled tournaments:', error);
+//     }
+// }
 
-function displayEnrolledTournaments(tournaments, message) {
-    const resultsContainer = document.getElementById('loaded-tournament-data');
-    resultsContainer.style.display = 'block';
-    resultsContainer.innerHTML = '';
+// function displayEnrolledTournaments(tournaments, message) {
+//     const resultsContainer = document.getElementById('loaded-tournament-data');
+//     resultsContainer.style.display = 'block';
+//     resultsContainer.innerHTML = '';
 
-    // Display the message about enrollment
-    const messageDiv = document.createElement('div');
-    messageDiv.innerText = message;
-    resultsContainer.appendChild(messageDiv);
+//     // Display the message about enrollment
+//     const messageDiv = document.createElement('div');
+//     messageDiv.innerText = message;
+//     resultsContainer.appendChild(messageDiv);
 
-    if (tournaments.length === 0) {
-        resultsContainer.innerHTML += '<p>No enrolled tournaments found.</p>';
-        return; // No need to display anything further
-    }
+//     if (tournaments.length === 0) {
+//         resultsContainer.innerHTML += '<p>No enrolled tournaments found.</p>';
+//         return; // No need to display anything further
+//     }
 
-    // Retrieve the current player ID
-    const currentPlayerId = localStorage.getItem('playerId'); // Adjust as necessary
+//     // Retrieve the current player ID
+//     const currentPlayerId = localStorage.getItem('playerId'); // Adjust as necessary
 
-    tournaments.forEach(tournament => {
-        const tournamentDiv = document.createElement('div');
-        tournamentDiv.classList.add('tournament-item');
+//     tournaments.forEach(tournament => {
+//         const tournamentDiv = document.createElement('div');
+//         tournamentDiv.classList.add('tournament-item');
 
 
-        tournamentDiv.innerHTML = `
-            <h3>${tournament.tournamentName}</h3>
+//         tournamentDiv.innerHTML = `
+//             <h3>${tournament.tournamentName}</h3>
            
-            <button disabled>Joined</button>
-        `;
+//             <button disabled>Joined</button>
+//         `;
         
-        resultsContainer.appendChild(tournamentDiv);
-    });
-}
+//         resultsContainer.appendChild(tournamentDiv);
+//     });
+// }
 
 
 

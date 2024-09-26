@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="/assets/css/createTournament.css"> <!-- Add your CSS file path here -->
 </head>
 <body>
-    <h1>Create a New Tournament</h1>
-
+    <div class="navBar">
+        <h1>Create a New Tournament</h1>
+    </div>
     <!-- Tournament creation form -->
     <form action="/api/tournament/create" method="POST">
         <div>
@@ -51,6 +52,7 @@
     </form>
 
     <!-- Back to dashboard link -->
-    <a href="/api/organiser/<%= organiser.username %>/dashboard">Back to Dashboard</a>
+     
+        <a href="/api/organiser/<%= organiser.username %>/dashboard"><div class="backToDashboard"><p>Back to Dashboard</p></div></a>
 </body>
 </html>

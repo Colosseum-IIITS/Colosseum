@@ -531,5 +531,3 @@ exports.getDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };
-
-

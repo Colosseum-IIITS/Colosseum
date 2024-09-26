@@ -237,6 +237,7 @@ exports.updateVisibilitySettings = async (req, res) => {
   const {
     descriptionVisible,
     profilePhotoVisible,
+    prizePoolVisible,
     tournamentsVisible,
     followersVisible,
   } = req.body;
@@ -245,6 +246,7 @@ exports.updateVisibilitySettings = async (req, res) => {
   const updatedVisibilitySettings = {
     descriptionVisible: descriptionVisible === 'on', // true if checked
     profilePhotoVisible: profilePhotoVisible === 'on', // true if checked
+    prizePoolVisible: prizePoolVisible === 'on', // true if checked
     tournamentsVisible: tournamentsVisible === 'on', // true if checked
     followersVisible: followersVisible === 'on', // true if checked
   };
@@ -317,20 +319,23 @@ exports.getOrganiserDashboard = async (req, res) => {
 
         // Handle visibility settings for players
         const visibilitySettings = organiser.visibilitySettings || {
-            showFollowers: true,
-            showTotalPrizePool: true,
-            showTournaments: true
-        };
-        console.log("Visibility Settings:"+visibilitySettings);
+          descriptionVisible: true,
+          profilePhotoVisible: true,
+          prizePoolVisible: true,
+          tournamentsVisible: true,
+          followersVisible: true,
+      };
+      
+        console.log("Visibility Settings:"+visibilitySettings , followerCount , totalPrizePool , totalTournaments , tournamentList);
 
         // Render the dashboard with all tournaments in a single list
         res.render('organiserDashboard', {
             organiser,
             isOwner,
             visibilitySettings,
-            followerCount: visibilitySettings.showFollowers ? followerCount : 'Hidden',
-            totalPrizePool: visibilitySettings.showTotalPrizePool ? totalPrizePool : 'Hidden',
-            totalTournaments: visibilitySettings.showTournaments ? totalTournaments : 'Hidden',
+            followerCount,
+            totalPrizePool,
+            totalTournaments,
             tournamentList
         });
     } catch (error) {

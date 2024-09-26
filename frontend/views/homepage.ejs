@@ -30,7 +30,6 @@
             <h3> Joined Tournaments</h3></div>
             <div id="joined-tournaments">
                 <% if (joinedTournaments.length > 0) { %>
-                   
                         <% joinedTournaments.forEach(tournament => { %>
                             <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/pointsTable/<%= tournament._id.toString() %>'">
                              <div class="TName">   <h4><%= tournament.name %></h4> <!-- Tournament Name --></div>
@@ -62,10 +61,10 @@
                                     <ul>
                                         <% if (organiser.tournaments && organiser.tournaments.length > 0) { %>
                                             <% organiser.tournaments.forEach(tournament => { %>
-                                                <p class="tournamentPara">Tournament ID: <%= tournament._id.toString() %></p>
+                                                <p class="tournamentPara" style="color: white;">Tournament ID: <%= tournament._id.toString() %></p>
                                             <% }); %>
                                         <% } else { %>
-                                            <p class="tournamentPara">No tournaments organized yet</p>
+                                            <p class="tournamentPara" style="color: white;">No tournaments organized yet</p>
                                         <% } %>
                                     </ul>
                                     <!-- Unfollow button -->

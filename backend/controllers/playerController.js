@@ -4,6 +4,7 @@ const Organiser = require('../models/Organiser');
 const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Team = require('../models/Team');
 
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
@@ -483,10 +484,15 @@ exports.getDashboard = async (req, res) => {
         }
 
         const winPercentage = player.tournamentsPlayed
-            ? (player.tournamentsWon / player.tournamentsPlayed) * 100
+            ? (player.tournamentsWon + 1 / player.tournamentsPlayed + 1) * 100
             : 0;
 
-        
+
+            const teamId = player.team; // Get the ObjectId of the team
+            const team = await Team.findById(teamId); // Fetch the team by ID
+            
+            
+
         res.render('dashboard', {  // No leading slash
             player: {
                 username: player.username,
@@ -495,7 +501,7 @@ exports.getDashboard = async (req, res) => {
                 tournamentsWon: player.tournamentsWon || 0,
                 tournamentsPlayed: player.tournamentsPlayed || 0,
                 noOfOrgsFollowing: player.following.length || 0,
-                teamName: player.team?.name || 'Not in a team',
+                team,
                 winPercentage: winPercentage.toFixed(2),
             }
         });

@@ -68,7 +68,9 @@ app.get('/', (req, res) => {
     res.render('profile', { user: req.user || null });
 });
 app.get('/homepage', playerController.getHomePage);
-
+app.get('/logout',(req, res) => {
+    res.clearCookie('token');
+    res.redirect('/'); });
 
 
 // Use routes for players, tournaments, organisers, teams, reports, and authentication

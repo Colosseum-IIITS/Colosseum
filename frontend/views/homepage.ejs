@@ -14,7 +14,7 @@
     <div class="entireContent">
  
         <nav class="navbar">
-            <a href="/dashboard" class="navLinks"><div class="navbar-brand"><%= playerName %>'s website</div></a>
+            <a href="/dashboard" class="navLinks"><div class="navbar-brand" style="color: white;"><%= playerName %>'s website</div></a>
             <div class="search-profile">
                 <form class="search-form" method="GET" action="/api/player/searchTournaments" onsubmit="return preprocessSearchInput()">
                     <input type="text" id="search-input" name="searchTerm" placeholder="'?' for tournaments, '>' for teams, ':' for org" required aria-label="Search tournaments and teams">

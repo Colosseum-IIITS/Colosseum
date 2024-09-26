@@ -254,12 +254,11 @@ exports.updateEmail = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     const { username, email, currentPassword, newPassword } = req.body;
-    console.log("rithvik hot" ,req.body);
     const userId = req.user._id; // Ensure you have the user's ID from the JWT
 
     try {
         const player = await Player.findById(userId);
-        console.log("helooasd i want player : " ,player);
+        
         
         if (!player) {
             return res.status(404).json({ message: 'User not found' });

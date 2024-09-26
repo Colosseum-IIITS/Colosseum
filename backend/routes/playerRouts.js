@@ -27,6 +27,5 @@ router.get('/dashboard', authenticateToken, playerController.getDashboard);
 router.get('/teamName', authenticateToken, teamController.getTeamsByName);
 router.get('/followedOrg',authenticateToken,organiserController.getMyOrganisers);
 router.get('/homepage', authenticateToken, playerController.getHomePage);
-
-
+router.post('/joinTeam', authenticateToken, teamController.joinTeam);    
 module.exports = router;

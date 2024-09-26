@@ -59,7 +59,7 @@ exports.getOrganiserByUsername = async (req, res) => {
       }
 
       console.log(`${organisers.length} organisers found.`);
-      return res.render('homepage', {
+      return res.render('searchOrg', { // Render the new EJS template
           organisationResults: organisers,
           searchTerm: searchTerm,
           results: [] // Ensure results is defined as an empty array or pass tournament results as needed
@@ -345,28 +345,35 @@ exports.getOrganiserDashboard = async (req, res) => {
 };
 
 exports.getMyOrganisers = async (req, res) => {
-    const { _id } = req.user; // Player ID
+  const { _id } = req.user; // Player ID
 
-    try {
-        const player = await Player.findById(_id).populate({
-            path: 'following', // Assuming this is the field in Player model
-            model: 'Organiser',
-            populate: {
-                path: 'tournaments', // Assuming each organiser has a tournaments field
-                model: 'Tournament' // Replace with your actual tournament model name
-            }
-        });
+  try {
+      const player = await Player.findById(_id).populate({
+          path: 'following', // Assuming this is the field in Player model
+          model: 'Organiser',
+          populate: {
+              path: 'tournaments', // Assuming each organiser has a tournaments field
+              model: 'Tournament' // Replace with your actual tournament model name
+          }
+      });
 
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
+      if (!player) {
+          return res.status(404).render('error', { message: 'Player not found' });
+      }
 
-        res.status(200).json(player.following); // Return the followed organisers
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving followed organisers' });
-    }
+      // Log followed organisers for debugging
+      console.log('Followed Organisers:', player.following);
+
+      // Render the homepage and pass the followed organisers
+      res.render('homepage', {
+          followedOrganisers: player.following // Pass followed organisers to the view
+      });
+  } catch (error) {
+      console.error(error);
+      return res.status(500).render('error', { message: 'Error retrieving followed organisers' });
+  }
 };
+
 
 
 exports.banTeam = async (req, res) => {

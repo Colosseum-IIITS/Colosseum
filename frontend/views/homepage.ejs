@@ -25,42 +25,24 @@
     <div class="main-container">
         <!-- Left Column for tournaments -->
         <div class="left-column">
-            <div class="searchResults" id="searchTournament">
-                <h1>Tournament Results</h1>
-
-
-
-<!-- Display search term for clarity -->
-<% if (searchTerm) { %>
-    <h2>Search Results for "<%= searchTerm %>"</h2>
-<% } %>
-
-<!-- Check if there are any results -->
-<% if (results.length > 0) { %>
-    <ul>
-        <% results.forEach(tournament => { %>
-            <li><%= tournament.name %> (ID: <%= tournament.tid %>)</li>
-        <% }) %>
-    </ul>
-<% } else if (searchTerm) { %>
-    <h3>No tournaments found for "<%= searchTerm %>"</h3>
-<% } else { %>
-    <h3>Please enter a tournament name to search.</h3>
-<% } %>
-
+            <div id="joined-tournaments">
+                <% if (joinedTournaments.length > 0) { %>
+                    <h3>Your Joined Tournaments:</h3>
+                    <div class="tournament-list">
+                        <% joinedTournaments.forEach(tournament => { %>
+                            <div class="tournament-item" onclick="window.location.href='/tournament/<%= tournament._id.toString() %>'">
+                                <h4><%= tournament.name %></h4> <!-- Tournament Name -->
+                                <p>Description: <%= tournament.description %></p> <!-- Tournament Description -->
+                                <p>Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
+                            </div>
+                        <% }); %>
                     </div>
-                    <div id="loaded-tournament-data" style="display:block;">
-                        <h2>Your Registered Tournaments</h2>
-                        <% if (joinedTournaments && joinedTournaments.length > 0) { %>
-                            <ul>
-                                <% joinedTournaments.forEach(tournament => { %>
-                                    <li><%= tournament.name %> (ID: <%= tournament._id %>)</li>
-                                <% }) %>
-                            </ul>
-                        <% } else { %>
-                            <p>You haven't registered for any tournaments yet.</p>
-                        <% } %>
-                    </div>
+                <% } else { %>
+                    <p>You have not joined any tournaments.</p>
+                <% } %>
+            </div>
+        </div>
+        
                     
                     <script>
                         // Optionally, you can show this section after a successful join
@@ -74,38 +56,34 @@
         <div class="right-column">
             <div class="searchResults" id="searchOrg">
                 <div class="heading">Organization Results</div>
-                
-                <form class="searchForm" method="GET" action="/api/player/searchOrganisers" onsubmit="return handleOrganiserSearch()">
-                    <input type="text" name="searchTerm" id="organiser-search-input" placeholder="Search Organizations" required aria-label="Search organizations">
-                    <button type="submit">Search Organizations</button>
-                </form>
-                <div id="organization-results" style="display:block;">
-                    <h2>Organiser Results</h2>
-                    <% if (organisationResults && organisationResults.length > 0) { %>
-                        <ul>
-                            <% organisationResults.forEach(organiser => { %>
-                                <li>
-                                    <strong>Name:</strong> <%= organiser.username %> (ID: <%= organiser._id %>)
-                                    <form action="/api/player/followOrganiser" method="POST" style="display:inline;">
-                                        <input type="hidden" name="organiserId" value="<%= organiser._id %>">
-                                        <button type="submit" class="followButton">Follow Organiser</button>
-                                    </form>
-                                    <br>
-                                    <strong>Tournaments:</strong>
-                                    <ul>
+                <h2>Followed Organisers</h2>
+                <div id="followed-organisers">
+                    <% if (followedOrganisers.length > 0) { %>
+                        <% followedOrganisers.forEach(organiser => { %>
+                            <div class="organiser-details">
+                                <h3><%= organiser.username %></h3>
+                                <p><strong>Email:</strong> <%= organiser.email %></p>
+                                <strong>Tournaments Organized:</strong>
+                                <ul>
+                                    <% if (organiser.tournaments && organiser.tournaments.length > 0) { %>
                                         <% organiser.tournaments.forEach(tournament => { %>
-                                            <li><%= tournament.name %> (ID: <%= tournament._id %>)</li>
+                                            <li>Tournament ID: <%= tournament._id.toString() %></li>
                                         <% }); %>
-                                    </ul>
-                                </li>
-                            <% }); %>
-                        </ul>
+                                    <% } else { %>
+                                        <li>No tournaments organized yet</li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        <% }); %>
                     <% } else { %>
-                        <p>No organisers found matching your search.</p>
+                        <p>No followed organisers.</p>
                     <% } %>
                 </div>
                 
-                <div id="followed-organisers"></div>
+                </div>
+                
+                    </div>
+                </div>
             </div>
 
         </div>

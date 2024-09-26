@@ -18,41 +18,46 @@
 
     <div class="main-container">
         <h1>Team Search Results</h1>
-<% if (teams.length > 0) { %>
-    <% teams.forEach(team => { %>
-        <div>
-            <h2>Team Name: <%= team.name %></h2>
-            <img src="<%= team.logo %>" alt="<%= team.name %> Logo">
-            <p><strong>Captain:</strong> <%= team.captain ? team.captain.username : 'N/A' %></p>
-
-            <strong>Players:</strong>
-            <ul>
-                <% if (team.players.length > 0) { %>
-                    <% team.players.forEach(player => { %>
-                        <li><%= player.username %></li>
-                    <% }); %>
-                <% } else { %>
-                    <li>No players found</li>
-                <% } %>
-            </ul>
-
-            <strong>Tournaments:</strong>
-            <ul>
-                <% team.tournaments.forEach(tournament => { %>
-                    <li>Tournament ID: <%= tournament.toString() %></li>
-                <% }); %>
-            </ul>
-
-            <!-- Join Button with AJAX -->
-            <form action="/join" method="POST" id="join-form-<%= team._id %>" onsubmit="joinTeam(event, '<%= team._id %>')">
-                <input type="hidden" name="teamId" value="<%= team._id %>">
-                <button type="submit">Join Team</button>
-            </form>
+        <% if (teams.length > 0) { %>
+            <% teams.forEach(team => { %>
+                <div>
+                    <h2>Team Name: <%= team.name %></h2>
+                    <img src="<%= team.logo %>" alt="<%= team.name %> Logo">
+                    <p><strong>Captain:</strong> <%= team.captain ? team.captain.username : 'N/A' %></p>
+        
+                    <strong>Players:</strong>
+                    <ul>
+                        <% if (team.players.length > 0) { %>
+                            <% team.players.forEach(player => { %>
+                                <li><%= player.username %></li>
+                            <% }); %>
+                        <% } else { %>
+                            <li>No players found</li>
+                        <% } %>
+                    </ul>
+        
+                    <strong>Tournaments:</strong>
+                    <ul>
+                        <% team.tournaments.forEach(tournament => { %>
+                            <li>Tournament ID: <%= tournament.toString() %></li>
+                        <% }); %>
+                    </ul>
+        
+                    <!-- Join Button that submits directly to the controller -->
+                    <form action="/api/player/joinTeam" method="POST" style="display:inline;" id="join-form-<%= team._id %>">
+                        <input type="hidden" name="teamId" value="<%= team._id %>">
+                        <button type="submit" class="joinButton">Join Team</button>
+                    </form>
+                    
+                    
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No teams found matching your search.</p>
+        <% } %>
         </div>
-    <% }); %>
-<% } else { %>
-    <p>No teams found matching your search.</p>
-<% } %>
+        
     </div>
+
 </body>
 </html>

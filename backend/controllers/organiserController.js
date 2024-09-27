@@ -37,6 +37,33 @@ exports.deleteTournament = async (req, res) => {
         res.status(500).json({ message: "Error deleting tournament", error });
     }
 };
+
+// Route to render the points table for a specific tournament
+exports.renderPointsTable = async (req, res) => {
+  try {
+    const { tournamentId } = req.params; // Get the tournament ID from the route parameters
+    const tournament = await Tournament.findById(tournamentId); // Find the tournament by ID
+
+    if (!tournament) {
+      return res.status(404).send('Tournament not found');
+    }
+
+    // Ensure only the organiser can access this page
+    if (req.user.role !== 'organiser') {
+      return res.status(403).send('Unauthorized: Only organisers can update points');
+    }
+
+    // Render the EJS page with tournament data
+    res.render('updatePointsTable', {
+      tournament,
+      userRole: req.user.role,
+      username: req.user.username
+    });
+  } catch (error) {
+    console.error('Error fetching tournament:', error);
+    return res.status(500).send('Server error');
+  }
+};
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query;

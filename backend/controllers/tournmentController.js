@@ -200,12 +200,20 @@ exports.updatePointsTable = async (req, res) => {
     }
 
     // Update the team's total points
-    teamEntry.totalPoints += additionalPoints;
+    
+// Ensure totalPoints and additionalPoints are numbers
+teamEntry.totalPoints = Number(teamEntry.totalPoints) + Number(additionalPoints);
+   // teamEntry.totalPoints += additionalPoints;
+      tournament.pointsTable.sort((a, b) => b.totalPoints - a.totalPoints);
 
+    // Re-assign rankings based on the sorted points table
+    tournament.pointsTable.forEach((entry, index) => {
+      entry.ranking = index + 1; // The ranking is the index + 1 (since index starts from 0)
+    });
     // Save the updated tournament
     await tournament.save();
     
-    return res.status(200).json({ message: 'Points updated successfully', tournament });
+    return res.status(200).redirect('/api/tournament/'+tournamentId+'/points-table');
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error', error });
   }
@@ -255,6 +263,33 @@ exports.getEnrolledTournaments = async (req, res) => {
   }
 };
 
+
+// Route to render the points table for a specific tournament
+exports.renderPointsTable = async (req, res) => {
+  try {
+    const { tournamentId } = req.params; // Get the tournament ID from the route parameters
+    const tournament = await Tournament.findById(tournamentId); // Find the tournament by ID
+
+    if (!tournament) {
+      return res.status(404).send('Tournament not found');
+    }
+
+    // Ensure only the organiser can access this page
+    if (req.user.role !== 'organiser') {
+      return res.status(403).send('Unauthorized: Only organisers can update points');
+    }
+
+    // Render the EJS page with tournament data
+    res.render('updatePointsTable', {
+      tournament,
+      userRole: req.user.role,
+      username: req.user.username
+    });
+  } catch (error) {
+    console.error('Error fetching tournament:', error);
+    return res.status(500).send('Server error');
+  }
+};
 
 exports.getTournamentById = async (req, res) => {
   try {

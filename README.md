@@ -119,7 +119,9 @@ To configure the environment variables, update the `.env` file as follows:
 - `POST /api/admin/approveTournament/:id`: Approve a tournament.
 
 For a full list of API routes, see the [API documentation](./docs/API.md).
+
 #SNAPSHOTS TO DESCRIBE THE FLOW OF APPLICATION
+
 ![Screenshot from 2024-09-27 05-37-50](https://github.com/user-attachments/assets/58a2342f-27bb-48ae-bdd9-d59c9e6422d1)
 
 ![Screenshot from 2024-09-27 05-37-59](https://github.com/user-attachments/assets/f3cd7faf-7576-4046-b92e-fbe1cfdd2f58)

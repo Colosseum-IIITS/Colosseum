@@ -75,13 +75,16 @@ To configure the environment variables, update the `.env` file as follows:
 ## Project Structure
 
 ```plaintext
-backend
-├── app.js                      # Main entry point of the application
-├── controllers/                # Controller files handling business logic
-├── middleware/                 # Authentication and role-based access middlewares
-├── models/                     # Mongoose models for the database
-├── routes/                     # Route handlers for different resources
-└── views/                      # EJS views for the frontend
+├── backend
+│   ├── app.js              //Server      
+│   ├── controllers         //Controller Files To Handle Backend Logic
+│   ├── middleware          //Middleware Functions To Handle Authentication
+│   ├── models              //Database Schema
+│   └── routes              //Handles Routing Logic
+├── frontend
+│   ├── assets              //Contains Front-End Assets         
+│   └── views               //Contains Views to be rendered
+
 ```
 
 ### Main Components

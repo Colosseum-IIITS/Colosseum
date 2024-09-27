@@ -92,13 +92,18 @@ exports.searchTournaments = async (req, res) => {
         if (searchTerm) {
             // Perform search only if a searchTerm is provided
             tournaments = await Tournament.find({
-                $or: [
-                    { tid: new RegExp(searchTerm, 'i') },
-                    { name: new RegExp(searchTerm, 'i') }
-                ]
+                $and: [
+                    {
+                        $or: [
+                        { tid: new RegExp(searchTerm, 'i') },
+                        { name: new RegExp(searchTerm, 'i') }
+                        ]
+                    },
+                    { status: 'Approved' }
+                ]   
             });
         }
-
+        
         // Fetch joined tournaments if the user is logged in
         if (req.user && req.user._id) {
             const player = await Player.findById(req.user._id).populate('tournaments.tournament');

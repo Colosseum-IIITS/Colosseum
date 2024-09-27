@@ -25,7 +25,7 @@
                     <ul>
                         <% if (organiser.tournaments.length > 0) { %>
                             <% organiser.tournaments.forEach(tournament => { %>
-                                <li>Tournament ID: <%= tournament.toString() %></li>
+                                <li>Tournament Name: <%= tournament.name %></li>
                             <% }); %>
                         <% } else { %>
                             <li>No tournaments organized yet</li>

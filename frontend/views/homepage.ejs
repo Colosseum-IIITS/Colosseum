@@ -14,7 +14,7 @@
     <div class="entireContent">
  
         <nav class="navbar">
-            <a href="/dashboard" class="navLinks"><div class="navbar-brand" style="color: white;"><%= playerName %>'s website</div></a>
+            <a href="/dashboard" class="navLinks"><div class="navbar-brand" style="color: white;"><%= playerName %>'s Colosseum</div></a>
             <div class="search-profile">
                 <form class="search-form" method="GET" action="/api/player/searchTournaments" onsubmit="return preprocessSearchInput()">
                     <input type="text" id="search-input" name="searchTerm" placeholder="'?' for tournaments, '>' for teams, ':' for org" required aria-label="Search tournaments and teams">
@@ -60,7 +60,7 @@
                                     <ul>
                                         <% if (organiser.tournaments && organiser.tournaments.length > 0) { %>
                                             <% organiser.tournaments.forEach(tournament => { %>
-                                                <p class="tournamentPara" style="color: white;">Tournament ID: <%= tournament._id.toString() %></p>
+                                                <p class="tournamentPara" style="color: white;">Tournament Name: <%= tournament.name %></p>
                                             <% }); %>
                                         <% } else { %>
                                             <p class="tournamentPara" style="color: white;">No tournaments organized yet</p>

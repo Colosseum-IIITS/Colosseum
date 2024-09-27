@@ -23,7 +23,7 @@ body {
   height: 80px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding-left: 0px;
   border-bottom: 1px, white, solid;
   transition: background-color 0.3s, transform 0.3s;
@@ -415,6 +415,14 @@ font-size: 13px;
   width:10%;
 }
 .logoutIcon{
-  display: flex;
-  justify-content: flex-end;
+  display: block;
 }
+
+.logoutIcon a{
+  position: relative;
+  margin-left: 85%;
+  width: 10px;
+  height: 10px;
+}
+
+

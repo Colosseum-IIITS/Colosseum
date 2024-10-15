@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 
 
-// Delete a tournament by tid (custom string identifier)
+// Delete a tournament by tid
 exports.deleteTournament = async (req, res) => {
     const { tournamentId } = req.params; // `tournamentId` refers to `tid` here
 
@@ -18,17 +18,14 @@ exports.deleteTournament = async (req, res) => {
             return res.status(404).json({ message: "Tournament not found" });
         }
 
-        // Check if the user is the organiser of the tournament
         if (!tournament.organiser.equals(req.user._id)) {
             return res.status(403).json({ message: "You are not authorized to delete this tournament" });
         }
 
-        // Remove the tournament from the organiser's tournament list
         await Organiser.findByIdAndUpdate(tournament.organiser, {
-            $pull: { tournaments: tournament._id } // Use tournament._id here, not tid
+            $pull: { tournaments: tournament._id }
         });
 
-        // Finally, delete the tournament
         await Tournament.findOneAndDelete({ tid: tournamentId });
 
         res.status(200).json({ message: "Tournament deleted successfully" });
@@ -38,12 +35,11 @@ exports.deleteTournament = async (req, res) => {
     }
 };
 
-// Route to render the points table for a specific tournament
+
 exports.renderPointsTable = async (req, res) => {
   try {
-    const { tournamentId } = req.params; // Get the tournament ID from the route parameters
-    const tournament = await Tournament.findById(tournamentId); // Find the tournament by ID
-
+    const { tournamentId } = req.params;
+    const tournament = await Tournament.findById(tournamentId);
     if (!tournament) {
       return res.status(404).send('Tournament not found');
     }
@@ -53,7 +49,6 @@ exports.renderPointsTable = async (req, res) => {
       return res.status(403).send('Unauthorized: Only organisers can update points');
     }
 
-    // Render the EJS page with tournament data
     res.render('updatePointsTable', {
       tournament,
       userRole: req.user.role,
@@ -64,6 +59,8 @@ exports.renderPointsTable = async (req, res) => {
     return res.status(500).send('Server error');
   }
 };
+
+
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query;
@@ -81,15 +78,15 @@ exports.getOrganiserByUsername = async (req, res) => {
               message: 'No organisers found',
               organisationResults: [],
               searchTerm: '',
-              results: [] // Ensure results is defined as an empty array
+              results: [] 
           });
       }
 
       console.log(`${organisers.length} organisers found.`);
-      return res.render('searchOrg', { // Render the new EJS template
+      return res.render('searchOrg', {
           organisationResults: organisers,
           searchTerm: searchTerm,
-          results: [] // Ensure results is defined as an empty array or pass tournament results as needed
+          results: []
       });
       
   } catch (error) {
@@ -99,7 +96,7 @@ exports.getOrganiserByUsername = async (req, res) => {
 };
 
 
-
+// Update 
 exports.updateOrganiserSettings = async (req, res) => {
   const { showTournaments, showFollowerCount, showPrizePool } = req.body;
   const { id } = req.user;

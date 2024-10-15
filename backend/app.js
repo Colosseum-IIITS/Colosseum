@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { authenticateToken } = require('./middleware/authMiddleware');
 
-
 // Import routes
 const playerRoutes = require('./routes/playerRouts');
 const tournamentRoutes = require('./routes/tournamentRoutes');
@@ -18,7 +17,6 @@ const adminRoutes = require('./routes/adminRoutes');
 
 // Import the tournament controller
 const playerController = require('./controllers/playerController');
-
 const app = express();
 
 // Middleware setup
@@ -59,15 +57,14 @@ app.get('/admin/create', (req, res) => {
 app.get('/', (req, res) => {
   res.render('parallax');
 });
-// app.get('/dashboard', (req, res) => {
-//     res.render('dashboard');
-// });
 
-  app.get('/profile', (req, res) => {
+app.get('/profile', (req, res) => {
     console.log(req.user); // Check what is being passed
     res.render('profile', { user: req.user || null });
 });
+
 app.get('/homepage', playerController.getHomePage);
+
 app.get('/logout',(req, res) => {
     res.clearCookie('token');
     res.redirect('/'); });
@@ -92,7 +89,7 @@ mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
-const PORT = process.env.PORT || 8000; 
+const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

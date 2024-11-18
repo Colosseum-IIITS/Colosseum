@@ -30,6 +30,12 @@
                 <div class="completeContainer">
                     <div class="navBar">
                         <h1 class="headerText">Player Statistics</h1>
+                        <div class="search-profile">
+                            <form class="search-form" method="GET" action="/api/player/searchTournaments" onsubmit="return preprocessSearchInput()">
+                                <input type="text" id="search-input" name="searchTerm" placeholder=" '>' for teams '-' for player" required aria-label="Search teams and player">
+                                <button type="submit">Search</button>
+                            </form>
+                        </div>
                        <div class="logoutIcon">
                           <a href="/logout">
                               <img src="/assets/exit.png" class="iconImg" alt="Logout">

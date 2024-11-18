@@ -127,6 +127,35 @@ exports.searchTournaments = async (req, res) => {
     }
 };
 
+exports.searchPlayer = async (req, res) => {
+    try {
+        const { searchTerm } = req.query || '';
+        console.log('Search Term:', searchTerm); // Debugging line
+
+        let players = [];
+
+        if (searchTerm) {
+            // Perform search only if a searchTerm is provided
+            players = await Player.find({
+                $or: [
+                    { username: new RegExp(searchTerm, 'i') },
+                    { email: new RegExp(searchTerm, 'i') }
+                ]
+            }).populate('team').populate('tournaments.tournament');
+        }
+
+        console.log('Players Found:', players); // Debugging line
+
+        // Render the player search results page
+        res.render('resultsPlayer', {
+            players: players || [], // Pass the found players
+            searchTerm: searchTerm || '' // Pass the search term to the template
+        });
+    } catch (error) {
+        console.error('Error searching players:', error); // Log the error
+        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error searching players' });
+    }
+};
 
 
 

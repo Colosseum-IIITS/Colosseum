@@ -95,7 +95,7 @@ exports.approveTournament = async (req, res) => {
       const totalBannedPlayers = await Player.countDocuments({ banned: true });
       const totalTournamentsConducted = organisers.reduce((acc, organiser) => acc + organiser.tournamentsConducted, 0);
       const totalBannedOrgs = await Organiser.countDocuments({ banned: true });
-
+  
       const currentDate = new Date();
       const ongoingTournamentsCount = await Tournament.countDocuments({
         startDate: { $lte: currentDate },
@@ -103,10 +103,25 @@ exports.approveTournament = async (req, res) => {
       });
       const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
       const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
-
+  
+      // Calculate player stats
+      const playersWithStats = await Promise.all(players.map(async (player) => {
+        const totalTournamentsPlayed = player.tournaments.length;
+        const totalWins = player.tournaments.filter(t => t.won).length;
+        const winPercentage = totalTournamentsPlayed > 0 ? (totalWins / totalTournamentsPlayed) * 100 : 0;
+        const totalTournamentsWon = totalWins; // Assuming achievements are equivalent to wins for simplicity
+  
+        return {
+          ...player._doc, // Spread the existing player fields
+          totalTournamentsPlayed,
+          winPercentage: winPercentage.toFixed(2),
+          totalTournamentsWon
+        };
+      }));
+  
       res.render('adminDashboard', {
         organisers,
-        players,
+        players: playersWithStats, // Pass the enriched players with stats
         tournaments,
         totalTeams,
         totalBannedPlayers,
@@ -118,7 +133,7 @@ exports.approveTournament = async (req, res) => {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).render( 'error', {statusCode:'500', errorMessage:'Error Fetching data from dashboard' });
+      res.status(500).render('error', { statusCode: '500', errorMessage: 'Error Fetching data from dashboard' });
     }
   };
   

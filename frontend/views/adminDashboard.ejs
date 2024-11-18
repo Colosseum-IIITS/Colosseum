@@ -84,87 +84,105 @@
     </div>
   </div>
 
-  <!-- Organisers Section -->
-  <div class="userControlBox">
-    <div class="topOfBox">
-      <h2>Organisers</h2>
-      <input type="text" id="searchOrganisers" class="FilterSearch" placeholder="Filter Search" onkeyup="filterCards('organiser')">
-    </div>
-    <div class="headerCard">
-      <h3>UserName</h3>
-      <h3>Email</h3>
-      <h3>Ban Status</h3>
-      <h3>Actions</h3>
-    </div>
-    <div class="section">
-      <div class="card-container" id="organisersList">
-        <% organisers.forEach(organiser => { %>
-          <div class="card organiser">
-            <div class="card-content">
-              <h3><%= organiser.username %></h3>
-              <p><%= organiser.email %></p>
-              <p><%= organiser.banned ? "Yes" : "No" %></p>
-              <div class="actions">
-                <% if (organiser.banned) { %>
-                  <form action="/admin/unban/organiser/<%= organiser._id %>" method="POST">
-                    <button type="submit" class="unBanButton">Unban</button>
-                  </form>
-                <% } else { %>
-                  <form action="/admin/ban/organiser/<%= organiser._id %>" method="POST">
-                    <button type="submit" class="banButton">Ban</button>
-                  </form>
-                <% } %>
-                <form action="/admin/delete/organiser/<%= organiser._id %>" method="POST">
-                  <button type="submit" class="deleteButton">Delete</button>
+ <!-- Organisers Section -->
+ <div class="userControlBox">
+  <div class="topOfBox">
+    <h2>Organisers</h2>
+    <input type="text" id="searchOrganisers" class="FilterSearch" placeholder="Filter Search" onkeyup="filterCards('organiser')">
+  </div>
+  <div class="headerCard">
+    <h3>UserName</h3>
+    <h3>Email</h3>
+    <h3>Ban Status</h3>
+    <h3>Actions</h3>
+  </div>
+  <div class="section">
+    <div class="card-container" id="organisersList">
+      <% organisers.forEach(organiser => { %>
+        <div class="card organiser">
+          <div class="card-content">
+            <h3><%= organiser.username %></h3>
+            <p><%= organiser.email %></p>
+            <p><%= organiser.banned ? "Yes" : "No" %></p>
+            <div class="actions">
+              <% if (organiser.banned) { %>
+                <form action="/admin/unban/organiser/<%= organiser._id %>" method="POST">
+                  <button type="submit" class="unBanButton">Unban</button>
                 </form>
-              </div>
+              <% } else { %>
+                <form action="/admin/ban/organiser/<%= organiser._id %>" method="POST">
+                  <button type="submit" class="banButton">Ban</button>
+                </form>
+              <% } %>
+              <form action="/admin/delete/organiser/<%= organiser._id %>" method="POST">
+                <button type="submit" class="deleteButton">Delete</button>
+              </form>
             </div>
           </div>
-        <% }) %>
-      </div>
+          <!-- Dropdown for Organiser Stats -->
+          <div class="statsToggle">
+            <button class="dropdownButton" onclick="toggleDropdown('<%= organiser._id %>')">View Stats</button>
+            <div class="dropdownContent" id="dropdown-<%= organiser._id %>">
+              <p>Total Tournaments: <%= organiser.totalTournaments %></p>
+              <p>Total Players in Tournaments: <%= organiser.totalPlayers %></p>
+              <p>Average Tournament Rating: <%= organiser.averageRating %></p>
+            </div>
+          </div>
+        </div>
+      <% }) %>
     </div>
   </div>
+</div>
 
   <!-- Players Section -->
-  <div class="userControlBox">
-    <div class="topOfBox">
-      <h2>Players</h2>
-      <input type="text" id="searchPlayers" class="FilterSearch" placeholder="Filter Search" onkeyup="filterCards('player')">
-    </div>
-    <div class="headerCard">
-      <h3>UserName</h3>
-      <h3>Email</h3>
-      <h3>Ban Status</h3>
-      <h3>Actions</h3>
-    </div>
-    <div class="section">
-      <div class="card-container" id="playersList">
-        <% players.forEach(player => { %>
-          <div class="card player">
-            <div class="card-content">
-              <h3><%= player.username %></h3>
-              <p><%= player.email %></p>
-              <p><%= player.banned ? "Yes" : "No" %></p>
-              <div class="actions">
-                <% if (player.banned) { %>
-                  <form action="/admin/unban/player/<%= player._id %>" method="POST">
-                    <button type="submit" class="unBanButton">Unban</button>
-                  </form>
-                <% } else { %>
-                  <form action="/admin/ban/player/<%= player._id %>" method="POST">
-                    <button type="submit" class="banButton">Ban</button>
-                  </form>
-                <% } %>
-                <form action="/admin/delete/player/<%= player._id %>" method="POST">
-                  <button type="submit" class="deleteButton">Delete</button>
+<div class="userControlBox">
+  <div class="topOfBox">
+    <h2>Players</h2>
+    <input type="text" id="searchPlayers" class="FilterSearch" placeholder="Filter Search" onkeyup="filterCards('player')">
+  </div>
+  <div class="headerCard">
+    <h3>UserName</h3>
+    <h3>Email</h3>
+    <h3>Ban Status</h3>
+    <h3>Actions</h3>
+  </div>
+  <div class="section">
+    <div class="card-container" id="playersList">
+      <% players.forEach(player => { %>
+        <div class="card player">
+          <div class="card-content">
+            <h3><%= player.username %></h3>
+            <p><%= player.email %></p>
+            <p><%= player.banned ? "Yes" : "No" %></p>
+            <div class="actions">
+              <% if (player.banned) { %>
+                <form action="/admin/unban/player/<%= player._id %>" method="POST">
+                  <button type="submit" class="unBanButton">Unban</button>
                 </form>
-              </div>
+              <% } else { %>
+                <form action="/admin/ban/player/<%= player._id %>" method="POST">
+                  <button type="submit" class="banButton">Ban</button>
+                </form>
+              <% } %>
+              <form action="/admin/delete/player/<%= player._id %>" method="POST">
+                <button type="submit" class="deleteButton">Delete</button>
+              </form>
             </div>
           </div>
-        <% }) %>
-      </div>
+          <!-- Dropdown for Player Stats -->
+          <div class="statsToggle">
+            <button class="dropdownButton" onclick="toggleDropdown('<%= player._id %>')">View Stats</button>
+            <div class="dropdownContent" id="dropdown-<%= player._id %>">
+              <p>Total Tournaments Played: <%= player.totalTournamentsPlayed %></p>
+              <p>Win Percentage: <%= player.winPercentage %>%</p>
+              <p>Total Tournaments Won: <%= player.totalTournamentsWon %></p>
+            </div>
+          </div>
+        </div>
+      <% }) %>
     </div>
   </div>
+</div>
 
   <!-- Tournaments Pending Approval Section -->
   <div class="userControlBox">

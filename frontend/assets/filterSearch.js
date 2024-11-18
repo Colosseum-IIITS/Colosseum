@@ -13,3 +13,21 @@ function filterCards(type) {
     }
     }
 }
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(`dropdown-${id}`);
+    dropdown.classList.toggle("show");
+  }
+  
+  // Close the dropdown when clicking outside
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropdownButton')) {
+      const dropdowns = document.getElementsByClassName("dropdownContent");
+      for (let i = 0; i < dropdowns.length; i++) {
+        const openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  };
+  

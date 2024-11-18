@@ -56,7 +56,60 @@ a{
     font-family: 'Press Start 2P', cursive;
     font-size: 27px;
 }
-
+.card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 10px 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-content {
+    margin-bottom: 15px;
+  }
+  
+  .statsToggle {
+    text-align: center;
+  }
+  
+  .dropdownButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+  }
+  
+  .dropdownButton:hover {
+    background-color: #45a049;
+  }
+  
+  .dropdownContent {
+    display: none;
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dropdownContent p {
+    margin: 5px 0;
+    color: black;
+    font-size: 14px;
+  }
+  
+  .show {
+    display: block;
+  }  
 
 h1 {
     text-align: center;

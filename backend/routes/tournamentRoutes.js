@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tournamentController = require('../controllers/tournmentController');
-const { authenticateOrganiser  ,authenticateToken, authenticateUser } = require('../middleware/authMiddleware');
+const { authenticateOrganiser, authenticateUser } = require('../middleware/authMiddleware');
 
 // Route to create a new tournament
 router.post('/create', authenticateOrganiser,tournamentController.createTournament);
@@ -9,8 +9,8 @@ router.get('/create',authenticateOrganiser,tournamentController.createTournament
 router.get('/:tournamentId', authenticateUser, tournamentController.getTournamentById);
 
 router.get('/edit/:tournamentId', authenticateOrganiser, tournamentController.getTournamentEditPage );
-router.post('/join/:tournamentId',authenticateToken,tournamentController.joinTournament);
-router.post('/leave/:tournamentId',authenticateToken,tournamentController.leaveTournament);
+router.post('/join/:tournamentId',authenticateUser,tournamentController.joinTournament);
+router.post('/leave/:tournamentId',authenticateUser,tournamentController.leaveTournament);
 // Route to update an existing tournament
 router.post('/update/:tournamentId', tournamentController.updateTournament);
 router.post('/updatePointsTable',tournamentController.updateTournament);

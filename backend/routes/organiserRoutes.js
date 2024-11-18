@@ -4,7 +4,7 @@ const organiserController = require("../controllers/organiserController");
 const teamController = require("../controllers/teamControllers");
 const reportController = require("../controllers/reportController");
 const tournamentController = require("../controllers/tournmentController");
-const { authenticateToken, authenticateOrganiser,authenticateUser} = require("../middleware/authMiddleware");
+const { authenticateUser, authenticateOrganiser} = require("../middleware/authMiddleware");
 
 
 // Route to search the Organiser

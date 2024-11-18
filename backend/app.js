@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { authenticateToken } = require('./middleware/authMiddleware');
+const { authenticateUser } = require('./middleware/authMiddleware');
 
 // Import routes
 const playerRoutes = require('./routes/playerRouts');
@@ -33,7 +33,7 @@ app.use('/assets', express.static(path.join(__dirname, '../frontend/assets')));
 
 // Route for searching tournaments
 app.get('/searchTournaments', playerController.searchTournaments); // Tournament search route
-app.get('/dashboard', authenticateToken, playerController.getDashboard);
+app.get('/dashboard', authenticateUser, playerController.getDashboard);
 
 // Routes for sign-in and sign-up with roles
 app.get('/signin', (req, res) => {

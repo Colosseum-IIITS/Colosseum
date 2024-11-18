@@ -96,7 +96,7 @@ exports.getOrganiserByUsername = async (req, res) => {
 };
 
 
-// Update 
+// Rename And Change Naming
 exports.updateOrganiserSettings = async (req, res) => {
   const { showTournaments, showFollowerCount, showPrizePool } = req.body;
   const { id } = req.user;

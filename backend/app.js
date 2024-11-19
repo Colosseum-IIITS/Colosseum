@@ -78,6 +78,7 @@ app.use('/api/team', teamRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/reports', reportRoutes);
 
 
 // MongoDB connection

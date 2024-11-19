@@ -40,7 +40,6 @@ exports.createTeam = async (req, res) => {
   }
 };
 
-  
 // Join an existing team              
 exports.joinTeam = async (req, res) => {
   const { teamId } = req.body;
@@ -70,7 +69,6 @@ exports.joinTeam = async (req, res) => {
   }
 };
 
-
 // Leave a team
 exports.leaveTeam = async (req, res) => {
   const { _id: playerId } = req.user;
@@ -93,7 +91,6 @@ exports.leaveTeam = async (req, res) => {
     res.status(500).json({ error: 'Error leaving team' });
   }
 };
-
 
 // Controller to fetch teams based on search term and render the resultsTeam.ejs view
 exports.getTeamsByName = async (req, res) => {
@@ -118,10 +115,6 @@ exports.getTeamsByName = async (req, res) => {
       res.status(500).render('resultsTeam', { teams: [], searchTerm, error: 'Error fetching teams' });
   }
 };
-
-
-
-
 
 // Update team name (only by captain)
 exports.updateTeamName = async (req, res) => {
@@ -165,9 +158,6 @@ exports.updateTeamName = async (req, res) => {
     res.status(500).json({ error: 'Error updating team name', details: error.message });
   }
 };
-
-
-
 
 exports.getEnrolledTeams = async (req, res) => {
   const { _id: playerId } = req.user; // Extract playerId from JWT token

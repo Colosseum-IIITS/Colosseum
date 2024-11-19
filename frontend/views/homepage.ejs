@@ -6,6 +6,7 @@
     <link rel="icon" href="/assets/colosseumLogo.png" type="image/x-icon">
     <title>Search Tournaments and Teams</title>
     <link rel="stylesheet" href="/assets/homePage.css">
+    <link rel="stylesheet" href="/assets/css/reportCard.css">
     <script src="/assets/homepage.js" defer></script>
 </head>
 <body>
@@ -23,27 +24,26 @@
             </div>
         </nav>
         <div class="main-container">
-    
-        <div class="tournamentList">
-            <div class="headTitle">
-            <h3> Joined Tournaments</h3></div>
-            <div id="joined-tournaments">
-                <% if (joinedTournaments.length > 0) { %>
-                        <% joinedTournaments.forEach(tournament => { %>
-                            <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/<%= tournament._id.toString() %>'">
-                             <div class="TName">   <h4><%= tournament.name %></h4> <!-- Tournament Name --></div>
-                              <div class="DescT"><p class="tournamentDesc"> Description: <%= tournament.description %></p> <!-- Tournament Description -->
-                                <p class="tournamentDate">Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
+            <div class="tournamentList">
+                <div class="headTitle">
+                <h3> Joined Tournaments</h3></div>
+                <div id="joined-tournaments">
+                    <% if (joinedTournaments.length > 0) { %>
+                            <% joinedTournaments.forEach(tournament => { %>
+                                <div class="tournament-item tournament-list" onclick="window.location.href='/api/tournament/<%= tournament._id.toString() %>'">
+                                <div class="TName">   <h4><%= tournament.name %></h4> <!-- Tournament Name --></div>
+                                <div class="DescT"><p class="tournamentDesc"> Description: <%= tournament.description %></p> <!-- Tournament Description -->
+                                    <p class="tournamentDate">Start Date: <%= new Date(tournament.startDate).toLocaleDateString() %></p> <!-- Start Date -->
+                                </div>
                             </div>
-                        </div>
-                        <% }); %>
-                  
+                            <% }); %>
                     
-                <% } else { %>
-                    <p>You have not joined any tournaments.</p>
-                <% } %>
-            </div>
-          </div>  
+                        
+                    <% } else { %>
+                        <p>You have not joined any tournaments.</p>
+                    <% } %>
+                </div>
+            </div>  
             <div class="searchResults" id="searchOrg">
                 <div class="headTitle" id="orgTitle">
                 <h2>Followed Organisers</h2></div>
@@ -83,6 +83,21 @@
                
             </div>
         </div>
+        <div class="common-container">
+            <h2>Report a Team</h2>
+            <form action="/reports/PreportT2O" method="POST">
+              <label for="teamName">Team Name:</label>
+              <input type="text" id="teamName" name="teamName" required />
+              
+              <label for="reason">Reason:</label>
+              <textarea id="reason" name="reason" required></textarea>
+          
+              <button type="submit">Report Team</button>
+            </form>
+        </div>
+          
+          
+
         
         <!-- Right Column for organiser and team results -->
     </div>

@@ -5,22 +5,23 @@ const Organiser = require('../models/Organiser');
 
 // Player reports a team
 exports.reportTeam = async (req, res) => {
-    const { teamId, reason } = req.body;
+    const { teamName, reason } = req.body;
     const playerId = req.user._id; // Extracting user ID from token
 
     try {
         const report = new Report({
             reportedBy: playerId,
             reportType: 'Team',
-            reportedTeam: teamId,
+            reportedTeam: teamName, // Store teamName instead of ObjectId
             reason
         });
         await report.save();
-        res.status(201).json({ message: "Team reported successfully", report });
+        res.redirect('/api/player/homepage');
     } catch (error) {
         res.status(500).json({ error: "Error reporting team", details: error.message });
     }
 };
+
 
 // Player reports an organise
 exports.reportOrganiser = async (req, res) => {

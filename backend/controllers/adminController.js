@@ -2,6 +2,7 @@ const Organiser = require('../models/Organiser');
 const Player = require('../models/Player');
 const Tournament = require('../models/Tournament');
 const Team = require('../models/Team');
+const Report = require('../models/Report');
 
 // Ban an organiser
 exports.banOrganiser = async (req, res) => {
@@ -88,53 +89,61 @@ exports.approveTournament = async (req, res) => {
   // Render the admin dashboard
   exports.getDashboard = async (req, res) => {
     try {
-      const organisers = await Organiser.find();
-      const players = await Player.find();
-      const tournaments = await Tournament.find();
-      const totalTeams = await Team.countDocuments();
-      const totalBannedPlayers = await Player.countDocuments({ banned: true });
-      const totalTournamentsConducted = organisers.reduce((acc, organiser) => acc + organiser.tournamentsConducted, 0);
-      const totalBannedOrgs = await Organiser.countDocuments({ banned: true });
-  
-      const currentDate = new Date();
-      const ongoingTournamentsCount = await Tournament.countDocuments({
-        startDate: { $lte: currentDate },
-        endDate: { $gte: currentDate }
-      });
-      const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
-      const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
-  
-      // Calculate player stats
-      const playersWithStats = await Promise.all(players.map(async (player) => {
-        const totalTournamentsPlayed = player.tournaments.length;
-        const totalWins = player.tournaments.filter(t => t.won).length;
-        const winPercentage = totalTournamentsPlayed > 0 ? (totalWins / totalTournamentsPlayed) * 100 : 0;
-        const totalTournamentsWon = totalWins; // Assuming achievements are equivalent to wins for simplicity
-  
-        return {
-          ...player._doc, // Spread the existing player fields
-          totalTournamentsPlayed,
-          winPercentage: winPercentage.toFixed(2),
-          totalTournamentsWon
-        };
-      }));
-  
-      res.render('adminDashboard', {
-        organisers,
-        players: playersWithStats, // Pass the enriched players with stats
-        tournaments,
-        totalTeams,
-        totalBannedPlayers,
-        totalTournamentsConducted,
-        totalBannedOrgs,
-        ongoingTournamentsCount,
-        pendingTournamentsCount,
-        tournamentToBeApproved
-      });
+        const organisers = await Organiser.find();
+        const players = await Player.find();
+        const tournaments = await Tournament.find();
+        const totalTeams = await Team.countDocuments();
+        const totalBannedPlayers = await Player.countDocuments({ banned: true });
+        const totalTournamentsConducted = organisers.reduce((acc, organiser) => acc + organiser.tournamentsConducted, 0);
+        const totalBannedOrgs = await Organiser.countDocuments({ banned: true });
+
+        const currentDate = new Date();
+        const ongoingTournamentsCount = await Tournament.countDocuments({
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
+        const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
+        const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
+
+        // Calculate player stats
+        const playersWithStats = await Promise.all(players.map(async (player) => {
+            const totalTournamentsPlayed = player.tournaments.length;
+            const totalWins = player.tournaments.filter(t => t.won).length;
+            const winPercentage = totalTournamentsPlayed > 0 ? (totalWins / totalTournamentsPlayed) * 100 : 0;
+            const totalTournamentsWon = totalWins;
+
+            return {
+                ...player._doc, // Spread the existing player fields
+                totalTournamentsPlayed,
+                winPercentage: winPercentage.toFixed(2),
+                totalTournamentsWon
+            };
+        }));
+
+        // Assuming Report model and populate are being used correctly
+        const reports = await Report.find({ reportType: 'Organiser' })
+        .populate('reportedBy')   // Populate Player details for reportedBy
+        .populate('reportedOrganiser'); // Populate Organiser details for reportedOrganiser
+
+        // Pass all the necessary data to the view
+        res.render('adminDashboard', {
+            organisers,
+            players: playersWithStats, // Pass the enriched players with stats
+            tournaments,
+            totalTeams,
+            totalBannedPlayers,
+            totalTournamentsConducted,
+            totalBannedOrgs,
+            ongoingTournamentsCount,
+            pendingTournamentsCount,
+            tournamentToBeApproved,
+            reports // Add reports to the data passed to the view
+        });
     } catch (error) {
-      console.error(error);
-      res.status(500).render('error', { statusCode: '500', errorMessage: 'Error Fetching data from dashboard' });
+        console.error(error);
+        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error Fetching data from dashboard' });
     }
   };
-  
+
+
   

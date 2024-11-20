@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/reportCard.css">
 
 </head>
 <body>
@@ -224,7 +225,46 @@
       </div>
     </div>
   </div>
- 
+
+  <div class="common-container">
+    <h2>Reported Organisers</h2>
+    <table>
+      <thead>
+          <tr>
+              <th>Reported By</th>
+              <th>Reported Organiser</th>
+              <th>Reason</th>
+              <th>Status</th>
+          </tr>
+      </thead>
+      <tbody>
+            <% reports.forEach(report => { %>
+                <tr>
+                    <td>
+                        <% if (report.reportedBy) { %>
+                            <%= report.reportedBy.name %>
+                        <% } else { %>
+                            Unknown Player
+                        <% } %>
+                    </td>
+    
+                    <td>
+                        <% if (report.reportedOrganiser) { %>
+                            <%= report.reportedOrganiser.name %>
+                        <% } else { %>
+                            Unknown Organiser
+                        <% } %>
+                    </td>
+    
+                    <td><%= report.reason %></td>
+                    <td><%= report.status %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>  
+  </div>
+  
+  
   
 </body>
 </html>

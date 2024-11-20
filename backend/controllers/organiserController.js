@@ -2,6 +2,7 @@ const Organiser = require("../models/Organiser");
 const Player = require("../models/Player");
 const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
+const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
 
 
@@ -351,6 +352,7 @@ exports.getOrganiserDashboard = async (req, res) => {
       };
       
         console.log("Visibility Settings:"+visibilitySettings , followerCount , totalPrizePool , totalTournaments , tournamentList);
+        const reports = await Report.find({ reportType: 'Team' }).populate('reportedTeam');
 
         // Render the dashboard with all tournaments in a single list
         res.render('organiserDashboard', {
@@ -360,7 +362,8 @@ exports.getOrganiserDashboard = async (req, res) => {
             followerCount,
             totalPrizePool,
             totalTournaments,
-            tournamentList
+            tournamentList,
+            reports 
         });
     } catch (error) {
         console.error('Error fetching organiser dashboard:', error);

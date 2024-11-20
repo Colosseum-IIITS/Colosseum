@@ -53,6 +53,27 @@
                 <button type="submit" class="btn btn-primary mt-2">Join Tournament</button>
             </form>
         <% } %>
+
+        <div class="common-container">
+            <h2>Report the Organiser of This Tournament</h2>
+            <form action="/reports/PreportO2A" method="POST">
+              <input 
+                type="text" 
+                id="organiserName" 
+                name="organiserName" 
+                value="<%= organiser.username %>" 
+                style="display: none;"
+                readonly 
+                required 
+              />
+          
+              <label for="reason">Reason:</label>
+              <textarea id="reason" name="reason" required></textarea>
+          
+              <button type="submit">Report Organiser</button>
+            </form>
+          </div>
+                    
     </div>
 <% } else if (userRole === 'organiser') { %>
     <div class="alert alert-success">

@@ -86,6 +86,46 @@
                     Update Profile
                 </button>
             </section>
+            <div class="common-container">
+                <h2>Organiser Reporting Another Organiser</h2>
+                <form action="/reports/OreportO2A" method="POST">
+                  <label for="organiserName">Organiser Name:</label>
+                  <input type="text" id="organiserName" name="organiserName" required />
+              
+                  <label for="reason">Reason:</label>
+                  <textarea id="reason" name="reason" required></textarea>
+              
+                  <button type="submit">Submit Report</button>
+                </form>
+              </div>
+              
+              <div class="common-container">
+                <h2>Reported Teams</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Reported By</th>
+                      <th>Team Name</th>
+                      <th>Reason</th>
+                      <th>Status</th>
+                      <th>Reported At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% reports.forEach(report => { %>
+                      <tr>
+                        <td><%= report.reportedBy.name %></td>
+                        <td><%= report.reportedTeam %></td> <!-- Display teamName -->
+                        <td><%= report.reason %></td>
+                        <td><%= report.status %></td>
+                        <td><%= new Date(report.createdAt).toLocaleString() %></td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              
+              
         <% } %>
     </div>
 </body>

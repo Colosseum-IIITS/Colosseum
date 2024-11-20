@@ -7,11 +7,29 @@ const reportSchema = new mongoose.Schema(
       ref: "Player",
       required: true,
     },
-    reportType: { type: String, enum: ["Team", "Organiser"], required: true },
-    reportedTeam: { type: String, required: true },  // Change to store teamName as a string
-    reportedOrganiser: { type: mongoose.Schema.Types.ObjectId, ref: "Organiser" },
-    reason: { type: String, required: true },
-    status: { type: String, enum: ["Pending", "Reviewed"], default: "Pending" },
+    reportType: { 
+      type: String, 
+      enum: ["Team", "Organiser"], 
+      required: true 
+    },
+    reportedTeam: { 
+      type: String, 
+      required: function() { return this.reportType === 'Team'; } // Only required for team reports
+    },
+    reportedOrganiser: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Organiser",
+      required: function() { return this.reportType === 'Organiser'; } // Only required for organiser reports
+    },
+    reason: { 
+      type: String, 
+      required: true 
+    },
+    status: { 
+      type: String, 
+      enum: ["Pending", "Reviewed"], 
+      default: "Pending" 
+    },
   },
   { timestamps: true }
 );

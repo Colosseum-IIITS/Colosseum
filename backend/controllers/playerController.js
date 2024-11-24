@@ -92,37 +92,44 @@ exports.searchTournaments = async (req, res) => {
                 $and: [
                     {
                         $or: [
-                        { tid: new RegExp(searchTerm, 'i') },
-                        { name: new RegExp(searchTerm, 'i') }
-                        ]
+                            { tid: new RegExp(searchTerm, 'i') },
+                            { name: new RegExp(searchTerm, 'i') },
+                        ],
                     },
-                    { status: 'Approved' }
-                ]   
+                    { status: 'Approved' },
+                ],
             });
         }
-        
+
         // Fetch joined tournaments if the user is logged in
         if (req.user && req.user._id) {
-            const player = await Player.findById(req.user._id).populate('tournaments.tournament');
+            const player = await Player.findById(req.user._id).populate(
+                'tournaments.tournament'
+            );
             if (player) {
-                joinedTournaments = player.tournaments.map(t => t.tournament);
+                joinedTournaments = player.tournaments.map((t) => t.tournament);
             }
         }
 
         console.log('Tournaments Found:', tournaments); // Debugging line
         console.log('Joined Tournaments:', joinedTournaments); // Debugging line
 
-        // Render the search results page
-        res.render('searchResults', {
-            results: tournaments, // Pass the found tournaments
-            searchTerm: searchTerm || '', // Pass the search term to the template
-            joinedTournaments: joinedTournaments || [] // Pass the joined tournaments
+        // Respond with JSON data
+        res.status(200).json({
+            message: 'Tournaments fetched successfully',
+            results: tournaments,
+            searchTerm: searchTerm || '',
+            joinedTournaments: joinedTournaments || [],
         });
     } catch (error) {
         console.error('Error searching tournaments:', error); // Log the error
-        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error searching tournaments' });
+        res.status(500).json({
+            error: 'Error searching tournaments',
+            details: error.message,
+        });
     }
 };
+
 
 exports.searchPlayer = async (req, res) => {
     try {
@@ -144,16 +151,19 @@ exports.searchPlayer = async (req, res) => {
         console.log('Players Found:', players); // Debugging line
 
         res.status(200).json({
-            results: tournaments,
-            searchTerm: searchTerm || '',
-            joinedTournaments: joinedTournaments || []
+            results: players, // Corrected the response to include the players results
+            searchTerm: searchTerm || '' // Return the search term in the response
         });
         
     } catch (error) {
         console.error('Error searching players:', error); // Log the error
-        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error searching players' });
+        res.status(500).json({
+            error: 'Error searching players',
+            details: error.message,
+        });
     }
 };
+
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
@@ -163,20 +173,20 @@ exports.joinTournament = async (req, res) => {
     try {
         const player = await Player.findOne({ _id }).populate('team');
         if (!player) {
-            return res.status(404).render('error', { statusCode: '404', errorMessage: 'Player not found' });
+            return res.status(404).json({ error: 'Player not found' });
         }
 
         if (!player.team) {
-            return res.status(400).render('error', { statusCode: '400', errorMessage: 'Player must be part of a team' });
+            return res.status(400).json({ error: 'Player must be part of a team' });
         }
 
         const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
-            return res.status(404).render('error', { statusCode: '404', errorMessage: 'Tournament not found' });
+            return res.status(404).json({ error: 'Tournament not found' });
         }
 
         if (tournament.teams.includes(player.team._id)) {
-            return res.status(400).render('error', { statusCode: '400', errorMessage: 'Team is already registered for this tournament' });
+            return res.status(400).json({ error: 'Team is already registered for this tournament' });
         }
 
         tournament.teams.push(player.team._id);
@@ -208,7 +218,10 @@ exports.joinTournament = async (req, res) => {
         
     } catch (error) {
         console.error("Error joining tournament:", error);
-        return res.status(500).render('error', { statusCode: '500', errorMessage: 'Server error', error });
+        return res.status(500).json({
+            error: 'Server error',
+            details: error.message,
+        });
     }
 };
 

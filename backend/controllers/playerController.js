@@ -35,12 +35,11 @@ exports.followOrganiser = async (req, res) => {
         organiser.followers.push(player._id);
         await organiser.save();
 
-        res.redirect('/api/player/homepage');
+        res.status(200).json({ message: 'Player successfully followed the organiser', player, organiser });
     } catch (error) {
         res.status(500).json({ error: 'Error following organiser' });
     }
 };
-
 
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
@@ -71,7 +70,7 @@ exports.unfollowOrganiser = async (req, res) => {
         organiser.followers.pull(playerId);
         await organiser.save();
 
-        res.redirect('/api/player/homepage')
+        res.status(200).json({ message: 'Player successfully unfollowed the organiser', player, organiser });
     } catch (error) {
         console.error('Error unfollowing organiser:', error);
         res.status(500).json({ error: 'Error unfollowing organiser', details: error.message });
@@ -79,8 +78,6 @@ exports.unfollowOrganiser = async (req, res) => {
 };
 
 // Func: Search tournaments by tid or name
-// searchController.js
-
 exports.searchTournaments = async (req, res) => {
     try {
         const { searchTerm } = req.query || '';
@@ -146,19 +143,17 @@ exports.searchPlayer = async (req, res) => {
 
         console.log('Players Found:', players); // Debugging line
 
-        // Render the player search results page
-        res.render('resultsPlayer', {
-            players: players || [], // Pass the found players
-            searchTerm: searchTerm || '' // Pass the search term to the template
+        res.status(200).json({
+            results: tournaments,
+            searchTerm: searchTerm || '',
+            joinedTournaments: joinedTournaments || []
         });
+        
     } catch (error) {
         console.error('Error searching players:', error); // Log the error
         res.status(500).render('error', { statusCode: '500', errorMessage: 'Error searching players' });
     }
 };
-
-
-
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
@@ -204,20 +199,18 @@ exports.joinTournament = async (req, res) => {
 
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
-        // return res.render('homepage', {
-        //     joinedTournaments,
-        //     results: joinedTournaments, // Ensure 'results' is passed here
-        //     searchTerm: null
-        // });
-        res.redirect('/api/player/homepage');
+        res.status(200).json({
+            message: 'Player successfully joined the tournament',
+            player,
+            tournament,
+            joinedTournaments: joinedTournaments || []
+        });
+        
     } catch (error) {
         console.error("Error joining tournament:", error);
         return res.status(500).render('error', { statusCode: '500', errorMessage: 'Server error', error });
     }
 };
-
-
-
 
 // Update username
 exports.updateUsername = async (req, res) => {
@@ -239,7 +232,10 @@ exports.updateUsername = async (req, res) => {
         player.username = username;
         await player.save();
 
-        res.status(200).redirect('/dashboard');
+        res.status(200).json({
+            message: 'Username updated successfully',
+            player
+        });
     } catch (error) {
         console.error('Error updating username:', error);
         res.status(500).json({ error: 'Error updating username', details: error.message });
@@ -267,13 +263,15 @@ exports.updatePassword = async (req, res) => {
         player.password = hashedPassword;
         await player.save();
 
-        res.status(200).redirect('/dashboard');
+        res.status(200).json({
+            message: 'Password updated successfully',
+            player
+        });
     } catch (error) {
         console.error('Error updating password:', error);
         res.status(500).json({ error: 'Error updating password', details: error.message });
     }
 };
-
 // Update email
 exports.updateEmail = async (req, res) => {
     const { email } = req.body; // Extract email from request body
@@ -294,31 +292,26 @@ exports.updateEmail = async (req, res) => {
         player.email = email; // Update the player's email
         await player.save();
 
-        res.status(200).redirect('/dashboard');
+        res.status(200).json({
+            message: 'Email updated successfully',
+            player
+        });
     } catch (error) {
         console.error('Error updating email:', error);
         res.status(500).json({ error: 'Error updating email', details: error.message });
     }
 };
 
-
+// Update profile
 exports.updateProfile = async (req, res) => {
     const { username, email, currentPassword, newPassword } = req.body;
     const userId = req.user._id; // Ensure you have the user's ID from the JWT
 
     try {
         const player = await Player.findById(userId);
-        
-        
         if (!player) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        // // Log to check the incoming data
-        // console.log('Incoming data:', req.body);
-        // console.log('Fetched Player:', player);
-
-        console.log(currentPassword);
 
         // Check if currentPassword is provided
         if (!currentPassword) {
@@ -343,24 +336,21 @@ exports.updateProfile = async (req, res) => {
         // Save the updated player information
         await player.save();
 
-        res.status(200).json({ message: 'Profile updated successfully' });
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            player
+        });
     } catch (error) {
         console.error('Error updating profile:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-
-
-
-
 // Fetch number of tournaments played by the player
 exports.getTournamentsPlayed = async (req, res) => {
     const { _id } = req.user;
     try {
-        const player = await Player.findById( { _id } );
-
-        console.log('Player ID from token:', { _id });
+        const player = await Player.findById({ _id });
 
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
@@ -375,7 +365,6 @@ exports.getTournamentsPlayed = async (req, res) => {
 };
 
 // Fetch number of tournaments won by the player
-// backend/controllers/playerController.js
 exports.getTournamentsWon = async (req, res) => {
     const { _id } = req.user;
 
@@ -420,8 +409,6 @@ exports.getFollowedOrganisers = async (req, res) => {
         // Find the player by their ID
         const player = await Player.findById(_id).populate('following');
 
-        console.log('Player ID from token:', _id);
-
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
@@ -434,7 +421,6 @@ exports.getFollowedOrganisers = async (req, res) => {
         res.status(500).json({ error: 'Error fetching organisers followed' });
     }
 };
-
 
 // Example route for search results rendering the homepage
 exports.getHomePage = async (req, res) => {
@@ -457,7 +443,6 @@ exports.getHomePage = async (req, res) => {
         let followedOrganisers = [];
         let joinedTournaments = [];
 
-        // Ensure the playerName is extracted if user is logged in
         const playerName = req.user?.username || 'Guest';
         
         if (req.user && req.user._id) {
@@ -481,7 +466,6 @@ exports.getHomePage = async (req, res) => {
             if (player) {
                 followedOrganisers = player.following || [];
 
-                // Fetch tournaments for the player's team
                 const team = player.team;
                 if (team) {
                     joinedTournaments = await Tournament.find({ teams: team._id })
@@ -493,27 +477,22 @@ exports.getHomePage = async (req, res) => {
             }
         }
 
-        res.render('homepage', {
-            results: tournaments || [],
-            players: players || [],
-            searchTerm: '',
-            organisers: organisers || [],
+        res.status(200).json({
+            tournaments,
+            players,
+            organisers,
             followedOrganisers,
             joinedTournaments,
             playerName
         });
     } catch (error) {
         console.error('Error in getHomePage:', error);
-        res.status(500).render('error', {
+        res.status(500).json({
             statusCode: '500',
             errorMessage: 'Error fetching data for the homepage'
         });
     }
 };
-
-
-
-
 
 exports.getTournamentPointsTable = async (req, res) => {
     const { tournamentId } = req.params;
@@ -524,14 +503,17 @@ exports.getTournamentPointsTable = async (req, res) => {
             return res.status(404).json({ message: 'Tournament not found' });
         }   
         
-        res.render('tournamentDetails', { pointsTable: tournament.pointsTable, tournamentName: tournament.name });
+        res.status(200).json({
+            pointsTable: tournament.pointsTable,
+            tournamentName: tournament.name
+        });
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error });
+        return res.status(500).json({
+            message: 'Internal server error',
+            error
+        });
     }
 };
-
-
-
 
 exports.getDashboard = async (req, res) => {
     const _id = req.user._id;
@@ -558,7 +540,7 @@ exports.getDashboard = async (req, res) => {
         const teamId = player.team; 
         const team = await Team.findById(teamId); 
 
-        res.render('dashboard', {
+        res.status(200).json({
             player: {
                 username: player.username,
                 email: player.email,
@@ -577,3 +559,4 @@ exports.getDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };
+

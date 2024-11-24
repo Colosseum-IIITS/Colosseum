@@ -16,7 +16,7 @@ exports.reportTeam = async (req, res) => {
             reason
         });
         await report.save();
-        res.redirect('/api/player/homepage'); // Redirect after successful report
+        res.status(200).json({ message: 'Team reported successfully' }); // Respond with success message
     } catch (error) {
         res.status(500).json({ error: "Error reporting team", details: error.message });
     }
@@ -43,17 +43,16 @@ exports.reportOrganiser = async (req, res) => {
         await report.save();
 
         if (isOrganiser) {
-            // If the report was made by an organiser, redirect to that organiser's dashboard
-            return res.redirect(`/api/organiser/${req.user.username}/dashboard`);
+            // If the report was made by an organiser, return to organiser's dashboard
+            return res.status(200).json({ message: 'Organiser report submitted successfully' });
         } else {
-            // If the report was made by a player, redirect to player's homepage
-            return res.redirect('/api/player/homepage');
+            // If the report was made by a player, return to player homepage
+            return res.status(200).json({ message: 'Organiser reported successfully' });
         }
     } catch (error) {
         res.status(500).json({ error: "Error reporting organiser", details: error.message });
     }
 };
-
 
 // Organiser sees reported teams
 exports.getReportedTeams = async (req, res) => {

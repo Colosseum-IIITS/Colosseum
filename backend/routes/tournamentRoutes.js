@@ -18,7 +18,6 @@ router.post('/updatePointsTable',tournamentController.updateTournament);
 // Route to update the winner by the Organiser of the tournamne
 router.put('/updateWinner', tournamentController.updateWinner);
 
-router.get('/:tournamentId/points-table',authenticateUser, tournamentController.renderPointsTable);
 router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);
 router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
 router.post('/edit/:tournamentId', tournamentController.editTournament);

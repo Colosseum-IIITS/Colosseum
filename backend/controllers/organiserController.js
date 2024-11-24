@@ -36,32 +36,6 @@ exports.deleteTournament = async (req, res) => {
     }
 };
 
-
-exports.renderPointsTable = async (req, res) => {
-  try {
-    const { tournamentId } = req.params;
-    const tournament = await Tournament.findById(tournamentId);
-    if (!tournament) {
-      return res.status(404).send('Tournament not found');
-    }
-
-    // Ensure only the organiser can access this page
-    if (req.user.role !== 'organiser') {
-      return res.status(403).send('Unauthorized: Only organisers can update points');
-    }
-
-    res.render('updatePointsTable', {
-      tournament,
-      userRole: req.user.role,
-      username: req.user.username
-    });
-  } catch (error) {
-    console.error('Error fetching tournament:', error);
-    return res.status(500).send('Server error');
-  }
-};
-
-
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query;
@@ -95,7 +69,6 @@ exports.getOrganiserByUsername = async (req, res) => {
       return res.status(500).render('error', { statusCode: '500', errorMessage: 'Error fetching organisers' });
   }
 };
-
 
 // Rename And Change Naming
 exports.updateOrganiserSettings = async (req, res) => {

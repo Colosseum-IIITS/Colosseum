@@ -7,87 +7,85 @@ const Report = require('../models/Report');
 // Ban an organiser
 exports.banOrganiser = async (req, res) => {
     try {
-      await Organiser.findByIdAndUpdate(req.params.id, { banned: true });
-      res.redirect('/admin/dashboard');
+        await Organiser.findByIdAndUpdate(req.params.id, { banned: true });
+        res.status(200).json({ message: 'Organiser banned successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error banning organiser', details: error.message });
     }
-  };
-  
-  // Unban an organiser
-  exports.unBanOrganiser = async (req, res) => {
+};
+
+// Unban an organiser
+exports.unBanOrganiser = async (req, res) => {
     try {
-      await Organiser.findByIdAndUpdate(req.params.id, { banned: false });
-      res.redirect('/admin/dashboard');
+        await Organiser.findByIdAndUpdate(req.params.id, { banned: false });
+        res.status(200).json({ message: 'Organiser unbanned successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error unbanning organiser', details: error.message });
     }
-  };
-  
-  // Delete an organiser
-  exports.deleteOrganiser = async (req, res) => {
+};
+
+// Delete an organiser
+exports.deleteOrganiser = async (req, res) => {
     try {
-      await Organiser.findByIdAndDelete(req.params.id);
-      res.redirect('/admin/dashboard');
+        await Organiser.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Organiser deleted successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error deleting organiser', details: error.message });
     }
-  };
-  
-  // Ban a player
-  exports.banPlayer = async (req, res) => {
+};
+
+// Ban a player
+exports.banPlayer = async (req, res) => {
     try {
-      await Player.findByIdAndUpdate(req.params.id, { banned: true });
-      res.redirect('/admin/dashboard');
+        await Player.findByIdAndUpdate(req.params.id, { banned: true });
+        res.status(200).json({ message: 'Player banned successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error banning player', details: error.message });
     }
-  };
-  
-  // Unban a player
-  exports.unBanPlayer = async (req, res) => {
+};
+
+// Unban a player
+exports.unBanPlayer = async (req, res) => {
     try {
-      await Player.findByIdAndUpdate(req.params.id, { banned: false });
-      res.redirect('/admin/dashboard');
+        await Player.findByIdAndUpdate(req.params.id, { banned: false });
+        res.status(200).json({ message: 'Player unbanned successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error unbanning player', details: error.message });
     }
-  };
-  
-  // Delete a player
-  exports.deletePlayer = async (req, res) => {
+};
+
+// Delete a player
+exports.deletePlayer = async (req, res) => {
     try {
-      await Player.findByIdAndDelete(req.params.id);
-      res.redirect('/admin/dashboard');
+        await Player.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Player deleted successfully.' });
     } catch (error) {
-      res.status(400).json({ error });
+        res.status(400).json({ error: 'Error deleting player', details: error.message });
     }
-  };
-  
+};
 
 // Approve a tournament
 exports.approveTournament = async (req, res) => {
-  try {
-    const tournament = await Tournament.findByIdAndUpdate(req.params.id, { status: 'Approved' });
-    res.redirect('/admin/dashboard');
-  } catch (error) {
-    res.status(400).json({ error });
-  }
+    try {
+        await Tournament.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+        res.status(200).json({ message: 'Tournament approved successfully.' });
+    } catch (error) {
+        res.status(400).json({ error: 'Error approving tournament', details: error.message });
+    }
 };
 
-
-  // Fetch reports (for admin)
-  exports.fetchOrganiserReportsForAdmin = async (req, res) => {
+// Fetch reports (for admin)
+exports.fetchOrganiserReportsForAdmin = async (req, res) => {
     try {
-      const reports = await Report.find().populate('reportedBy organiser');
-      res.status(200).json(reports);
+        const reports = await Report.find().populate('reportedBy organiser');
+        res.status(200).json(reports);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching reports', details: error.message });
+        res.status(500).json({ error: 'Error fetching reports', details: error.message });
     }
-  };
+};
 
-  // Render the admin dashboard
-  exports.getDashboard = async (req, res) => {
+// Render the admin dashboard
+exports.getDashboard = async (req, res) => {
     try {
         const organisers = await Organiser.find();
         const players = await Player.find();
@@ -120,15 +118,14 @@ exports.approveTournament = async (req, res) => {
             };
         }));
 
-        // Assuming Report model and populate are being used correctly
         const reports = await Report.find({ reportType: 'Organiser' })
-        .populate('reportedBy')   // Populate Player details for reportedBy
-        .populate('reportedOrganiser'); // Populate Organiser details for reportedOrganiser
+            .populate('reportedBy')
+            .populate('reportedOrganiser');
 
-        // Pass all the necessary data to the view
-        res.render('adminDashboard', {
+        // Respond with JSON
+        res.status(200).json({
             organisers,
-            players: playersWithStats, // Pass the enriched players with stats
+            players: playersWithStats,
             tournaments,
             totalTeams,
             totalBannedPlayers,
@@ -137,13 +134,9 @@ exports.approveTournament = async (req, res) => {
             ongoingTournamentsCount,
             pendingTournamentsCount,
             tournamentToBeApproved,
-            reports // Add reports to the data passed to the view
+            reports
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).render('error', { statusCode: '500', errorMessage: 'Error Fetching data from dashboard' });
+        res.status(500).json({ error: 'Error fetching dashboard data', details: error.message });
     }
-  };
-
-
-  
+};

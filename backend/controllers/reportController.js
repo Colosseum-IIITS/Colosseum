@@ -6,17 +6,17 @@ const Organiser = require('../models/Organiser');
 // Player reports a team
 exports.reportTeam = async (req, res) => {
     const { teamName, reason } = req.body;
-    const playerId = req.user._id; // Extracting user ID from token
+    const playerId = req.user._id;
 
     try {
         const report = new Report({
             reportedBy: playerId,
             reportType: 'Team',
-            reportedTeam: teamName, // Store teamName as a string
+            reportedTeam: teamName,
             reason
         });
         await report.save();
-        res.status(200).json({ message: 'Team reported successfully' }); // Respond with success message
+        res.status(200).json({ message: 'Team reported successfully' });
     } catch (error) {
         res.status(500).json({ error: "Error reporting team", details: error.message });
     }
@@ -25,11 +25,11 @@ exports.reportTeam = async (req, res) => {
 // Player reports an organiser
 exports.reportOrganiser = async (req, res) => {
     const { organiserName, reason } = req.body;
-    const userId = req.user._id; // Extracting user ID from token
+    const userId = req.user._id;
     const isOrganiser = req.path.includes('OreportO2A'); // Check if the request is from an Organiser
 
     try {
-        const organiser = await Organiser.findOne({ username: organiserName }); // Adjust if 'username' is different
+        const organiser = await Organiser.findOne({ username: organiserName });
         if (!organiser) {
             return res.status(404).json({ error: "Organiser not found" });
         }
@@ -37,16 +37,14 @@ exports.reportOrganiser = async (req, res) => {
         const report = new Report({
             reportedBy: userId,
             reportType: 'Organiser',
-            reportedOrganiser: organiser._id, // Link by ObjectId
+            reportedOrganiser: organiser._id,
             reason
         });
         await report.save();
 
         if (isOrganiser) {
-            // If the report was made by an organiser, return to organiser's dashboard
             return res.status(200).json({ message: 'Organiser report submitted successfully' });
         } else {
-            // If the report was made by a player, return to player homepage
             return res.status(200).json({ message: 'Organiser reported successfully' });
         }
     } catch (error) {
@@ -58,7 +56,7 @@ exports.reportOrganiser = async (req, res) => {
 exports.getReportedTeams = async (req, res) => {
     try {
         const reports = await Report.find({ reportType: 'Team' })
-            .populate('reportedBy', 'name') // Populate reporter's name
+            .populate('reportedBy', 'name')
             .exec();
 
         res.status(200).json(reports);
@@ -71,8 +69,8 @@ exports.getReportedTeams = async (req, res) => {
 exports.getReportedOrganisers = async (req, res) => {
     try {
         const reports = await Report.find({ reportType: 'Organiser' })
-            .populate('reportedBy', 'name') // Populate reporter's name
-            .populate('reportedOrganiser', 'name') // Populate organiser's name
+            .populate('reportedBy', 'name')
+            .populate('reportedOrganiser', 'name')
             .exec();
 
         res.status(200).json(reports);

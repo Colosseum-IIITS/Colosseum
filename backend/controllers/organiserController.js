@@ -244,7 +244,7 @@ exports.updateProfilePhoto = async (req, res) => {
 };
 
 exports.updateVisibilitySettings = async (req, res) => {
-  const { id } = req.user; // Assuming user ID is from JWT
+  const { id } = req.user;
   const {
       descriptionVisible,
       profilePhotoVisible,
@@ -288,10 +288,9 @@ exports.updateVisibilitySettings = async (req, res) => {
 
 
 exports.renderUpdateVisibilitySettings = async (req, res) => {
-  const { id } = req.user; // Assuming user ID is from JWT
-
-  try {
-      const organiser = await Organiser.findById(id);
+    const { id } = req.user;
+    try {
+        const organiser = await Organiser.findById(id);
 
       if (!organiser) {
           return res.status(404).json({ message: "Organiser not found" });
@@ -312,36 +311,31 @@ exports.renderUpdateVisibilitySettings = async (req, res) => {
 
 
 exports.getOrganiserDashboard = async (req, res) => {
-  const { username } = req.params; // Organiser's username passed in the URL
-  const loggedInUserId = req.user._id; // Get the logged-in user's ID
+    const { username } = req.params;
+    const loggedInUserId = req.user._id;
 
-  try {
-      // Find the organiser by username
-      const organiser = await Organiser.findOne({ username })
-          .populate('tournaments')
-          .populate('followers');
+    try {
+        const organiser = await Organiser.findOne({ username })
+            .populate('tournaments')
+            .populate('followers');
 
       if (!organiser) {
           return res.status(404).json({ message: 'Organiser not found' });
       }
 
-      const isOwner = loggedInUserId.equals(organiser._id); // Check if logged-in user is the organiser
-      console.log("DEBUG: ISOWNER:", isOwner, "LOGGEDINID:", loggedInUserId, "ORGID:", organiser._id);
+        const isOwner = loggedInUserId.equals(organiser._id);
+        console.log("DEBUG:ISOWNER:"+isOwner+"lOGGEDINID:"+loggedInUserId+"ORGID:"+organiser._id);
+        const totalTournaments = organiser.tournaments.length;
+        console.log("Total Tournaments Count Fetched:"+totalTournaments);
+        const followerCount = organiser.followers.length;
+        console.log("FollowerCount fetched: "+followerCount);
 
-      const totalTournaments = organiser.tournaments.length;
-      console.log("Total Tournaments Count Fetched:", totalTournaments);
-
-      const followerCount = organiser.followers.length;
-      console.log("FollowerCount fetched:", followerCount);
-
-      // Fetch all tournaments organized by the organiser
-      const tournamentList = await Tournament.find({ organiser: organiser._id });
+        const tournamentList = await Tournament.find({ organiser: organiser._id });
 
       const totalPrizePool = tournamentList.reduce((sum, tournament) => sum + tournament.prizePool, 0);
       console.log("Total Prize Pool:", totalPrizePool);
 
-      // Handle visibility settings for players
-      const visibilitySettings = organiser.visibilitySettings || {
+        const visibilitySettings = organiser.visibilitySettings || {
           descriptionVisible: true,
           profilePhotoVisible: true,
           prizePoolVisible: true,
@@ -353,25 +347,20 @@ exports.getOrganiserDashboard = async (req, res) => {
 
       const reports = await Report.find({ reportType: 'Team' }).populate('reportedTeam');
 
-      // Respond with JSON data
-      res.status(200).json({
-          message: 'Organiser dashboard data fetched successfully',
-          organiser,
-          isOwner,
-          visibilitySettings,
-          followerCount,
-          totalPrizePool,
-          totalTournaments,
-          tournamentList,
-          reports,
-      });
-  } catch (error) {
-      console.error('Error fetching organiser dashboard:', error);
-      res.status(500).json({
-          error: 'Error fetching organiser dashboard',
-          details: error.message,
-      });
-  }
+        res.render('organiserDashboard', {
+            organiser,
+            isOwner,
+            visibilitySettings,
+            followerCount,
+            totalPrizePool,
+            totalTournaments,
+            tournamentList,
+            reports 
+        });
+    } catch (error) {
+        console.error('Error fetching organiser dashboard:', error);
+        res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
+    }
 };
 
 
@@ -380,25 +369,22 @@ exports.getMyOrganisers = async (req, res) => {
 
   try {
       const player = await Player.findById(_id).populate({
-          path: 'following', // Assuming this is the field in Player model
+          path: 'following',
           model: 'Organiser',
           populate: {
-              path: 'tournaments', // Assuming each organiser has a tournaments field
-              model: 'Tournament', // Replace with your actual tournament model name
-          },
+              path: 'tournaments',
+              model: 'Tournament'
+          }
       });
 
       if (!player) {
           return res.status(404).json({ message: 'Player not found' });
       }
 
-      // Log followed organisers for debugging
       console.log('Followed Organisers:', player.following);
 
-      // Respond with JSON data
-      res.status(200).json({
-          message: 'Followed organisers fetched successfully',
-          followedOrganisers: player.following,
+      res.render('homepage', {
+          followedOrganisers: player.following
       });
   } catch (error) {
       console.error('Error retrieving followed organisers:', error);

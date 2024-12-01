@@ -5,11 +5,11 @@ const jwt = require('jsonwebtoken');
 const Organiser = require("../models/Organiser");
 
 // Create a new tournament
-exports.createTournamentForm = async (req, res) => {
-    res.status(200).json({ message: "Render createTournament page", organiser: req.user });
-};
+// exports.createTournamentForm = async (req, res) => {
+//     res.status(200).json({ message: "Render createTournament page", organiser: req.user });
+// };
 
-// Create a tournament
+// Create a tournament.
 exports.createTournament = async (req, res) => {
     const {
         tid,
@@ -281,9 +281,8 @@ exports.editTournament = async (req, res) => {
   const { tournamentId } = req.params;
 
   try {
-      // Find the tournament by ID and update it
       const updatedTournament = await Tournament.findOneAndUpdate(
-          { tid: tournamentId }, // Match by TID
+          { tid: tournamentId },
           {
               name,
               startDate,
@@ -348,7 +347,6 @@ exports.joinTournament = async (req, res) => {
 exports.getPointsTable = async (req, res) => {
   const { tournamentId } = req.params;
   try {
-      // Fetch tournament details by ID
       const tournament = await Tournament.findById(tournamentId).populate('teams');
 
       if (!tournament) {
@@ -356,7 +354,7 @@ exports.getPointsTable = async (req, res) => {
       }
 
       const tournamentName = tournament.name;
-      const pointsTable = tournament.pointsTable || []; // If pointsTable is missing, default to an empty array
+      const pointsTable = tournament.pointsTable || [];
 
       res.status(200).json({
           tournamentName,
@@ -371,30 +369,26 @@ exports.getPointsTable = async (req, res) => {
 exports.leaveTournament = async (req, res) => {
   try {
     const tournamentId = req.params.tournamentId;
-    const playerId = req.user._id; // Assuming user is logged in and their ID is in req.user
+    const playerId = req.user._id;
 
-    // Fetch the tournament
     const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
 
     if (!tournament) {
       return res.status(404).json({ message: 'Tournament not found' });
     }
 
-    // Check if the player is part of any team in the tournament
     const team = tournament.teams.find(team => team.players.includes(playerId));
 
     if (!team) {
       return res.status(400).json({ message: 'Player is not part of any team in this tournament' });
     }
 
-    // Check if the player is the team captain
     if (team.captain.toString() !== playerId.toString()) {
       return res.status(403).json({
         message: 'Only the team captain can leave the tournament. Please contact your team captain.'
       });
     }
 
-    // Remove the team from the tournament
     tournament.teams = tournament.teams.filter(t => t._id.toString() !== team._id.toString());
 
     await tournament.save();

@@ -122,7 +122,6 @@ exports.getDashboard = async (req, res) => {
             .populate('reportedBy')
             .populate('reportedOrganiser');
 
-        // Respond with JSON
         res.status(200).json({
             organisers,
             players: playersWithStats,

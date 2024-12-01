@@ -73,16 +73,21 @@ exports.getTeamsByName = async (req, res) => {
   try {
     const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
       .populate('players', 'name')
-      .populate('captain', 'name'); 
+      .populate('captain', 'name');
 
-    console.log('Fetched Teams:', JSON.stringify(teams, null, 2));
 
-    res.status(200).json({ teams, searchTerm, error: null });
+    if (teams.length > 0) {
+      return res.status(200).json({ teams, searchTerm, error: null });
+    } else {
+      return res.status(404).json({ teams: [], searchTerm, error: 'No teams found' });
+    }
+
   } catch (error) {
     console.error('Error fetching teams:', error);
-    res.status(500).json({ teams: [], searchTerm, error: 'Error fetching teams' });
+    return res.status(500).json({ teams: [], searchTerm, error: 'Error fetching teams' });
   }
 };
+
 
 // Update team name (only by captain)
 exports.updateTeamName = async (req, res) => {

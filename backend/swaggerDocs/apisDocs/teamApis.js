@@ -106,13 +106,13 @@ router.post('/leave', authenticateUser, teamController.leaveTeam);
 
 /**
  * @swagger
- * /team/search:
+ * /api/team/search:
  *   get:
  *     summary: "Search for Teams"
  *     description: "This endpoint allows a player to search for teams by name."
  *     parameters:
  *       - in: query
- *         name: teamName
+ *         name: searchTerm
  *         required: false
  *         schema:
  *           type: string
@@ -133,12 +133,12 @@ router.get('/search', teamController.getTeamsByName);
  *     description: "This endpoint allows the team captain to update the team name."
  *     parameters:
  *       - in: body
- *         name: teamName
+ *         name: newName
  *         required: true
  *         schema:
  *           type: object
  *           properties:
- *             teamName:
+ *             newName:
  *               type: string
  *               description: "The new name of the team."
  *     responses:

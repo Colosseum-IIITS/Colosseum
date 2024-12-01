@@ -16,7 +16,6 @@ const swaggerOptions = {
   apis: [path.resolve(__dirname, './swaggerDocs/apisDocs/*.js')],
 };
 
-// SwaggerDocs generation
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 module.exports = swaggerDocs;

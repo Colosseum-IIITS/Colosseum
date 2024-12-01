@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /organiser/search:
+ * /api/organiser/search:
  *   get:
  *     summary: "Search an Organiser"
  *     description: "This endpoint allows searching an organiser by their username."

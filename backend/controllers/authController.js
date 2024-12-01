@@ -9,6 +9,8 @@ require('dotenv').config();
 exports.createPlayer = async (req, res) => {
     const { username, email, password } = req.body;
 
+    console.log('Request Body:', req.body);  // Log incoming request data
+
     if (!username || !email || !password) {
         return res.status(400).json({ statusCode: 400, errorMessage: 'Invalid Details' });
     }

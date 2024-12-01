@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const { authenticateUser } = require('./middleware/authMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swaggerConfig'); // Import Swagger configuration
+require('dotenv').config();
 
 // Import routes
 const playerRoutes = require('./routes/playerRoutes');

@@ -110,30 +110,32 @@ exports.updateUsername = async (req, res) => {
   const { newUsername } = req.body;
   const { _id } = req.user;
 
-  try {
-    const organiser = await Organiser.findOne({ _id });
-    if (!organiser) {
-      return res.status(404).json({ message: "Organiser not found" });
-    }
+  if (!newUsername) {
+    return res.status(400).json({ message: "New username is required" });
+  }
 
-    const existingOrganiser = await Organiser.findOne({
-      username: newUsername,
-    });
+  try {
+    // Check if username is already taken
+    const existingOrganiser = await Organiser.findOne({ username: newUsername });
     if (existingOrganiser) {
       return res.status(400).json({ message: "Username already taken" });
     }
 
-    organiser.username = newUsername;
-    await organiser.save();
+    // Find and update the organiser's username
+    const organiser = await Organiser.findByIdAndUpdate(
+      _id, 
+      { username: newUsername },
+      { new: true, runValidators: true }
+    );
 
-    res
-      .status(200)
-      .json({ message: "Username updated successfully", organiser });
+    if (!organiser) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
+
+    res.status(200).json({ message: "Username updated successfully", organiser });
   } catch (error) {
     console.error("Error updating username:", error);
-    res
-      .status(500)
-      .json({ error: "Error updating username", details: error.message });
+    res.status(500).json({ error: "Error updating username", details: error.message });
   }
 };
 
@@ -346,17 +348,17 @@ exports.getOrganiserDashboard = async (req, res) => {
       console.log("Visibility Settings:", visibilitySettings);
 
       const reports = await Report.find({ reportType: 'Team' }).populate('reportedTeam');
-
-        res.render('organiserDashboard', {
-            organiser,
-            isOwner,
-            visibilitySettings,
-            followerCount,
-            totalPrizePool,
-            totalTournaments,
-            tournamentList,
-            reports 
-        });
+      res.status(200).json({
+        organiser,
+        isOwner,
+        visibilitySettings,
+        followerCount,
+        totalPrizePool,
+        totalTournaments,
+        tournamentList,
+        reports
+    });
+    
     } catch (error) {
         console.error('Error fetching organiser dashboard:', error);
         res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });

@@ -21,19 +21,19 @@ router.get("/search", organiserController.getOrganiserByUsername);
 
 /**
  * @swagger
- * /organiser/updateUsername:
+ * /api/organiser/updateUsername:
  *   post:
  *     summary: "Update Organiser Username"
  *     description: "This endpoint allows an organiser to update their username."
- *     parameters:
- *       - in: body
- *         name: organiser
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             username:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newUsername:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Username updated successfully."
@@ -42,21 +42,24 @@ router.get("/search", organiserController.getOrganiserByUsername);
  */
 router.post("/updateUsername", authenticateOrganiser, organiserController.updateUsername);
 
+
 /**
+ * /**
  * @swagger
- * /organiser/updateEmail:
+ * /api/organiser/updateEmail:
  *   post:
  *     summary: "Update Organiser Email"
  *     description: "This endpoint allows an organiser to update their email."
- *     parameters:
- *       - in: body
- *         name: organiser
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             email:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newEmail:
+ *                 type: string
+ *                 format: email
  *     responses:
  *       "200":
  *         description: "Email updated successfully."
@@ -67,10 +70,10 @@ router.post("/updateEmail", authenticateOrganiser, organiserController.updateEma
 
 /**
  * @swagger
- * /organiser/updatePassword:
+ * /api/organiser/updatePassword:
  *   post:
  *     summary: "Update Organiser Password"
- *     description: "This endpoint allows an organiser to update their password."
+ *     description: "This endpoint allows an organiser to update their password by providing the current password and the new password."
  *     parameters:
  *       - in: body
  *         name: organiser
@@ -78,19 +81,25 @@ router.post("/updateEmail", authenticateOrganiser, organiserController.updateEma
  *         schema:
  *           type: object
  *           properties:
- *             password:
+ *             currentPassword:
  *               type: string
+ *               description: "The current password of the organiser."
+ *             newPassword:
+ *               type: string
+ *               description: "The new password the organiser wants to set."
  *     responses:
  *       "200":
  *         description: "Password updated successfully."
  *       "400":
- *         description: "Invalid password format or other error."
+ *         description: "Incorrect current password or invalid new password."
+ *       "500":
+ *         description: "Error updating password."
  */
 router.post("/updatePassword", authenticateOrganiser, organiserController.updatePassword);
 
 /**
  * @swagger
- * /organiser/updateDescription:
+ * /api/organiser/updateDescription:
  *   post:
  *     summary: "Update Organiser Description"
  *     description: "This endpoint allows an organiser to update their profile description."
@@ -103,17 +112,20 @@ router.post("/updatePassword", authenticateOrganiser, organiserController.update
  *           properties:
  *             description:
  *               type: string
+ *               description: "The new description of the organiser's profile."
  *     responses:
  *       "200":
  *         description: "Description updated successfully."
  *       "400":
  *         description: "Invalid description format or other error."
+ *       "500":
+ *         description: "Internal server error."
  */
 router.post("/updateDescription", authenticateOrganiser, organiserController.updateDescription);
 
 /**
  * @swagger
- * /organiser/updateProfilePhoto:
+ * /api/organiser/updateProfilePhoto:
  *   post:
  *     summary: "Update Organiser Profile Photo"
  *     description: "This endpoint allows an organiser to update their profile photo."
@@ -137,7 +149,7 @@ router.post("/updateProfilePhoto", authenticateOrganiser, organiserController.up
 
 /**
  * @swagger
- * /organiser/update-visibility:
+ * /api/organiser/update-visibility:
  *   get:
  *     summary: "Update Organiser Visibility Settings"
  *     description: "This endpoint allows an organiser to manage their visibility settings."
@@ -151,12 +163,12 @@ router.get('/update-visibility', authenticateOrganiser, organiserController.rend
 
 /**
  * @swagger
- * /organiser/dashboard:
+ * /api/organiser/{username}/dashboard:
  *   get:
  *     summary: "Get Organiser Dashboard"
  *     description: "This endpoint allows an organiser to view their dashboard."
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: username
  *         required: true
  *         schema:
@@ -172,7 +184,7 @@ router.get('/:username/dashboard', authenticateUser, organiserController.getOrga
 
 /**
  * @swagger
- * /organiser/dashboardVisibility:
+ * /api/organiser/dashboardVisibility:
  *   post:
  *     summary: "Update Organiser Dashboard Visibility"
  *     description: "This endpoint allows an organiser to update their dashboard visibility settings."
@@ -203,7 +215,7 @@ router.post("/dashboardVisibility", authenticateOrganiser, organiserController.u
 
 /**
  * @swagger
- * /organiser/banTeam:
+ * /api/organiser/banTeam:
  *   post:
  *     summary: "Ban a Team"
  *     description: "This endpoint allows an organiser to ban a team from participating in their tournaments."
@@ -228,7 +240,7 @@ router.post("/banTeam", authenticateOrganiser, organiserController.banTeam);
 
 /**
  * @swagger
- * /organiser/create:
+ * /api/organiser/create:
  *   post:
  *     summary: "Create a Tournament"
  *     description: "This endpoint allows an organiser to create a new tournament."

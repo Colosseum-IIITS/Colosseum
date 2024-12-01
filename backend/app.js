@@ -34,7 +34,7 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
 // Swagger routes
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {

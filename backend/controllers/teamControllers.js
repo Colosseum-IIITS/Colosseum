@@ -195,25 +195,28 @@ exports.requestToJoinTeam = async (req, res) => {
 
 // Get join requests for a team (only captains can access this)
 exports.getJoinRequests = async (req, res) => {
-  const { teamId } = req.params;
-  const { _id: captainId } = req.user;
+  const { _id: playerId } = req.user;
 
   try {
-    const team = await Team.findById(teamId).populate('joinRequests', 'name');
-    if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
+    const player = await Player.findById(playerId).populate('team');
+    if (!player || !player.team) {
+      return res.status(404).json({ message: 'Player is not in a team' });
     }
 
-    if (team.captain.toString() !== captainId.toString()) {
+    const team = player.team; 
+
+    if (team.captain.toString() !== playerId.toString()) {
       return res.status(403).json({ message: 'Only the team captain can view join requests' });
     }
 
+    // Return the join requests if the player is the captain
     res.status(200).json({ joinRequests: team.joinRequests });
   } catch (error) {
     console.error('Error fetching join requests:', error);
     return res.status(500).json({ error: 'Error fetching join requests' });
   }
 };
+
 
 // Accept a join request (only captains can accept)
 exports.acceptJoinRequest = async (req, res) => {

@@ -15,7 +15,7 @@ router.post("/updatePassword",authenticateOrganiser,organiserController.updatePa
 router.post("/updateDescription",authenticateOrganiser,organiserController.updateDescription);
 router.post("/updateProfilePhoto",authenticateOrganiser,organiserController.updateProfilePhoto);
 router.get('/UpdateProfile', authenticateOrganiser, (req, res) => {
-    res.render('updateOrganiserProfile', { organiser: req.user });  // Assuming req.user contains organiser data
+    res.render('updateOrganiserProfile', { organiser: req.user }); 
 });
 router.get("/update-visibility", authenticateOrganiser, organiserController.renderUpdateVisibilitySettings);
 router.post('/delete/:tournamentId', authenticateOrganiser,organiserController.deleteTournament);

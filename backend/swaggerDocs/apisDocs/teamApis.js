@@ -31,7 +31,7 @@ router.post('/api/team/create', authenticateUser, teamController.createTeam);
 
 /**
  * @swagger
- * /api/team/join:
+ * /api/player/joinTeam:
  *   post:
  *     summary: "Join a Team"
  *     description: "This endpoint allows a player to join an existing team."
@@ -57,7 +57,8 @@ router.post('/api/team/create', authenticateUser, teamController.createTeam);
  *       "500":
  *         description: "Error joining team."
  */
-router.post('/api/team/join', authenticateUser, teamController.joinTeam);
+router.post('/player/joinTeam', authenticateUser, teamController.joinTeam);
+
 
 
 /**

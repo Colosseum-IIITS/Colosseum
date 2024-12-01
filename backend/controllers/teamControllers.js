@@ -139,7 +139,7 @@ exports.getEnrolledTeams = async (req, res) => {
 // Join an existing team 
 exports.joinTeam = async (req, res) => {
   const { teamId } = req.body;
-  const { _id: playerId } = req.user;  // Extract playerId from JWT token
+  const { _id: playerId } = req.user; 
 
   try {
     const team = await Team.findById(teamId);

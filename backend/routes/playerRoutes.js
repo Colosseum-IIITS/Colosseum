@@ -28,6 +28,6 @@ router.get('/dashboard', authenticateUser, playerController.getDashboard);
 router.get('/teamName', authenticateUser, teamController.getTeamsByName);
 router.get('/followedOrg',authenticateUser,organiserController.getMyOrganisers);
 router.get('/homepage', authenticateUser, playerController.getHomePage);
-router.post('/joinTeam', authenticateUser, teamController.joinTeam);    
+router.post('/joinTeam', authenticateUser, teamController.joinTeam);
 
 module.exports = router;

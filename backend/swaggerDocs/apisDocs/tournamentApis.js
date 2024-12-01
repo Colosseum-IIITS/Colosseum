@@ -1,43 +1,56 @@
 /**
  * @swagger
- * /tournament/create:
+ * /api/tournament/create:
  *   post:
  *     summary: "Create a Tournament"
  *     description: "This endpoint allows an organiser to create a new tournament."
- *     parameters:
- *       - in: body
- *         name: tournament
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             description:
- *               type: string
- *             startDate:
- *               type: string
- *               format: date
- *             endDate:
- *               type: string
- *               format: date
- *             entryFee:
- *               type: number
- *             prizePool:
- *               type: number
- *             organiser:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tid:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               entryFee:
+ *                 type: number
+ *               prizePool:
+ *                 type: number
+ *             required:
+ *               - tid
+ *               - name
+ *               - startDate
+ *               - endDate
+ *               - entryFee
+ *               - prizePool
+ *               - description
  *     responses:
  *       "200":
  *         description: "Tournament created successfully."
  *       "400":
  *         description: "Error creating the tournament."
+ *       "401":
+ *         description: "Unauthorized, the organiser must be authenticated."
+ *       "500":
+ *         description: "Error while creating tournament."
  */
-router.post('/create', authenticateOrganiser, tournamentController.createTournament);
+router.post('/api/tournament/create', authenticateOrganiser, tournamentController.createTournament);
+
 
 /**
  * @swagger
- * /tournament/{tournamentId}:
+ * /api/tournament/{tournamentId}:
  *   get:
  *     summary: "Get Tournament by ID"
  *     description: "This endpoint allows anyone to get the details of a specific tournament by its ID."
@@ -54,11 +67,12 @@ router.post('/create', authenticateOrganiser, tournamentController.createTournam
  *       "404":
  *         description: "Tournament not found."
  */
-router.get('/:tournamentId', authenticateUser, tournamentController.getTournamentById);
+router.get('/api/tournament/:tournamentId', authenticateUser, tournamentController.getTournamentById);
+
 
 /**
  * @swagger
- * /tournament/edit/{tournamentId}:
+ * /api/tournament/edit/{tournamentId}:
  *   get:
  *     summary: "Edit Tournament"
  *     description: "This endpoint allows an organiser to edit a tournament."
@@ -75,11 +89,12 @@ router.get('/:tournamentId', authenticateUser, tournamentController.getTournamen
  *       "404":
  *         description: "Tournament not found."
  */
-router.get('/edit/:tournamentId', authenticateOrganiser, tournamentController.getTournamentEditPage);
+router.get('/api/tournament/edit/:tournamentId', authenticateOrganiser, tournamentController.getTournamentEditPage);
+
 
 /**
  * @swagger
- * /tournament/join/{tournamentId}:
+ * /api/tournament/join/{tournamentId}:
  *   post:
  *     summary: "Join a Tournament"
  *     description: "This endpoint allows a player to join a tournament."
@@ -96,11 +111,12 @@ router.get('/edit/:tournamentId', authenticateOrganiser, tournamentController.ge
  *       "400":
  *         description: "Error joining the tournament."
  */
-router.post('/join/:tournamentId', authenticateUser, tournamentController.joinTournament);
+router.post('/api/tournament/join/:tournamentId', authenticateUser, tournamentController.joinTournament);
+
 
 /**
  * @swagger
- * /tournament/leave/{tournamentId}:
+ * /api/tournament/leave/{tournamentId}:
  *   post:
  *     summary: "Leave a Tournament"
  *     description: "This endpoint allows a player to leave a tournament."
@@ -117,11 +133,12 @@ router.post('/join/:tournamentId', authenticateUser, tournamentController.joinTo
  *       "400":
  *         description: "Error leaving the tournament."
  */
-router.post('/leave/:tournamentId', authenticateUser, tournamentController.leaveTournament);
+router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentController.leaveTournament);
+
 
 /**
  * @swagger
- * /tournament/update/{tournamentId}:
+ * /api/tournament/update/{tournamentId}:
  *   post:
  *     summary: "Update Tournament"
  *     description: "This endpoint allows an organiser to update a tournament."
@@ -152,11 +169,12 @@ router.post('/leave/:tournamentId', authenticateUser, tournamentController.leave
  *       "400":
  *         description: "Error updating the tournament."
  */
-router.post('/update/:tournamentId', authenticateOrganiser, tournamentController.updateTournament);
+router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tournamentController.updateTournament);
+
 
 /**
  * @swagger
- * /tournament/updatePointsTable:
+ * /api/tournament/updatePointsTable:
  *   post:
  *     summary: "Update Points Table"
  *     description: "This endpoint allows an organiser to update the points table of the tournament."
@@ -179,11 +197,12 @@ router.post('/update/:tournamentId', authenticateOrganiser, tournamentController
  *       "400":
  *         description: "Error updating points table."
  */
-router.post('/updatePointsTable', authenticateOrganiser, tournamentController.updatePointsTable);
+router.post('/api/tournament/updatePointsTable', authenticateOrganiser, tournamentController.updatePointsTable);
+
 
 /**
  * @swagger
- * /tournament/pointsTable/{tournamentId}:
+ * /api/tournament/pointsTable/{tournamentId}:
  *   get:
  *     summary: "Get Points Table"
  *     description: "This endpoint allows anyone to view the points table of a specific tournament."
@@ -200,11 +219,12 @@ router.post('/updatePointsTable', authenticateOrganiser, tournamentController.up
  *       "404":
  *         description: "Tournament not found."
  */
-router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
+router.get('/api/tournament/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
+
 
 /**
  * @swagger
- * /tournament/updateWinner:
+ * /api/tournament/updateWinner:
  *   put:
  *     summary: "Update Tournament Winner"
  *     description: "This endpoint allows an organiser to update the winner of the tournament."
@@ -224,11 +244,12 @@ router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.
  *       "400":
  *         description: "Error updating tournament winner."
  */
-router.put('/updateWinner', authenticateOrganiser, tournamentController.updateWinner);
+router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentController.updateWinner);
+
 
 /**
  * @swagger
- * /tournament/edit/{tournamentId}:
+ * /api/tournament/edit/{tournamentId}:
  *   post:
  *     summary: "Edit Tournament"
  *     description: "This endpoint allows an organiser to edit tournament details after creation."
@@ -255,4 +276,4 @@ router.put('/updateWinner', authenticateOrganiser, tournamentController.updateWi
  *       "400":
  *         description: "Error editing tournament."
  */
-router.post('/edit/:tournamentId', authenticateOrganiser, tournamentController.editTournament);
+router.post('/api/tournament/edit/:tournamentId', authenticateOrganiser, tournamentController.editTournament);

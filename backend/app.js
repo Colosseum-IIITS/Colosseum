@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { authenticateUser } = require('./middleware/authMiddleware');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swaggerConfig'); // Import Swagger configuration
+const swaggerDocs = require('./swaggerConfig');
 require('dotenv').config();
 
 // Import routes

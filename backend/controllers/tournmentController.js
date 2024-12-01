@@ -4,10 +4,10 @@ const Team = require("../models/Team");
 const jwt = require('jsonwebtoken');
 const Organiser = require("../models/Organiser");
 
-// Create a new tournament
-// exports.createTournamentForm = async (req, res) => {
-//     res.status(200).json({ message: "Render createTournament page", organiser: req.user });
-// };
+//Create a new tournament
+exports.createTournamentForm = async (req, res) => {
+    res.status(200).json({ message: "Render createTournament page", organiser: req.user });
+};
 
 // Create a tournament.
 exports.createTournament = async (req, res) => {

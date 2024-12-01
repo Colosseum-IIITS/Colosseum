@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Use routes for players, tournaments, organisers, teams, reports, and authentication
+// Routes setup
 app.use('/api/player', playerRoutes);
 app.use('/api/tournament', tournamentRoutes);
 app.use('/api/organiser', organiserRoutes);
@@ -31,8 +31,9 @@ app.use('/api/team', teamRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
-app.use('/reports', reportRoutes);
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Swagger routes
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {

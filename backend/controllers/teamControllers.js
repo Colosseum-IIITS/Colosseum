@@ -1,6 +1,7 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 // Create a new team
 exports.createTeam = async (req, res) => {
@@ -195,86 +196,98 @@ exports.requestToJoinTeam = async (req, res) => {
 
 // Get join requests for a team (only captains can access this)
 exports.getJoinRequests = async (req, res) => {
-  const { _id: playerId } = req.user;
-
+  const { _id: playerId } = req.user;  // Extract player ID from authenticated user
+  
   try {
-    const player = await Player.findById(playerId).populate('team');
-    if (!player || !player.team) {
-      return res.status(404).json({ message: 'Player is not in a team' });
+    // Step 1: Find the team where the player is the captain
+    const team = await Team.findOne({ captain: playerId }).populate('joinRequests');  // Populate joinRequests
+    
+    if (!team) {
+      // Step 2: If the player is not the captain of any team
+      return res.status(404).json({ message: 'Player is not the captain of any team' });
     }
-
-    const team = player.team; 
-
-    if (team.captain.toString() !== playerId.toString()) {
-      return res.status(403).json({ message: 'Only the team captain can view join requests' });
-    }
-
-    // Return the join requests if the player is the captain
+    
+    // Step 3: If the player is the captain, return the joinRequests
     res.status(200).json({ joinRequests: team.joinRequests });
+
   } catch (error) {
     console.error('Error fetching join requests:', error);
-    return res.status(500).json({ error: 'Error fetching join requests' });
+    return res.status(500).json({ error: 'Error fetching join requests', details: error.message });
   }
 };
+
 
 
 // Accept a join request (only captains can accept)
 exports.acceptJoinRequest = async (req, res) => {
-  const { teamId, playerId } = req.body;
+  const { playerId } = req.body;
   const { _id: captainId } = req.user;
 
   try {
-    const team = await Team.findById(teamId);
+    console.log('Attempting to accept join request...');
+    
+    // Step 1: Find the team where the captain is the leader
+    const team = await Team.findOne({ captain: captainId });
     if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
+      console.error('No team found for this captain');
+      return res.status(404).json({ message: 'Team not found for this captain' });
     }
+    console.log(`Team found: ${team.name}`);
 
-    if (team.captain.toString() !== captainId.toString()) {
-      return res.status(403).json({ message: 'Only the team captain can accept join requests' });
-    }
+    // Step 2: Convert playerId to ObjectId
+    const playerObjectId = new mongoose.Types.ObjectId(playerId);
+    console.log(`Checking if player ${playerId} is in joinRequests...`);
 
-    if (!team.joinRequests.includes(playerId)) {
+    // Step 3: Check if the player has requested to join
+    if (!team.joinRequests.includes(playerObjectId)) {
+      console.error('Player has not requested to join the team');
       return res.status(400).json({ message: 'This player has not requested to join the team' });
     }
 
-    team.joinRequests.pull(playerId);
-    team.players.push(playerId);
+    // Step 4: Remove player from joinRequests and add to players
+    team.joinRequests.pull(playerObjectId);
+    team.players.push(playerObjectId);
     await team.save();
+    console.log('Player successfully added to the team');
 
-    await Player.findByIdAndUpdate(playerId, { team: teamId });
+    // Step 5: Update the player's team
+    await Player.findByIdAndUpdate(playerObjectId, { team: team._id });
+    console.log('Player team updated successfully');
 
+    // Step 6: Send success response
     res.status(200).json({ message: 'Player added to the team successfully' });
+
   } catch (error) {
     console.error('Error accepting join request:', error);
-    return res.status(500).json({ error: 'Error accepting join request' });
+    return res.status(500).json({ error: 'Error accepting join request', details: error.message });
   }
 };
 
+
 // Reject a join request (only captains can reject)
 exports.rejectJoinRequest = async (req, res) => {
-  const { teamId, playerId } = req.body;
-  const { _id: captainId } = req.user;  // Extract captainId from JWT token
+  const { playerId } = req.body;
+  const { _id: captainId } = req.user;
 
   try {
-    const team = await Team.findById(teamId);
+    const team = await Team.findOne({ captain: captainId });
     if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
+      return res.status(404).json({ message: 'Team not found for this captain' });
     }
 
-    if (team.captain.toString() !== captainId.toString()) {
-      return res.status(403).json({ message: 'Only the team captain can reject join requests' });
-    }
+    const playerObjectId = new mongoose.Types.ObjectId(playerId);
 
-    if (!team.joinRequests.includes(playerId)) {
+    if (!team.joinRequests.includes(playerObjectId)) {
       return res.status(400).json({ message: 'This player has not requested to join the team' });
     }
 
-    team.joinRequests.pull(playerId);
+    team.joinRequests.pull(playerObjectId);
     await team.save();
 
     res.status(200).json({ message: 'Player join request rejected' });
+
   } catch (error) {
     console.error('Error rejecting join request:', error);
-    return res.status(500).json({ error: 'Error rejecting join request' });
+    return res.status(500).json({ error: 'Error rejecting join request', details: error.message });
   }
 };

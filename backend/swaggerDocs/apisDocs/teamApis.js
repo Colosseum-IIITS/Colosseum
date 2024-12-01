@@ -169,10 +169,17 @@ router.post('/api/team/updateTeamName', authenticateUser, teamController.updateT
 
 /**
  * @swagger
- * /api/team/requests:
+ * /api/team/{teamId}/requests:
  *   get:
  *     summary: "Get Join Requests for the Player's Team"
  *     description: "This endpoint allows the team captain to view join requests for their team (the player is automatically considered as part of the team)."
+ *     parameters:
+ *       - in: path
+ *         name: teamId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "The ID of the team to fetch the join requests."
  *     responses:
  *       "200":
  *         description: "Join requests retrieved successfully."
@@ -189,11 +196,13 @@ router.post('/api/team/updateTeamName', authenticateUser, teamController.updateT
  *       "403":
  *         description: "Only the team captain can view join requests."
  *       "404":
- *         description: "Player is not in a team."
+ *         description: "Team not found or player is not part of the team."
  *       "500":
  *         description: "Error fetching join requests."
  */
-router.get('/api/team/requests', authenticateUser, teamController.getJoinRequests);
+router.get('/api/team/:teamId/requests', authenticateUser, teamController.getJoinRequests);
+
+
 
 
 

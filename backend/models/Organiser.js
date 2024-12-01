@@ -20,7 +20,7 @@ const toSchema = new mongoose.Schema(
       tournamentsVisible: { type: Boolean, default: true },
       followersVisible: { type: Boolean, default: true },
     },
-  },
+  }, 
   { timestamps: true }
 );
 

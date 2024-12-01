@@ -170,6 +170,14 @@ exports.updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const { _id } = req.user;
 
+  // Log the request body to check the input
+  console.log("Request Body:", req.body);
+
+  // Validate if both current and new passwords are provided
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Both current and new passwords are required" });
+  }
+
   console.log("Updating password for:", _id);
   try {
     const organiser = await Organiser.findOne({ _id });
@@ -181,7 +189,7 @@ exports.updatePassword = async (req, res) => {
     if (!isMatch) {
       return res
         .status(400)
-        .json({ message: "New Password Cannot be the Same as Old Password" });
+        .json({ message: "Incorrect current password" });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -201,25 +209,29 @@ exports.updateDescription = async (req, res) => {
   const { newDescription } = req.body;
   const { _id } = req.user;
 
+  console.log("Incoming newDescription:", newDescription);
+
   try {
     const organiser = await Organiser.findOne({ _id });
     if (!organiser) {
       return res.status(404).json({ message: "Organiser not found" });
     }
 
+    if (!newDescription || newDescription.trim() === "") {
+      return res.status(400).json({ message: "Description cannot be empty" });
+    }
+
     organiser.description = newDescription;
+
     await organiser.save();
 
-    res
-      .status(200)
-      .json({ message: "Description updated successfully", organiser });
+    res.status(200).json({ message: "Description updated successfully", organiser });
   } catch (error) {
     console.error("Error updating description:", error);
-    res
-      .status(500)
-      .json({ error: "Error updating description", details: error.message });
+    res.status(500).json({ error: "Error updating description", details: error.message });
   }
 };
+
 
 exports.updateProfilePhoto = async (req, res) => {
   const { newProfilePhoto } = req.body;

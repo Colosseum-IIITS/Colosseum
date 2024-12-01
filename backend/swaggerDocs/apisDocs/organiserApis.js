@@ -17,7 +17,7 @@
  *       "404":
  *         description: "Organiser not found."
  */
-router.get("/search", organiserController.getOrganiserByUsername);
+router.get("/api/organiser/search", organiserController.getOrganiserByUsername);
 
 /**
  * @swagger
@@ -40,7 +40,7 @@ router.get("/search", organiserController.getOrganiserByUsername);
  *       "400":
  *         description: "Invalid input or error."
  */
-router.post("/updateUsername", authenticateOrganiser, organiserController.updateUsername);
+router.post("/api/organiser/updateUsername", authenticateOrganiser, organiserController.updateUsername);
 
 
 /**
@@ -66,7 +66,7 @@ router.post("/updateUsername", authenticateOrganiser, organiserController.update
  *       "400":
  *         description: "Invalid email format or other error."
  */
-router.post("/updateEmail", authenticateOrganiser, organiserController.updateEmail);
+router.post("/api/organiser/updateEmail", authenticateOrganiser, organiserController.updateEmail);
 
 /**
  * @swagger
@@ -74,19 +74,19 @@ router.post("/updateEmail", authenticateOrganiser, organiserController.updateEma
  *   post:
  *     summary: "Update Organiser Password"
  *     description: "This endpoint allows an organiser to update their password by providing the current password and the new password."
- *     parameters:
- *       - in: body
- *         name: organiser
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             currentPassword:
- *               type: string
- *               description: "The current password of the organiser."
- *             newPassword:
- *               type: string
- *               description: "The new password the organiser wants to set."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 description: "The current password of the organiser."
+ *               newPassword:
+ *                 type: string
+ *                 description: "The new password the organiser wants to set."
  *     responses:
  *       "200":
  *         description: "Password updated successfully."
@@ -95,7 +95,8 @@ router.post("/updateEmail", authenticateOrganiser, organiserController.updateEma
  *       "500":
  *         description: "Error updating password."
  */
-router.post("/updatePassword", authenticateOrganiser, organiserController.updatePassword);
+
+router.post("/api/organiser/updatePassword", authenticateOrganiser, organiserController.updatePassword);
 
 /**
  * @swagger
@@ -103,16 +104,16 @@ router.post("/updatePassword", authenticateOrganiser, organiserController.update
  *   post:
  *     summary: "Update Organiser Description"
  *     description: "This endpoint allows an organiser to update their profile description."
- *     parameters:
- *       - in: body
- *         name: organiser
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             description:
- *               type: string
- *               description: "The new description of the organiser's profile."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newDescription:
+ *                 type: string
+ *                 description: "The new description of the organiser."
  *     responses:
  *       "200":
  *         description: "Description updated successfully."
@@ -121,7 +122,7 @@ router.post("/updatePassword", authenticateOrganiser, organiserController.update
  *       "500":
  *         description: "Internal server error."
  */
-router.post("/updateDescription", authenticateOrganiser, organiserController.updateDescription);
+router.post("/api/organiser/updateDescription", authenticateOrganiser, organiserController.updateDescription);
 
 /**
  * @swagger
@@ -180,7 +181,7 @@ router.get('/update-visibility', authenticateOrganiser, organiserController.rend
  *       "404":
  *         description: "Organiser not found."
  */
-router.get('/:username/dashboard', authenticateUser, organiserController.getOrganiserDashboard);
+router.get('/api/organiser/:username/dashboard', authenticateUser, organiserController.getOrganiserDashboard);
 
 /**
  * @swagger

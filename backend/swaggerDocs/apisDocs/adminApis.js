@@ -126,7 +126,7 @@ router.post('/approve/tournament/:id', adminController.approveTournament);
 
 /**
  * @swagger
- * /admin/delete/{tournamentId}:
+ * /api/organiser/delete/{tournamentId}:
  *   post:
  *     summary: "Delete a Tournament"
  *     description: "This endpoint allows an admin to delete a tournament by ID."
@@ -143,7 +143,7 @@ router.post('/approve/tournament/:id', adminController.approveTournament);
  *       "400":
  *         description: "Invalid tournament ID or other error."
  */
-router.post('/delete/:tournamentId', authenticateAdmin,organiserController.deleteTournament);
+router.post('/api/organiser/delete/:tournamentId', authenticateAdmin,organiserController.deleteTournament);
 
 /**
  * @swagger

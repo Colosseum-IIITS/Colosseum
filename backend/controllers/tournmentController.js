@@ -94,13 +94,13 @@ exports.didPlayerJoin = async (req, res) => {
 exports.updateTournament = async (req, res) => {
     const { tournamentId } = req.params;
     const updateData = req.body;
-
+    
     try {
         const tournament = await Tournament.findByIdAndUpdate(
-            tournamentId,
+            { tid: tournamentId },
             updateData,
             { new: true }
-        );
+        ).populate('teams');
 
         if (!tournament) {
             return res.status(404).json({ message: "Tournament not found" });
@@ -152,9 +152,9 @@ exports.updateWinner = async (req, res) => {
 exports.updatePointsTable = async (req, res) => {
     const organiserId = req.user._id;
     const { tournamentId, teamName, additionalPoints } = req.body;
-
+   
     try {
-        const tournament = await Tournament.findById(tournamentId);
+        const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
         }
@@ -223,43 +223,53 @@ exports.getEnrolledTournaments = async (req, res) => {
 // Fetch tournament by ID
 exports.getTournamentById = async (req, res) => {
     try {
-        const tournId = req.params.tournamentId;
-        const tournament = await Tournament.findById(tournId)
-            .populate('teams');
-
-        if (!tournament) {
-            return res.status(404).json({ message: 'Tournament not found' });
-        }
-
-        let isPlayerInTournament = false;
-
-        if (req.user.role === 'player') {
-            const player = await Player.findById(req.user._id).populate({
-                path: 'team',
-                match: { _id: { $in: tournament.teams } }
-            });
-
-            if (player && player.team) {
-                isPlayerInTournament = true;
-            }
-        }
-        const organiser = await Organiser.findById(tournament.organiser);
-
-        if (!organiser) {
-            return res.status(404).json({ error: 'Organiser not found.' });
-        }
-
-        res.status(200).json({
-            tournament,
-            organiser,
-            userRole: req.user.role,
-            username: req.user.username,
-            isPlayerInTournament
+      const tournId = req.params.tournamentId;
+      console.log(`Fetching tournament with ID: ${tournId}`); // Log the tournament ID being requested
+  
+      // Find tournament by the custom 'tid' field instead of '_id'
+      const tournament = await Tournament.findOne({ tid: tournId }).populate('teams');
+      if (!tournament) {
+        console.log(`Tournament with ID ${tournId} not found`);
+        return res.status(404).json({ message: 'Tournament not found' });
+      }
+  
+      let isPlayerInTournament = false;
+  
+      // Check if the user is a player and belongs to a team in the tournament
+      if (req.user.role === 'player') {
+        const player = await Player.findById(req.user._id).populate({
+          path: 'team',
+          match: { _id: { $in: tournament.teams } }
         });
+  
+        if (player && player.team) {
+          isPlayerInTournament = true;
+        } else {
+          console.log(`Player ${req.user.username} is not part of the tournament ${tournId}`);
+        }
+      }
+  
+      // Fetch the organiser details for the tournament
+      const organiser = await Organiser.findById(tournament.organiser);
+      if (!organiser) {
+        console.log(`Organiser for tournament ${tournId} not found`);
+        return res.status(404).json({ error: 'Organiser not found.' });
+      }
+  
+      // Return the tournament details along with organiser info, user role, and player participation status
+      res.status(200).json({
+        tournament,
+        organiser,
+        userRole: req.user.role,
+        username: req.user.username,
+        isPlayerInTournament
+      });
     } catch (error) {
-        return res.status(500).json({ message: 'Server error' });
+      console.error(`Error fetching tournament ${req.params.tournamentId}:`, error); // Log detailed error
+      return res.status(500).json({ message: 'Server error', error: error.message });
     }
-};
+  };
+  
 
 // Tournament edit page
 exports.getTournamentEditPage = async (req, res) => {
@@ -347,7 +357,7 @@ exports.joinTournament = async (req, res) => {
 exports.getPointsTable = async (req, res) => {
   const { tournamentId } = req.params;
   try {
-      const tournament = await Tournament.findById(tournamentId).populate('teams');
+    const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
 
       if (!tournament) {
           return res.status(404).json({ message: 'Tournament not found' });

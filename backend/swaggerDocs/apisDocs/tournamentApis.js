@@ -142,7 +142,7 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  *     description: "This endpoint allows an organiser to update a tournament."
  *     parameters:
  *       - in: body
- *         name: tournament
+ *         name: tournamentId
  *         required: true
  *         schema:
  *           type: object
@@ -253,7 +253,7 @@ router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentCont
  *     description: "This endpoint allows an organiser to edit tournament details after creation."
  *     parameters:
  *       - in: body
- *         name: tournament
+ *         name: name
  *         required: true
  *         schema:
  *           type: object

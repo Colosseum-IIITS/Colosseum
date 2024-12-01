@@ -32,6 +32,8 @@
  *               - name
  *               - startDate
  *               - endDate
+ *               - entryFee
+ *               - prizePool
  *               - description
  *     responses:
  *       "200":
@@ -142,7 +144,7 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  *     description: "This endpoint allows an organiser to update a tournament."
  *     parameters:
  *       - in: body
- *         name: tournamentId
+ *         name: tournament
  *         required: true
  *         schema:
  *           type: object
@@ -253,7 +255,7 @@ router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentCont
  *     description: "This endpoint allows an organiser to edit tournament details after creation."
  *     parameters:
  *       - in: body
- *         name: name
+ *         name: tournament
  *         required: true
  *         schema:
  *           type: object

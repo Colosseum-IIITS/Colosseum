@@ -106,13 +106,10 @@ router.post('/auth/org/signin', authController.loginOrganiser);
  *                 type: string
  *               password:
  *                 type: string
- *               description:
- *                 type:string
  *             required:
  *               - username
  *               - email
  *               - password
- *               - description
  *     responses:
  *       "201":
  *         description: "Organiser signed up successfully."

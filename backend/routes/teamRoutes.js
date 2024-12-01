@@ -3,6 +3,8 @@ const router = express.Router();
 const teamController = require('../controllers/teamControllers');
 const { authenticateUser }= require('../middleware/authMiddleware');
 
+
+
 // Route to create a new team   
 router.post('/create', authenticateUser, teamController.createTeam);
 

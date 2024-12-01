@@ -5,8 +5,7 @@ const jwt = require('jsonwebtoken');
 // Create a new team
 exports.createTeam = async (req, res) => {
   const { name } = req.body;
-  const { _id: playerId } = req.user;  // Extract playerId from JWT token
-
+  const { _id: playerId } = req.user; 
   try {
     const existingTeam = await Team.findOne({ name });
     if (existingTeam) {
@@ -72,10 +71,10 @@ exports.getTeamsByName = async (req, res) => {
 
   try {
     const teams = await Team.find({ name: { $regex: new RegExp(searchTerm, 'i') } })
-      .populate('players', 'name') // Populate only the name field
-      .populate('captain', 'name'); // Populate only the name field
+      .populate('players', 'name') 
+      .populate('captain', 'name'); 
 
-    // Log the fetched teams with populated data
+    
     console.log('Fetched Teams:', JSON.stringify(teams, null, 2));
 
     res.status(200).json({ teams, searchTerm, error: null });
@@ -97,7 +96,7 @@ exports.updateTeamName = async (req, res) => {
       return res.status(404).json({ message: 'Player not found' });
     }
 
-    const team = player.team; // Get the team from the player document
+    const team = player.team; 
     if (!team) {
       return res.status(404).json({ message: 'Player is not in a team' });
     }
@@ -138,7 +137,6 @@ exports.getEnrolledTeams = async (req, res) => {
 };
 
 // Join an existing team 
-// (DIRECLTY)
 exports.joinTeam = async (req, res) => {
   const { teamId } = req.body;
   const { _id: playerId } = req.user;  // Extract playerId from JWT token

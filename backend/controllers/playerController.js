@@ -9,7 +9,7 @@ const Team = require('../models/Team');
 // Func: Follow Organisation
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user; // Assuming _id is player's ID
+    const { _id } = req.user; 
 
     try {
         const player = await Player.findOne({ _id });
@@ -27,11 +27,11 @@ exports.followOrganiser = async (req, res) => {
             return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
-        // Add organiser to player's following list
+       
         player.following.push(organiserId);
         await player.save();
 
-        // Add player to organiser's followers list
+      
         organiser.followers.push(player._id);
         await organiser.save();
 
@@ -44,7 +44,7 @@ exports.followOrganiser = async (req, res) => {
 // Func: Unfollow Organisation
 exports.unfollowOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id: playerId } = req.user; // Extract playerId from JWT token
+    const { _id: playerId } = req.user; 
 
     try {
         const player = await Player.findById(playerId);
@@ -57,16 +57,13 @@ exports.unfollowOrganiser = async (req, res) => {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
-        // Check if player is following the organiser
         if (!player.following.includes(organiserId)) {
             return res.status(400).json({ message: 'Player is not following this organiser' });
         }
 
-        // Remove organiser from player's following list
         player.following.pull(organiserId);
         await player.save();
 
-        // Remove player from organiser's followers list
         organiser.followers.pull(playerId);
         await organiser.save();
 
@@ -81,13 +78,12 @@ exports.unfollowOrganiser = async (req, res) => {
 exports.searchTournaments = async (req, res) => {
     try {
         const { searchTerm } = req.query || '';
-        console.log('Search Term:', searchTerm); // Debugging line
-
+        console.log('Search Term:', searchTerm); 
         let tournaments = [];
         let joinedTournaments = [];
 
         if (searchTerm) {
-            // Perform search only if a searchTerm is provided
+
             tournaments = await Tournament.find({
                 $and: [
                     {
@@ -101,7 +97,6 @@ exports.searchTournaments = async (req, res) => {
             });
         }
 
-        // Fetch joined tournaments if the user is logged in
         if (req.user && req.user._id) {
             const player = await Player.findById(req.user._id).populate(
                 'tournaments.tournament'
@@ -111,10 +106,9 @@ exports.searchTournaments = async (req, res) => {
             }
         }
 
-        console.log('Tournaments Found:', tournaments); // Debugging line
-        console.log('Joined Tournaments:', joinedTournaments); // Debugging line
-
-        // Respond with JSON data
+        console.log('Tournaments Found:', tournaments); 
+        console.log('Joined Tournaments:', joinedTournaments); 
+      
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             results: tournaments,
@@ -122,7 +116,7 @@ exports.searchTournaments = async (req, res) => {
             joinedTournaments: joinedTournaments || [],
         });
     } catch (error) {
-        console.error('Error searching tournaments:', error); // Log the error
+        console.error('Error searching tournaments:', error);
         res.status(500).json({
             error: 'Error searching tournaments',
             details: error.message,
@@ -134,12 +128,12 @@ exports.searchTournaments = async (req, res) => {
 exports.searchPlayer = async (req, res) => {
     try {
         const { searchTerm } = req.query || '';
-        console.log('Search Term:', searchTerm); // Debugging line
+        console.log('Search Term:', searchTerm); 
 
         let players = [];
 
         if (searchTerm) {
-            // Perform search only if a searchTerm is provided
+    
             players = await Player.find({
                 $or: [
                     { username: new RegExp(searchTerm, 'i') },
@@ -148,15 +142,15 @@ exports.searchPlayer = async (req, res) => {
             }).populate('team').populate('tournaments.tournament');
         }
 
-        console.log('Players Found:', players); // Debugging line
+        console.log('Players Found:', players); 
 
         res.status(200).json({
-            results: players, // Corrected the response to include the players results
-            searchTerm: searchTerm || '' // Return the search term in the response
+            results: players, 
+            searchTerm: searchTerm || '' 
         });
         
     } catch (error) {
-        console.error('Error searching players:', error); // Log the error
+        console.error('Error searching players:', error); 
         res.status(500).json({
             error: 'Error searching players',
             details: error.message,
@@ -196,15 +190,13 @@ exports.joinTournament = async (req, res) => {
         await player.save();
 
         const pointsEntry = {
-            ranking: tournament.pointsTable.length + 1, // Set ranking as the current length + 1
-            teamName: player.team.name, // Get team name from the player
+            ranking: tournament.pointsTable.length + 1, 
+            teamName: player.team.name, 
             totalPoints: 0, // Initialize total points to 0
         };
 
-        // Add the points entry to the tournament's points table
         tournament.pointsTable.push(pointsEntry);
 
-        // Save the tournament with the new entry
         await tournament.save();
 
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
@@ -287,7 +279,7 @@ exports.updatePassword = async (req, res) => {
 };
 // Update email
 exports.updateEmail = async (req, res) => {
-    const { email } = req.body; // Extract email from request body
+    const { email } = req.body; 
     const { _id } = req.user;
 
     try {
@@ -296,13 +288,12 @@ exports.updateEmail = async (req, res) => {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        // Check if the email is already in use
         const existingPlayer = await Player.findOne({ email });
         if (existingPlayer) {
             return res.status(400).json({ message: 'Email already taken' });
         }
 
-        player.email = email; // Update the player's email
+        player.email = email; 
         await player.save();
 
         res.status(200).json({
@@ -326,27 +317,26 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Check if currentPassword is provided
+        
         if (!currentPassword) {
             return res.status(400).json({ message: 'Current password is required' });
         }
 
-        // Compare the provided current password with the stored hashed password
+      
         const match = await bcrypt.compare(currentPassword, player.password);
         if (!match) {
             return res.status(401).json({ message: 'Current password is incorrect' });
         }
 
-        // Update username and email
+     
         player.username = username;
         player.email = email;
 
-        // If a new password is provided, hash it and update
+       
         if (newPassword) {
             player.password = await bcrypt.hash(newPassword, 10);
         }
 
-        // Save the updated player information
         await player.save();
 
         res.status(200).json({
@@ -568,7 +558,7 @@ exports.getDashboard = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error fetching dashboard:", error.message);  // Log the error message
+        console.error("Error fetching dashboard:", error.message);  
         res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };

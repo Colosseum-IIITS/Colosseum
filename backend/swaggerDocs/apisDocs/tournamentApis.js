@@ -32,8 +32,6 @@
  *               - name
  *               - startDate
  *               - endDate
- *               - entryFee
- *               - prizePool
  *               - description
  *     responses:
  *       "200":

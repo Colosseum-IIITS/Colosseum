@@ -1,108 +1,115 @@
 /**
  * @swagger
- * /team/create:
+ * /api/team/create:
  *   post:
  *     summary: "Create a Team"
  *     description: "This endpoint allows a player to create a new team."
- *     parameters:
- *       - in: body
- *         name: team
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             logo:
- *               type: string
- *               description: "URL of the team logo."
- *             players:
- *               type: array
- *               items:
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
  *                 type: string
- *               description: "List of player IDs in the team."
- *             captain:
- *               type: string
- *               description: "ID of the team captain."
+ *               logo:
+ *                 type: string
+ *                 description: "URL of the team logo."
+ *             required:
+ *               - name
  *     responses:
- *       "200":
+ *       "201":
  *         description: "Team created successfully."
  *       "400":
  *         description: "Invalid team data."
+ *       "500":
+ *         description: "Error creating team."
  */
-router.post('/create', authenticateUser, teamController.createTeam);
+router.post('/api/team/create', authenticateUser, teamController.createTeam);
+
 
 /**
  * @swagger
- * /team/join:
+ * /api/team/join:
  *   post:
  *     summary: "Join a Team"
  *     description: "This endpoint allows a player to join an existing team."
- *     parameters:
- *       - in: body
- *         name: teamId
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             teamId:
- *               type: string
- *               description: "The ID of the team to join."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teamId:
+ *                 type: string
+ *                 description: "The ID of the team to join."
+ *             required:
+ *               - teamId
  *     responses:
  *       "200":
  *         description: "Player joined the team successfully."
  *       "400":
  *         description: "Error joining the team."
+ *       "404":
+ *         description: "Team not found."
+ *       "500":
+ *         description: "Error joining team."
  */
-router.post('/join', authenticateUser, teamController.joinTeam);
+router.post('/api/team/join', authenticateUser, teamController.joinTeam);
+
 
 /**
  * @swagger
- * /team/request:
+ * /api/team/request:
  *   post:
  *     summary: "Request to Join a Team"
  *     description: "This endpoint allows a player to request to join an existing team."
- *     parameters:
- *       - in: body
- *         name: teamId
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             teamId:
- *               type: string
- *               description: "The ID of the team to request joining."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teamId:
+ *                 type: string
+ *                 description: "The ID of the team to request joining."
+ *             required:
+ *               - teamId
  *     responses:
  *       "200":
  *         description: "Join request sent successfully."
  *       "400":
  *         description: "Error sending join request."
+ *       "404":
+ *         description: "Team not found."
+ *       "500":
+ *         description: "Error sending join request."
  */
-router.post('/request', authenticateUser, teamController.requestToJoinTeam);
+router.post('/api/team/request', authenticateUser, teamController.requestToJoinTeam);
+
 
 /**
  * @swagger
- * /team/leave:
+ * /api/team/leave:
  *   post:
  *     summary: "Leave a Team"
- *     description: "This endpoint allows a player to leave a team they are currently part of."
- *     parameters:
- *       - in: body
- *         name: teamId
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             teamId:
- *               type: string
- *               description: "The ID of the team the player is leaving."
+ *     description: "This endpoint allows a player to leave a team they are currently part of. The player must already be part of a team."
  *     responses:
  *       "200":
  *         description: "Player left the team successfully."
  *       "400":
  *         description: "Error leaving the team."
+ *       "404":
+ *         description: "Player not in a team."
+ *       "500":
+ *         description: "Error leaving team."
  */
-router.post('/leave', authenticateUser, teamController.leaveTeam);
+router.post('/api/team/leave', authenticateUser, teamController.leaveTeam);
+
+
 
 /**
  * @swagger
@@ -122,36 +129,46 @@ router.post('/leave', authenticateUser, teamController.leaveTeam);
  *         description: "Teams found successfully."
  *       "404":
  *         description: "No teams found."
+ *       "500":
+ *         description: "Error fetching teams."
  */
-router.get('/search', teamController.getTeamsByName);
+router.get('/api/team/search', teamController.getTeamsByName);
+
 
 /**
  * @swagger
- * /team/updateTeamName:
+ * /api/team/updateTeamName:
  *   post:
  *     summary: "Update Team Name"
  *     description: "This endpoint allows the team captain to update the team name."
- *     parameters:
- *       - in: body
- *         name: newName
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             newName:
- *               type: string
- *               description: "The new name of the team."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newName:
+ *                 type: string
+ *                 description: "The new name of the team."
+ *             required:
+ *               - newName
  *     responses:
  *       "200":
  *         description: "Team name updated successfully."
  *       "400":
  *         description: "Error updating team name."
+ *       "403":
+ *         description: "Only the team captain can update the team name."
+ *       "500":
+ *         description: "Error updating team name."
  */
-router.post('/updateTeamName', authenticateUser, teamController.updateTeamName);
+router.post('/api/team/updateTeamName', authenticateUser, teamController.updateTeamName);
+
 
 /**
  * @swagger
- * /team/{teamId}/requests:
+ * /api/team/{teamId}/requests:
  *   get:
  *     summary: "Get Join Requests for a Team"
  *     description: "This endpoint allows the team captain to view join requests for their team."
@@ -167,53 +184,71 @@ router.post('/updateTeamName', authenticateUser, teamController.updateTeamName);
  *         description: "Join requests retrieved successfully."
  *       "404":
  *         description: "No join requests found."
+ *       "403":
+ *         description: "Only the team captain can view join requests."
+ *       "500":
+ *         description: "Error fetching join requests."
  */
-router.get('/:teamId/requests', authenticateUser, teamController.getJoinRequests);
+router.get('/api/team/:teamId/requests', authenticateUser, teamController.getJoinRequests);
+
 
 /**
  * @swagger
- * /team/accept:
+ * /api/team/accept:
  *   post:
  *     summary: "Accept a Join Request"
  *     description: "This endpoint allows the captain to accept a join request for their team."
- *     parameters:
- *       - in: body
- *         name: joinRequest
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             playerId:
- *               type: string
- *               description: "ID of the player requesting to join the team."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               playerId:
+ *                 type: string
+ *                 description: "ID of the player requesting to join the team."
+ *             required:
+ *               - playerId
  *     responses:
  *       "200":
  *         description: "Join request accepted successfully."
  *       "400":
  *         description: "Error accepting join request."
+ *       "403":
+ *         description: "Only the team captain can accept join requests."
+ *       "500":
+ *         description: "Error accepting join request."
  */
-router.post('/accept', authenticateUser, teamController.acceptJoinRequest);
+router.post('/api/team/accept', authenticateUser, teamController.acceptJoinRequest);
+
 
 /**
  * @swagger
- * /team/reject:
+ * /api/team/reject:
  *   post:
  *     summary: "Reject a Join Request"
  *     description: "This endpoint allows the captain to reject a join request for their team."
- *     parameters:
- *       - in: body
- *         name: joinRequest
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             playerId:
- *               type: string
- *               description: "ID of the player requesting to join the team."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               playerId:
+ *                 type: string
+ *                 description: "ID of the player requesting to join the team."
+ *             required:
+ *               - playerId
  *     responses:
  *       "200":
  *         description: "Join request rejected successfully."
  *       "400":
  *         description: "Error rejecting join request."
+ *       "403":
+ *         description: "Only the team captain can reject join requests."
+ *       "500":
+ *         description: "Error rejecting join request."
  */
-router.post('/reject', authenticateUser, teamController.rejectJoinRequest);
+router.post('/api/team/reject', authenticateUser, teamController.rejectJoinRequest);

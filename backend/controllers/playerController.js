@@ -83,16 +83,20 @@ exports.searchTournaments = async (req, res) => {
         let joinedTournaments = [];
 
         if (searchTerm) {
+            const searchConditions = [];
+
+            // Check if searchTerm is a valid number for tid
+            if (!isNaN(searchTerm)) {
+                searchConditions.push({ tid: Number(searchTerm) }); // Exact match for tid
+            }
+
+            // Use regex for name field
+            searchConditions.push({ name: new RegExp(searchTerm, 'i') });
 
             tournaments = await Tournament.find({
                 $and: [
-                    {
-                        $or: [
-                            { tid: new RegExp(searchTerm, 'i') },
-                            { name: new RegExp(searchTerm, 'i') },
-                        ],
-                    },
-                    { status: 'Approved' },
+                    { $or: searchConditions }, // Match either tid or name
+                    { status: 'Approved' },   // Filter by status
                 ],
             });
         }
@@ -127,26 +131,25 @@ exports.searchTournaments = async (req, res) => {
 
 exports.searchPlayer = async (req, res) => {
     try {
-        const { searchTerm } = req.query || '';
+        const { searchTerm } = req.query; // No fallback to an empty string here
         console.log('Search Term:', searchTerm); 
 
-        let players = [];
-
-        if (searchTerm) {
-    
-            players = await Player.find({
-                $or: [
-                    { username: new RegExp(searchTerm, 'i') },
-                    { email: new RegExp(searchTerm, 'i') }
-                ]
-            }).populate('team').populate('tournaments.tournament');
+        if (!searchTerm) {
+            return res.status(400).json({ error: 'Search term is required.' });
         }
+
+        const players = await Player.find({
+            $or: [
+                { username: new RegExp(searchTerm, 'i') },
+                { email: new RegExp(searchTerm, 'i') }
+            ]
+        }).populate('team').populate('tournaments.tournament');
 
         console.log('Players Found:', players); 
 
         res.status(200).json({
             results: players, 
-            searchTerm: searchTerm || '' 
+            searchTerm,
         });
         
     } catch (error) {
@@ -157,6 +160,7 @@ exports.searchPlayer = async (req, res) => {
         });
     }
 };
+
 
 
 // Func: Join Tournament

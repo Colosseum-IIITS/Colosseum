@@ -1,48 +1,111 @@
 /**
  * @swagger
- * /player/searchTournaments:
+ * /api/player/searchTournaments:
  *   get:
- *     summary: "Search Tournaments"
- *     description: "This endpoint allows a player to search for tournaments."
+ *     summary: "Search for Tournaments"
+ *     description: "This endpoint allows a player to search for tournaments by their name or ID. Only approved tournaments are included in the results."
  *     parameters:
  *       - in: query
- *         name: tournamentName
+ *         name: searchTerm
  *         required: false
  *         schema:
  *           type: string
- *         description: "The name of the tournament to search for."
+ *         description: "The name or ID of the tournament to search for."
  *     responses:
  *       "200":
- *         description: "Tournaments found successfully."
- *       "404":
- *         description: "No tournaments found."
+ *         description: "Tournaments fetched successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Tournaments fetched successfully"
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       tid:
+ *                         type: string
+ *                         example: "12345"
+ *                       name:
+ *                         type: string
+ *                         example: "Summer Championship"
+ *                       status:
+ *                         type: string
+ *                         example: "Approved"
+ *                 searchTerm:
+ *                   type: string
+ *                   example: "Championship"
+ *                 joinedTournaments:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       tid:
+ *                         type: string
+ *                         example: "67890"
+ *                       name:
+ *                         type: string
+ *                         example: "Winter League"
+ *       "500":
+ *         description: "Internal server error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error searching tournaments"
+ *                 details:
+ *                   type: string
+ *                   example: "Database connection failed."
  */
-router.get('/searchTournaments', authenticateUser, playerController.searchTournaments);
+
+router.get('/api/player/searchTournaments', authenticateUser, playerController.searchTournaments);
 
 /**
  * @swagger
- * /player/searchPlayer:
+ * /api/player/searchPlayer:
  *   get:
  *     summary: "Search Player"
- *     description: "This endpoint allows a player to search for another player."
+ *     description: "This endpoint allows a player to search for another player using username or email."
  *     parameters:
  *       - in: query
- *         name: username
- *         required: false
+ *         name: searchTerm
+ *         required: true
  *         schema:
  *           type: string
- *         description: "The username of the player to search for."
+ *         description: "The search term to find a player (username or email)."
  *     responses:
  *       "200":
- *         description: "Player found successfully."
- *       "404":
- *         description: "Player not found."
+ *         description: "Players found successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                   description: "List of players matching the search term."
+ *                 searchTerm:
+ *                   type: string
+ *       "400":
+ *         description: "Search term is missing."
+ *       "500":
+ *         description: "Internal server error."
  */
-router.get('/searchPlayer', authenticateUser, playerController.searchPlayer);
+
+router.get('/api/player/searchPlayer', authenticateUser, playerController.searchPlayer);
 
 /**
  * @swagger
- * /player/followOrganiser:
+ * /api/player/followOrganiser:
  *   post:
  *     summary: "Follow an Organiser"
  *     description: "This endpoint allows a player to follow an organiser."
@@ -61,7 +124,7 @@ router.get('/searchPlayer', authenticateUser, playerController.searchPlayer);
  *       "400":
  *         description: "Error following the organiser."
  */
-router.post('/followOrganiser', authenticateUser, playerController.followOrganiser);
+router.post('/api/player/followOrganiser', authenticateUser, playerController.followOrganiser);
 
 /**
  * @swagger

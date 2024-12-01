@@ -237,34 +237,3 @@ router.post("/dashboardVisibility", authenticateOrganiser, organiserController.u
  *         description: "Invalid team ID or other error."
  */
 router.post("/banTeam", authenticateOrganiser, organiserController.banTeam);
-
-/**
- * @swagger
- * /api/organiser/create:
- *   post:
- *     summary: "Create a Tournament"
- *     description: "This endpoint allows an organiser to create a new tournament."
- *     parameters:
- *       - in: body
- *         name: tournament
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             description:
- *               type: string
- *             startDate:
- *               type: string
- *               format: date
- *             endDate:
- *               type: string
- *               format: date
- *     responses:
- *       "200":
- *         description: "Tournament created successfully."
- *       "400":
- *         description: "Invalid tournament data."
- */
-router.post('/create', authenticateOrganiser, tournamentController.createTournament);

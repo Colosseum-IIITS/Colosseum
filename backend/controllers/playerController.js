@@ -200,20 +200,9 @@ exports.searchPlayer = async (req, res) => {
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
-
-    console.log("Received tournamentId:", tournamentId); // Debugging log
-
-    if (!tournamentId) {
-        return res.status(400).json({ error: "Tournament ID is required" });
-    }
     const { _id } = req.user;
 
     try {
-        if (!tournamentId || typeof tournamentId !== 'string' || !tournamentId.trim()) {
-            return res.status(400).json({ error: 'Invalid tournament ID' });
-        }
-        
-
         const player = await Player.findOne({ _id }).populate('team');
         if (!player) {
             return res.status(404).json({ error: 'Player not found' });
@@ -223,33 +212,31 @@ exports.joinTournament = async (req, res) => {
             return res.status(400).json({ error: 'Player must be part of a team' });
         }
 
-        const tournament = await Tournament.findById(tournamentId.trim());
+        const tournament = await Tournament.findById(tournamentId);
         if (!tournament) {
-            console.error("No tournament found for ID:", tournamentId);
+            return res.status(404).json({ error: 'Tournament not found' });
         }
-        
+
         if (tournament.teams.includes(player.team._id)) {
             return res.status(400).json({ error: 'Team is already registered for this tournament' });
         }
 
-        // Add the team to the tournament's teams array
         tournament.teams.push(player.team._id);
         await tournament.save();
 
-        // Add the tournament to the player's tournaments array
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
 
-        // Update the points table
         const pointsEntry = {
             ranking: tournament.pointsTable.length + 1, 
             teamName: player.team.name, 
             totalPoints: 0, // Initialize total points to 0
         };
+
         tournament.pointsTable.push(pointsEntry);
+
         await tournament.save();
 
-        // Retrieve all tournaments the player's team is registered for
         const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
         res.status(200).json({
@@ -258,6 +245,7 @@ exports.joinTournament = async (req, res) => {
             tournament,
             joinedTournaments: joinedTournaments || []
         });
+        
     } catch (error) {
         console.error("Error joining tournament:", error);
         return res.status(500).json({
@@ -268,22 +256,24 @@ exports.joinTournament = async (req, res) => {
 };
 
 
-// Update username
 exports.updateUsername = async (req, res) => {
-    const { username } = req.body;
-    
-
-    const { _id } = req.user;
-
     try {
-        const player = await Player.findOne({ _id });
+        const { username } = req.body;
+
+        if (!username || typeof username !== 'string' || !username.trim()) {
+            return res.status(400).json({ error: 'Username is required and cannot be empty' });
+        }
+        
+        const { _id } = req.user;
+
+        const player = await Player.findById(_id);
         if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
+            return res.status(404).json({ error: 'Player not found' });
         }
 
-        const existingPlayer = await Player.findOne({ username: username });
+        const existingPlayer = await Player.findOne({ username });
         if (existingPlayer) {
-            return res.status(400).json({ message: 'Username already taken' });
+            return res.status(400).json({ error: 'Username already taken' });
         }
 
         player.username = username;
@@ -291,11 +281,14 @@ exports.updateUsername = async (req, res) => {
 
         res.status(200).json({
             message: 'Username updated successfully',
-            player
+            player,
         });
     } catch (error) {
         console.error('Error updating username:', error);
-        res.status(500).json({ error: 'Error updating username', details: error.message });
+        res.status(500).json({
+            error: 'Error updating username',
+            details: error.message,
+        });
     }
 };
 

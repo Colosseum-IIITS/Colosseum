@@ -167,7 +167,7 @@ router.post('/api/player/unFollowOrganiser', authenticateUser, playerController.
  *     description: "This endpoint allows a player to join a tournament."
  *     parameters:
  *       - in: body
- *         name: tournamentId
+ *         name: body
  *         required: true
  *         schema:
  *           type: object
@@ -181,22 +181,21 @@ router.post('/api/player/unFollowOrganiser', authenticateUser, playerController.
  *         description: "Error joining the tournament."
  */
 router.post('/api/player/joinTournament', authenticateUser, playerController.joinTournament);
-
 /**
  * @swagger
  * /api/player/updateUsername:
  *   post:
  *     summary: "Update Player Username"
  *     description: "This endpoint allows a player to update their username."
- *     parameters:
- *       - in: body
- *         name: username
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             username:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Username updated successfully."
@@ -205,21 +204,23 @@ router.post('/api/player/joinTournament', authenticateUser, playerController.joi
  */
 router.post('/api/player/updateUsername', authenticateUser, playerController.updateUsername);
 
+
 /**
  * @swagger
  * /api/player/updatePassword:
  *   post:
  *     summary: "Update Player Password"
  *     description: "This endpoint allows a player to update their password."
- *     parameters:
- *       - in: body
- *         name: password
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             password:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 format: password
  *     responses:
  *       "200":
  *         description: "Password updated successfully."
@@ -228,21 +229,23 @@ router.post('/api/player/updateUsername', authenticateUser, playerController.upd
  */
 router.post('/api/player/updatePassword', authenticateUser, playerController.updatePassword);
 
+
 /**
  * @swagger
  * /api/player/updateEmail:
  *   post:
  *     summary: "Update Player Email"
  *     description: "This endpoint allows a player to update their email."
- *     parameters:
- *       - in: body
- *         name: email
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             email:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
  *     responses:
  *       "200":
  *         description: "Email updated successfully."
@@ -294,7 +297,7 @@ router.get('/api/player/tournamentsPlayed', authenticateUser, playerController.g
 
 /**
  * @swagger
- * /player/tournamentsWon:
+ * /api/player/tournamentsWon:
  *   get:
  *     summary: "Get Tournaments Won"
  *     description: "This endpoint allows a player to get the list of tournaments they have won."
@@ -304,11 +307,11 @@ router.get('/api/player/tournamentsPlayed', authenticateUser, playerController.g
  *       "404":
  *         description: "No tournaments found."
  */
-router.get('/tournamentsWon', authenticateUser, playerController.getTournamentsWon);
+router.get('/api/player/tournamentsWon', authenticateUser, playerController.getTournamentsWon);
 
 /**
  * @swagger
- * /player/ranking:
+ * /api/player/ranking:
  *   get:
  *     summary: "Get Player Ranking"
  *     description: "This endpoint allows a player to get their ranking."
@@ -318,11 +321,11 @@ router.get('/tournamentsWon', authenticateUser, playerController.getTournamentsW
  *       "404":
  *         description: "Player not found."
  */
-router.get('/ranking', authenticateUser, playerController.getPlayerRanking);
+router.get('/api/player/ranking', authenticateUser, playerController.getPlayerRanking);
 
 /**
  * @swagger
- * /player/searchOrganisers:
+ * /api/player/searchOrganisers:
  *   get:
  *     summary: "Search Organisers"
  *     description: "This endpoint allows a player to search for organisers."
@@ -339,11 +342,11 @@ router.get('/ranking', authenticateUser, playerController.getPlayerRanking);
  *       "404":
  *         description: "No organisers found."
  */
-router.get('/searchOrganisers', authenticateUser, organiserController.getOrganiserByUsername);
+router.get('/api/player/searchOrganisers', authenticateUser, organiserController.getOrganiserByUsername);
 
 /**
  * @swagger
- * /player/report-team:
+ * /api/player/report-team:
  *   post:
  *     summary: "Report a Team"
  *     description: "This endpoint allows a player to report a team."
@@ -364,11 +367,11 @@ router.get('/searchOrganisers', authenticateUser, organiserController.getOrganis
  *       "400":
  *         description: "Error reporting the team."
  */
-router.post('/report-team', authenticateUser, reportController.reportTeam);
+router.post('/api/player/report-team', authenticateUser, reportController.reportTeam);
 
 /**
  * @swagger
- * /player/report-organiser:
+ * /api/player/report-organiser:
  *   post:
  *     summary: "Report an Organiser"
  *     description: "This endpoint allows a player to report an organiser."
@@ -389,11 +392,11 @@ router.post('/report-team', authenticateUser, reportController.reportTeam);
  *       "400":
  *         description: "Error reporting the organiser."
  */
-router.post('/report-organiser', authenticateUser, reportController.reportOrganiser);
+router.post('/api/player/report-organiser', authenticateUser, reportController.reportOrganiser);
 
 /**
  * @swagger
- * /player/dashboard:
+ * /api/player/dashboard:
  *   get:
  *     summary: "Get Player Dashboard"
  *     description: "This endpoint allows a player to view their dashboard."
@@ -403,18 +406,18 @@ router.post('/report-organiser', authenticateUser, reportController.reportOrgani
  *       "404":
  *         description: "Player not found."
  */
-router.get('/dashboard', authenticateUser, playerController.getDashboard);
+router.get('/api/player/dashboard', authenticateUser, playerController.getDashboard);
 
 /**
  * @swagger
- * /player/teamName:
+ * /api/player/teamName:
  *   get:
  *     summary: "Search Teams by Name"
  *     description: "This endpoint allows a player to search for teams by name."
  *     parameters:
  *       - in: query
- *         name: teamName
- *         required: false
+ *         name: searchTerm
+ *         required: true
  *         schema:
  *           type: string
  *         description: "The name of the team to search for."
@@ -424,21 +427,38 @@ router.get('/dashboard', authenticateUser, playerController.getDashboard);
  *       "404":
  *         description: "No teams found."
  */
-router.get('/teamName', authenticateUser, teamController.getTeamsByName);
+router.get('/api/player/teamName', authenticateUser, teamController.getTeamsByName);
+
 
 /**
  * @swagger
- * /player/followedOrg:
+ * /api/player/followedOrg:
  *   get:
  *     summary: "Get Followed Organisers"
  *     description: "This endpoint allows a player to get the list of organisers they are following."
  *     responses:
  *       "200":
  *         description: "List of followed organisers."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 followedOrganisers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
  *       "404":
  *         description: "No organisers found."
+ *       "500":
+ *         description: "Error retrieving organisers."
  */
-router.get('/followedOrg', authenticateUser, organiserController.getMyOrganisers);
+
 
 /**
  * @swagger

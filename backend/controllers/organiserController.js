@@ -377,9 +377,9 @@ exports.getOrganiserDashboard = async (req, res) => {
     }
 };
 
-
 exports.getMyOrganisers = async (req, res) => {
   const { _id } = req.user; // Player ID
+  console.log("User ID:", _id);
 
   try {
       const player = await Player.findById(_id).populate({
@@ -392,22 +392,25 @@ exports.getMyOrganisers = async (req, res) => {
       });
 
       if (!player) {
-          return res.status(404).json({ message: 'Player not found' });
+          console.log("Player not found");
+          return res.status(404).json({ message: "Player not found" });
       }
 
-      console.log('Followed Organisers:', player.following);
+      console.log("Followed Organisers:", player.following);
 
-      res.render('homepage', {
+      return res.status(200).json({
           followedOrganisers: player.following
       });
   } catch (error) {
-      console.error('Error retrieving followed organisers:', error);
+      console.error("Error retrieving followed organisers:", error);
       return res.status(500).json({
-          error: 'Error retrieving followed organisers',
+          error: "Error retrieving followed organisers",
           details: error.message,
       });
   }
 };
+
+
 
 
 

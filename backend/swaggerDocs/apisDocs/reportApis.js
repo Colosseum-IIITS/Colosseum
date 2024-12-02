@@ -1,27 +1,28 @@
 /**
  * @swagger
- * /report/PreportT2O:
+ * /api/report/PreportT2O:
  *   post:
  *     summary: "Report a Team"
  *     description: "This endpoint allows a player to report a team to an organiser."
- *     parameters:
- *       - in: body
- *         name: report
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             teamId:
- *               type: string
- *             reason:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teamName:
+ *                 type: string
+ *               reason:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Team reported successfully."
  *       "400":
  *         description: "Error reporting the team."
  */
-router.post('/PreportT2O', authenticateUser, reportController.reportTeam);
+router.post('/api/report/PreportT2O', authenticateUser, reportController.reportTeam);
+
 
 /**
  * @swagger

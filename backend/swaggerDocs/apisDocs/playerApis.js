@@ -350,17 +350,17 @@ router.get('/api/player/searchOrganisers', authenticateUser, organiserController
  *   post:
  *     summary: "Report a Team"
  *     description: "This endpoint allows a player to report a team."
- *     parameters:
- *       - in: body
- *         name: report
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             teamId:
- *               type: string
- *             reason:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teamName:
+ *                 type: string
+ *               reason:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Team reported successfully."
@@ -368,6 +368,7 @@ router.get('/api/player/searchOrganisers', authenticateUser, organiserController
  *         description: "Error reporting the team."
  */
 router.post('/api/player/report-team', authenticateUser, reportController.reportTeam);
+
 
 /**
  * @swagger

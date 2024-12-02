@@ -11,7 +11,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               teamName:
+ *               teamName:  # Corrected from 'teamId' to 'teamName'
  *                 type: string
  *               reason:
  *                 type: string
@@ -21,33 +21,39 @@
  *       "400":
  *         description: "Error reporting the team."
  */
-router.post('/api/report/PreportT2O', authenticateUser, reportController.reportTeam);
 
+router.post('/api/report/PreportT2O', authenticateUser, reportController.reportTeam);
 
 /**
  * @swagger
- * /report/PreportO2A:
+ * /api/report/PreportO2A:
  *   post:
  *     summary: "Report an Organiser"
  *     description: "This endpoint allows a player to report an organiser to an admin."
- *     parameters:
- *       - in: body
- *         name: report
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             organiserId:
- *               type: string
- *             reason:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organiserName:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *             required:
+ *               - organiserName
+ *               - reason
  *     responses:
  *       "200":
  *         description: "Organiser reported successfully."
+ *       "404":
+ *         description: "Organiser not found."
  *       "400":
  *         description: "Error reporting the organiser."
  */
-router.post('/PreportO2A', authenticateUser, reportController.reportOrganiser);
+
+router.post('/api/report/PreportO2A', authenticateUser, reportController.reportOrganiser);
 
 /**
  * @swagger

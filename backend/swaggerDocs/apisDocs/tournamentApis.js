@@ -171,7 +171,6 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  */
 router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tournamentController.updateTournament);
 
-
 /**
  * @swagger
  * /api/tournament/updatePointsTable:
@@ -185,21 +184,15 @@ router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tourn
  *           schema:
  *             type: object
  *             properties:
- *               tid:
- *                 type: number
+ *               tournamentId:
+ *                 type: string
  *                 description: "The ID of the tournament to update."
- *               pointsTable:
- *                 type: array
- *                 description: "Array of team names and points to be updated."
- *                 items:
- *                   type: object
- *                   properties:
- *                     teamName:
- *                       type: string
- *                       description: "Name of the team."
- *                     Totalpoints:
- *                       type: number
- *                       description: "Points to be added for the team."
+ *               teamName:
+ *                 type: string
+ *                 description: "Name of the team."
+ *               additionalPoints:
+ *                 type: number
+ *                 description: "Points to be added for the team."
  *     responses:
  *       "200":
  *         description: "Points table updated successfully."
@@ -213,45 +206,14 @@ router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tourn
  *                   example: "Points table updated successfully."
  *       "400":
  *         description: "Invalid request or error updating points table."
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Invalid request body format."
  *       "403":
  *         description: "Unauthorized: Not the organiser of this tournament."
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Unauthorized: You are not the organiser of this tournament."
  *       "404":
  *         description: "Tournament or team not found."
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Tournament not found."
  *       "500":
  *         description: "Internal server error."
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal server error."
  */
+
 
 router.post('/api/tournament/updatePointsTable', authenticateOrganiser, tournamentController.updatePointsTable);
 
@@ -361,28 +323,41 @@ router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentCont
  * /api/tournament/edit/{tournamentId}:
  *   post:
  *     summary: "Edit Tournament"
- *     description: "This endpoint allows an organiser to edit tournament details after creation."
+ *     description: "Allows an organiser to edit tournament details."
  *     parameters:
- *       - in: body
- *         name: tournament
+ *       - in: path
+ *         name: tournamentId
  *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             description:
- *               type: string
- *             startDate:
- *               type: string
- *               format: date
- *             endDate:
- *               type: string
- *               format: date
+ *           type: string
+ *         description: "The ID of the tournament to edit."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               entryFee:
+ *                 type: number
+ *               prizePool:
+ *                 type: number
  *     responses:
  *       "200":
- *         description: "Tournament edited successfully."
- *       "400":
- *         description: "Error editing tournament."
+ *         description: "Tournament updated successfully."
+ *       "404":
+ *         description: "Tournament not found."
+ *       "500":
+ *         description: "Server error."
  */
 router.post('/api/tournament/edit/:tournamentId', authenticateOrganiser, tournamentController.editTournament);

@@ -57,32 +57,39 @@ router.post('/api/report/PreportO2A', authenticateUser, reportController.reportO
 
 /**
  * @swagger
- * /report/OreportO2A:
+ * /api/report/OreportO2A:
  *   post:
- *     summary: "Organiser Report an Organiser"
+ *     summary: "Organiser Reports Another Organiser"
  *     description: "This endpoint allows an organiser to report another organiser to an admin."
- *     parameters:
- *       - in: body
- *         name: report
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             organiserId:
- *               type: string
- *             reason:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organiserName:
+ *                 type: string
+ *                 description: "The ID of the organiser being reported."
+ *               reason:
+ *                 type: string
+ *                 description: "Reason for reporting the organiser."
+ *             required:
+ *               - organiserId
+ *               - reason
  *     responses:
  *       "200":
  *         description: "Organiser reported successfully."
  *       "400":
  *         description: "Error reporting the organiser."
+ *       "404":
+ *         description: "Organiser not found."
  */
-router.post('/OreportO2A', authenticateOrganiser, reportController.reportOrganiser);
+router.post('/api/report/OreportO2A', authenticateOrganiser, reportController.reportOrganiser);
 
 /**
  * @swagger
- * /report/getTeamReports:
+ * /api/report/getTeamReports:
  *   get:
  *     summary: "Get Reported Teams"
  *     description: "This endpoint allows an organiser to get a list of reported teams."
@@ -92,11 +99,11 @@ router.post('/OreportO2A', authenticateOrganiser, reportController.reportOrganis
  *       "404":
  *         description: "No reports found."
  */
-router.get('/getTeamReports', authenticateOrganiser, reportController.getReportedTeams);
+router.get('/api/report/getTeamReports', authenticateOrganiser, reportController.getReportedTeams);
 
 /**
  * @swagger
- * /report/getOrganiserReports:
+ * /api/report/getOrganiserReports:
  *   get:
  *     summary: "Get Reported Organisers"
  *     description: "This endpoint allows a player to get a list of reported organisers."
@@ -106,4 +113,4 @@ router.get('/getTeamReports', authenticateOrganiser, reportController.getReporte
  *       "404":
  *         description: "No reports found."
  */
-router.get('/getOrganiserReports', authenticateUser, reportController.getReportedOrganisers);
+router.get('api/report/getOrganiserReports', authenticateUser, reportController.getReportedOrganisers);

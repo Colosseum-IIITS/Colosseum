@@ -148,40 +148,55 @@ exports.updateWinner = async (req, res) => {
     }
 };
 
-// Update points table
 exports.updatePointsTable = async (req, res) => {
     const organiserId = req.user._id;
     const { tournamentId, teamName, additionalPoints } = req.body;
    
     try {
+        // Log the input values to check the request
+        console.log("Request data:", req.body);
+
         const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
         if (!tournament) {
+            console.error("Tournament not found");
             return res.status(404).json({ message: 'Tournament not found' });
         }
 
         if (tournament.organiser.toString() !== organiserId.toString()) {
+            console.error("Unauthorized: Not the organiser of the tournament");
             return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
         }
 
         const teamEntry = tournament.pointsTable.find(entry => entry.teamName === teamName);
         if (!teamEntry) {
+            console.error("Team not found in points table");
             return res.status(404).json({ message: 'Team not found in points table' });
         }
 
+        // Add the additional points
         teamEntry.totalPoints = Number(teamEntry.totalPoints) + Number(additionalPoints);
+        
+        // Sort the points table
         tournament.pointsTable.sort((a, b) => b.totalPoints - a.totalPoints);
-
+        
+        // Update rankings
         tournament.pointsTable.forEach((entry, index) => {
             entry.ranking = index + 1;
         });
 
+        // Save the updated tournament
         await tournament.save();
 
+        console.log("Points table updated successfully");
         return res.status(200).json({ message: 'Points table updated successfully' });
+
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error });
+        console.error('Error:', error); // Log the error to find the source of the problem
+        return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
+
+
 
 // Fetch enrolled tournaments
 exports.getEnrolledTournaments = async (req, res) => {
@@ -289,6 +304,8 @@ exports.getTournamentEditPage = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+
 
 exports.editTournament = async (req, res) => {
   const { name, startDate, endDate, entryFee, prizePool, status, description, winner } = req.body;

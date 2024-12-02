@@ -184,15 +184,21 @@ router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tourn
  *           schema:
  *             type: object
  *             properties:
- *               tournamentId:
- *                 type: string
- *                 description: "The ID of the tournament to update."
- *               teamName:
- *                 type: string
- *                 description: "Name of the team."
- *               additionalPoints:
+ *               tid:
  *                 type: number
- *                 description: "Points to be added for the team."
+ *                 description: "The ID of the tournament to update."
+ *               pointsTable:
+ *                 type: array
+ *                 description: "Array of team names and points to be updated."
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     teamName:
+ *                       type: string
+ *                       description: "Name of the team."
+ *                     Totalpoints:
+ *                       type: number
+ *                       description: "Points to be added for the team."
  *     responses:
  *       "200":
  *         description: "Points table updated successfully."
@@ -206,14 +212,45 @@ router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tourn
  *                   example: "Points table updated successfully."
  *       "400":
  *         description: "Invalid request or error updating points table."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid request body format."
  *       "403":
  *         description: "Unauthorized: Not the organiser of this tournament."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized: You are not the organiser of this tournament."
  *       "404":
  *         description: "Tournament or team not found."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Tournament not found."
  *       "500":
  *         description: "Internal server error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
  */
-
 
 router.post('/api/tournament/updatePointsTable', authenticateOrganiser, tournamentController.updatePointsTable);
 

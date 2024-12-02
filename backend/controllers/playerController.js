@@ -197,19 +197,24 @@ exports.searchPlayer = async (req, res) => {
 };
 
 
+// Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
-    const { _id: playerId } = req.user;
+
+    console.log("Received tournamentId:", tournamentId); // Debugging log
+
+    if (!tournamentId) {
+        return res.status(400).json({ error: "Tournament ID is required" });
+    }
+    const { _id } = req.user;
 
     try {
-        // Validate tournamentId format
-        const mongoose = require('mongoose');
-        if (!tournamentId || !mongoose.Types.ObjectId.isValid(tournamentId)) {
+        if (!tournamentId || typeof tournamentId !== 'string' || !tournamentId.trim()) {
             return res.status(400).json({ error: 'Invalid tournament ID' });
         }
+        
 
-        // Find the player
-        const player = await Player.findById(playerId).populate('team');
+        const player = await Player.findOne({ _id }).populate('team');
         if (!player) {
             return res.status(404).json({ error: 'Player not found' });
         }
@@ -218,29 +223,40 @@ exports.joinTournament = async (req, res) => {
             return res.status(400).json({ error: 'Player must be part of a team' });
         }
 
-        // Find the tournament
         const tournament = await Tournament.findById(tournamentId.trim());
         if (!tournament) {
-            return res.status(404).json({ error: 'Tournament not found' });
+            console.error("No tournament found for ID:", tournamentId);
         }
-
-        // Check if the team is already registered
+        
         if (tournament.teams.includes(player.team._id)) {
             return res.status(400).json({ error: 'Team is already registered for this tournament' });
         }
 
-        // Register the team
+        // Add the team to the tournament's teams array
         tournament.teams.push(player.team._id);
         await tournament.save();
 
-        // Add tournament to player's history
+        // Add the tournament to the player's tournaments array
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
+
+        // Update the points table
+        const pointsEntry = {
+            ranking: tournament.pointsTable.length + 1, 
+            teamName: player.team.name, 
+            totalPoints: 0, // Initialize total points to 0
+        };
+        tournament.pointsTable.push(pointsEntry);
+        await tournament.save();
+
+        // Retrieve all tournaments the player's team is registered for
+        const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
         res.status(200).json({
             message: 'Player successfully joined the tournament',
             player,
             tournament,
+            joinedTournaments: joinedTournaments || []
         });
     } catch (error) {
         console.error("Error joining tournament:", error);
@@ -250,7 +266,6 @@ exports.joinTournament = async (req, res) => {
         });
     }
 };
-
 
 
 // Update username

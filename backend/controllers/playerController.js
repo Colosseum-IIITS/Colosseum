@@ -6,68 +6,103 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Team = require('../models/Team');
 
-// Func: Follow Organisation
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
+
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user; 
+    const { _id } = req.user;
 
     try {
-        const player = await Player.findOne({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
+        // Log organiserId for debugging
+        console.log("Received organiserId:", organiserId);
+
+        // Ensure organiserId is a string
+        if (typeof organiserId !== 'string') {
+            return res.status(400).json({ message: 'organiserId is not a string' });
         }
 
-        const organiser = await Organiser.findById(organiserId);
+        // Check if organiserId is a valid MongoDB ObjectId
+        if (!ObjectId.isValid(organiserId)) {
+            return res.status(400).json({ message: 'Invalid organiser ID format' });
+        }
+
+        // Convert organiserId to ObjectId (with new)
+        const organiser = await Organiser.findById(new ObjectId(organiserId));
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
-        // Check if player is already following this organiser
+        // Find the player by their ID
+        const player = await Player.findById(_id);
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        // Check if the player is already following the organiser
         if (player.following.includes(organiserId)) {
             return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
-       
+        // Follow the organiser
         player.following.push(organiserId);
         await player.save();
 
-      
+        // Add the player to the organiser's followers list
         organiser.followers.push(player._id);
         await organiser.save();
 
         res.status(200).json({ message: 'Player successfully followed the organiser', player, organiser });
+
     } catch (error) {
-        res.status(500).json({ error: 'Error following organiser' });
+        console.error('Error:', error.message); // Log the error for debugging
+        res.status(500).json({ message: 'Error following organiser', error: error.message });
     }
 };
 
-// Func: Unfollow Organisation
+
+
 exports.unfollowOrganiser = async (req, res) => {
     const { organiserId } = req.body;
     const { _id: playerId } = req.user; 
 
     try {
+        // Ensure organiserId is a string
+        if (typeof organiserId !== 'string') {
+            return res.status(400).json({ message: 'organiserId is not a string' });
+        }
+
+        // Check if organiserId is a valid MongoDB ObjectId
+        if (!ObjectId.isValid(organiserId)) {
+            return res.status(400).json({ message: 'Invalid organiser ID format' });
+        }
+
+        // Use new ObjectId() to convert organiserId to a valid ObjectId
+        const organiser = await Organiser.findById(new ObjectId(organiserId));
+        if (!organiser) {
+            return res.status(404).json({ message: 'Organiser not found' });
+        }
+
         const player = await Player.findById(playerId);
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        const organiser = await Organiser.findById(organiserId);
-        if (!organiser) {
-            return res.status(404).json({ message: 'Organiser not found' });
-        }
-
+        // Check if the player is following the organiser
         if (!player.following.includes(organiserId)) {
             return res.status(400).json({ message: 'Player is not following this organiser' });
         }
 
+        // Unfollow the organiser
         player.following.pull(organiserId);
         await player.save();
 
+        // Remove the player from the organiser's followers
         organiser.followers.pull(playerId);
         await organiser.save();
 
         res.status(200).json({ message: 'Player successfully unfollowed the organiser', player, organiser });
+
     } catch (error) {
         console.error('Error unfollowing organiser:', error);
         res.status(500).json({ error: 'Error unfollowing organiser', details: error.message });
@@ -162,14 +197,19 @@ exports.searchPlayer = async (req, res) => {
 };
 
 
-
-// Func: Join Tournament
 exports.joinTournament = async (req, res) => {
     const { tournamentId } = req.body;
-    const { _id } = req.user;
+    const { _id: playerId } = req.user;
 
     try {
-        const player = await Player.findOne({ _id }).populate('team');
+        // Validate tournamentId format
+        const mongoose = require('mongoose');
+        if (!tournamentId || !mongoose.Types.ObjectId.isValid(tournamentId)) {
+            return res.status(400).json({ error: 'Invalid tournament ID' });
+        }
+
+        // Find the player
+        const player = await Player.findById(playerId).populate('team');
         if (!player) {
             return res.status(404).json({ error: 'Player not found' });
         }
@@ -178,40 +218,30 @@ exports.joinTournament = async (req, res) => {
             return res.status(400).json({ error: 'Player must be part of a team' });
         }
 
-        const tournament = await Tournament.findById(tournamentId);
+        // Find the tournament
+        const tournament = await Tournament.findById(tournamentId.trim());
         if (!tournament) {
             return res.status(404).json({ error: 'Tournament not found' });
         }
 
+        // Check if the team is already registered
         if (tournament.teams.includes(player.team._id)) {
             return res.status(400).json({ error: 'Team is already registered for this tournament' });
         }
 
+        // Register the team
         tournament.teams.push(player.team._id);
         await tournament.save();
 
+        // Add tournament to player's history
         player.tournaments.push({ tournament: tournament._id, won: false });
         await player.save();
-
-        const pointsEntry = {
-            ranking: tournament.pointsTable.length + 1, 
-            teamName: player.team.name, 
-            totalPoints: 0, // Initialize total points to 0
-        };
-
-        tournament.pointsTable.push(pointsEntry);
-
-        await tournament.save();
-
-        const joinedTournaments = await Tournament.find({ teams: player.team._id });
 
         res.status(200).json({
             message: 'Player successfully joined the tournament',
             player,
             tournament,
-            joinedTournaments: joinedTournaments || []
         });
-        
     } catch (error) {
         console.error("Error joining tournament:", error);
         return res.status(500).json({
@@ -221,9 +251,12 @@ exports.joinTournament = async (req, res) => {
     }
 };
 
+
+
 // Update username
 exports.updateUsername = async (req, res) => {
     const { username } = req.body;
+    
 
     const { _id } = req.user;
 

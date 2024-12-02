@@ -109,49 +109,59 @@ router.get('/api/player/searchPlayer', authenticateUser, playerController.search
  *   post:
  *     summary: "Follow an Organiser"
  *     description: "This endpoint allows a player to follow an organiser."
- *     parameters:
- *       - in: body
- *         name: organiserId
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             organiserId:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organiserId:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Player followed the organiser successfully."
  *       "400":
- *         description: "Error following the organiser."
+ *         description: "Invalid organiserId or error following the organiser."
+ *       "404":
+ *         description: "Player or Organiser not found."
+ *       "500":
+ *         description: "Internal server error."
  */
 router.post('/api/player/followOrganiser', authenticateUser, playerController.followOrganiser);
 
+
 /**
  * @swagger
- * /player/unFollowOrganiser:
+ * /api/player/unFollowOrganiser:
  *   post:
  *     summary: "Unfollow an Organiser"
  *     description: "This endpoint allows a player to unfollow an organiser."
- *     parameters:
- *       - in: body
- *         name: organiserId
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             organiserId:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organiserId:
+ *                 type: string
  *     responses:
  *       "200":
  *         description: "Player unfollowed the organiser successfully."
  *       "400":
- *         description: "Error unfollowing the organiser."
+ *         description: "Invalid organiser ID format or error unfollowing the organiser."
+ *       "404":
+ *         description: "Player or Organiser not found."
+ *       "500":
+ *         description: "Internal server error."
  */
-router.post('/unFollowOrganiser', authenticateUser, playerController.unfollowOrganiser);
+router.post('/api/player/unFollowOrganiser', authenticateUser, playerController.unfollowOrganiser);
+
 
 /**
  * @swagger
- * /player/joinTournament:
+ * /api/player/joinTournament:
  *   post:
  *     summary: "Join a Tournament"
  *     description: "This endpoint allows a player to join a tournament."
@@ -170,11 +180,11 @@ router.post('/unFollowOrganiser', authenticateUser, playerController.unfollowOrg
  *       "400":
  *         description: "Error joining the tournament."
  */
-router.post('/joinTournament', authenticateUser, playerController.joinTournament);
+router.post('/api/player/joinTournament', authenticateUser, playerController.joinTournament);
 
 /**
  * @swagger
- * /player/updateUsername:
+ * /api/player/updateUsername:
  *   post:
  *     summary: "Update Player Username"
  *     description: "This endpoint allows a player to update their username."
@@ -193,11 +203,11 @@ router.post('/joinTournament', authenticateUser, playerController.joinTournament
  *       "400":
  *         description: "Invalid username format or error."
  */
-router.post('/updateUsername', authenticateUser, playerController.updateUsername);
+router.post('/api/player/updateUsername', authenticateUser, playerController.updateUsername);
 
 /**
  * @swagger
- * /player/updatePassword:
+ * /api/player/updatePassword:
  *   post:
  *     summary: "Update Player Password"
  *     description: "This endpoint allows a player to update their password."
@@ -216,11 +226,11 @@ router.post('/updateUsername', authenticateUser, playerController.updateUsername
  *       "400":
  *         description: "Invalid password format or other error."
  */
-router.post('/updatePassword', authenticateUser, playerController.updatePassword);
+router.post('/api/player/updatePassword', authenticateUser, playerController.updatePassword);
 
 /**
  * @swagger
- * /player/updateEmail:
+ * /api/player/updateEmail:
  *   post:
  *     summary: "Update Player Email"
  *     description: "This endpoint allows a player to update their email."
@@ -239,11 +249,11 @@ router.post('/updatePassword', authenticateUser, playerController.updatePassword
  *       "400":
  *         description: "Invalid email format or other error."
  */
-router.post('/updateEmail', authenticateUser, playerController.updateEmail);
+router.post('/api/player/updateEmail', authenticateUser, playerController.updateEmail);
 
 /**
  * @swagger
- * /player/updateProfile:
+ * /api/player/updateProfile:
  *   post:
  *     summary: "Update Player Profile"
  *     description: "This endpoint allows a player to update their profile information."
@@ -266,11 +276,11 @@ router.post('/updateEmail', authenticateUser, playerController.updateEmail);
  *       "400":
  *         description: "Invalid profile data or other error."
  */
-router.post('/updateProfile', authenticateUser, playerController.updateProfile);
+router.post('/api/player/updateProfile', authenticateUser, playerController.updateProfile);
 
 /**
  * @swagger
- * /player/tournamentsPlayed:
+ * /api/player/tournamentsPlayed:
  *   get:
  *     summary: "Get Tournaments Played"
  *     description: "This endpoint allows a player to get the list of tournaments they have played in."
@@ -280,7 +290,7 @@ router.post('/updateProfile', authenticateUser, playerController.updateProfile);
  *       "404":
  *         description: "No tournaments found."
  */
-router.get('/tournamentsPlayed', authenticateUser, playerController.getTournamentsPlayed);
+router.get('/api/player/tournamentsPlayed', authenticateUser, playerController.getTournamentsPlayed);
 
 /**
  * @swagger

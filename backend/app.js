@@ -7,6 +7,7 @@ const { authenticateUser } = require('./middleware/authMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swaggerConfig');
 require('dotenv').config();
+const cors = require('cors');
 
 // Import routes
 const playerRoutes = require('./routes/playerRoutes');
@@ -18,6 +19,9 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+
+// Allow requests from the frontend
+app.use(cors({ origin: 'http://localhost:3000', credentials: true}));
 
 // Middleware setup
 app.use(express.json());
@@ -45,7 +49,7 @@ mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

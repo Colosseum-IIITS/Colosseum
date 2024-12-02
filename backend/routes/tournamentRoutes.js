@@ -6,7 +6,9 @@ const { authenticateOrganiser, authenticateUser } = require('../middleware/authM
 // Route to create a new tournament
 router.post('/create', authenticateOrganiser,tournamentController.createTournament);
 router.get('/create',authenticateOrganiser,tournamentController.createTournamentForm);
+router.get('/tournamentsEnrolled',authenticateUser,tournamentController.getEnrolledTournaments);
 router.get('/:tournamentId', authenticateUser, tournamentController.getTournamentById);
+
 
 router.get('/edit/:tournamentId', authenticateOrganiser, tournamentController.getTournamentEditPage );
 router.post('/join/:tournamentId',authenticateUser,tournamentController.joinTournament);

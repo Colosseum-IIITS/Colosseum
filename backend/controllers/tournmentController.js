@@ -188,37 +188,41 @@ exports.getEnrolledTournaments = async (req, res) => {
     const { id: playerId } = req.user;
 
     try {
-        const player = await Player.findById(playerId).populate("team");
+        const player = await Player.findById(playerId)
+            .populate({
+                path: 'tournaments.tournament',
+                model: 'Tournament'
+            })
+            .populate('team');
+
         if (!player || !player.team) {
             return res.status(404).json({ message: "Player or team not found" });
         }
 
-        const tournaments = await Tournament.find({
-            teams: player.team._id,
-        }).populate("teams", "name");
+        // Extract unique tournaments based on _id
+        const tournaments = player.tournaments.map((t) => t.tournament);
 
-        if (tournaments.length > 0) {
+        const uniqueTournaments = [...new Map(tournaments.map(t => [t._id, t])).values()];  // Remove duplicates
+
+        if (uniqueTournaments.length > 0) {
             res.status(200).json({
-                tournaments: tournaments.map((tournament) => ({
-                    tournamentId: tournament._id,
-                    tournamentName: tournament.name,
-                    teams: tournament.teams,
-                })),
-                message: "You are already enrolled in the following tournaments.",
+                tournaments: uniqueTournaments,
+                message: "You are already enrolled in the following tournaments."
             });
         } else {
             res.status(200).json({
                 tournaments: [],
-                message: "You are not enrolled in any tournaments.",
+                message: "You are not enrolled in any tournaments."
             });
         }
     } catch (error) {
         res.status(500).json({
             message: "Error fetching enrolled tournaments",
-            error: error.message,
+            error: error.message
         });
     }
 };
+
 
 // Fetch tournament by ID
 exports.getTournamentById = async (req, res) => {

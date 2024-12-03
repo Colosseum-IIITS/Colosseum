@@ -7,20 +7,30 @@ const Organiser = require('../models/Organiser');
 exports.reportTeam = async (req, res) => {
     const { teamName, reason } = req.body;
     const playerId = req.user._id;
-
+  
     try {
-        const report = new Report({
-            reportedBy: playerId,
-            reportType: 'Team',
-            reportedTeam: teamName,
-            reason
-        });
-        await report.save();
-        res.status(200).json({ message: 'Team reported successfully' });
+      // Create a new report entry
+      const report = new Report({
+        reportedBy: playerId,
+        reportType: 'Team',
+        reportedTeam: teamName,
+        reason,
+      });
+  
+      // Save report to the database
+      await report.save();
+  
+      // Send response if everything is okay
+      res.status(200).json({ message: 'Team reported successfully' });
     } catch (error) {
-        res.status(500).json({ error: "Error reporting team", details: error.message });
+      console.error('Error reporting team:', error);
+      res.status(500).json({
+        error: 'Error reporting team',
+        details: error.message,
+      });
     }
-};
+  };
+  
 
 // Player reports an organiser
 exports.reportOrganiser = async (req, res) => {

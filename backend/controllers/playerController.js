@@ -14,41 +14,31 @@ exports.followOrganiser = async (req, res) => {
     const { _id } = req.user;
 
     try {
-        // Log organiserId for debugging
-        console.log("Received organiserId:", organiserId);
-
-        // Ensure organiserId is a string
         if (typeof organiserId !== 'string') {
             return res.status(400).json({ message: 'organiserId is not a string' });
         }
 
-        // Check if organiserId is a valid MongoDB ObjectId
         if (!ObjectId.isValid(organiserId)) {
             return res.status(400).json({ message: 'Invalid organiser ID format' });
         }
 
-        // Convert organiserId to ObjectId (with new)
         const organiser = await Organiser.findById(new ObjectId(organiserId));
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
-        // Find the player by their ID
         const player = await Player.findById(_id);
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        // Check if the player is already following the organiser
         if (player.following.includes(organiserId)) {
             return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
         }
 
-        // Follow the organiser
         player.following.push(organiserId);
         await player.save();
 
-        // Add the player to the organiser's followers list
         organiser.followers.push(player._id);
         await organiser.save();
 
@@ -59,8 +49,6 @@ exports.followOrganiser = async (req, res) => {
         res.status(500).json({ message: 'Error following organiser', error: error.message });
     }
 };
-
-
 
 exports.unfollowOrganiser = async (req, res) => {
     const { organiserId } = req.body;
@@ -563,6 +551,8 @@ exports.getTournamentPointsTable = async (req, res) => {
     }
 };
 
+
+
 exports.getDashboard = async (req, res) => {
     const _id = req.user._id;
     const currentDate = new Date();
@@ -607,4 +597,32 @@ exports.getDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };
+
+exports.getUsername = async (req, res) => {
+    try {
+        const { _id } = req.user;  // Extract the _id from the authenticated user
+
+        // Fetch the player from the database
+        const player = await Player.findById(_id);
+        
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        // Respond with the player's username
+        res.status(200).json({
+            username: player.username,
+        });
+
+    } catch (error) {
+        // Enhanced error logging for better debugging
+        console.error('Error fetching username:', error);
+
+        res.status(500).json({
+            error: 'Error fetching username',
+            details: error.message,
+        });
+    }
+};
+
 

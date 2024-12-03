@@ -133,8 +133,6 @@ exports.searchTournaments = async (req, res) => {
             }
         }
 
-        console.log('Tournaments Found:', tournaments); 
-        console.log('Joined Tournaments:', joinedTournaments); 
       
         res.status(200).json({
             message: 'Tournaments fetched successfully',
@@ -187,61 +185,41 @@ exports.searchPlayer = async (req, res) => {
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
-    const { tournamentId } = req.body;
-    const { _id } = req.user;
-
+    const { tournamentId } = req.params;  // Tournament ID passed in URL
+    const { _id } = req.user;  // Player's ID from authenticated user
+  
     try {
-        const player = await Player.findOne({ _id }).populate('team');
-        if (!player) {
-            return res.status(404).json({ error: 'Player not found' });
-        }
-
-        if (!player.team) {
-            return res.status(400).json({ error: 'Player must be part of a team' });
-        }
-
-        const tournament = await Tournament.findById(tournamentId);
-        if (!tournament) {
-            return res.status(404).json({ error: 'Tournament not found' });
-        }
-
-        if (tournament.teams.includes(player.team._id)) {
-            return res.status(400).json({ error: 'Team is already registered for this tournament' });
-        }
-
-        tournament.teams.push(player.team._id);
-        await tournament.save();
-
-        player.tournaments.push({ tournament: tournament._id, won: false });
-        await player.save();
-
-        const pointsEntry = {
-            ranking: tournament.pointsTable.length + 1, 
-            teamName: player.team.name, 
-            totalPoints: 0, // Initialize total points to 0
-        };
-
-        tournament.pointsTable.push(pointsEntry);
-
-        await tournament.save();
-
-        const joinedTournaments = await Tournament.find({ teams: player.team._id });
-
-        res.status(200).json({
-            message: 'Player successfully joined the tournament',
-            player,
-            tournament,
-            joinedTournaments: joinedTournaments || []
-        });
-        
+      const player = await Player.findOne({ _id }).populate('team');
+      if (!player) {
+        return res.status(404).json({ message: 'Player not found' });
+      }
+  
+      if (!player.team) {
+        return res.status(400).json({ message: 'Player must be part of a team' });
+      }
+  
+      const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
+  
+      if (!tournament) {
+        return res.status(404).json({ message: 'Tournament not found' });
+      }
+  
+      if (tournament.teams.includes(player.team._id)) {
+        return res.status(400).json({ message: 'Team is already registered for this tournament' });
+      }
+  
+      tournament.teams.push(player.team._id);
+      await tournament.save();
+  
+      player.tournaments.push({ tournament: tournament._id, won: false });
+      await player.save();
+  
+      return res.status(200).json({ message: 'Successfully joined the tournament' });
     } catch (error) {
-        console.error("Error joining tournament:", error);
-        return res.status(500).json({
-            error: 'Server error',
-            details: error.message,
-        });
+      console.error("Error joining tournament:", error);
+      return res.status(500).json({ message: 'Server error', error });
     }
-};
+  };
 
 
 exports.updateUsername = async (req, res) => {

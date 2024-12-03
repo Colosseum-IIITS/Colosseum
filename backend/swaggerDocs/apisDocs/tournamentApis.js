@@ -171,7 +171,6 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  */
 router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tournamentController.updateTournament);
 
-
 /**
  * @swagger
  * /api/tournament/updatePointsTable:
@@ -361,28 +360,41 @@ router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentCont
  * /api/tournament/edit/{tournamentId}:
  *   post:
  *     summary: "Edit Tournament"
- *     description: "This endpoint allows an organiser to edit tournament details after creation."
+ *     description: "Allows an organiser to edit tournament details."
  *     parameters:
- *       - in: body
- *         name: tournament
+ *       - in: path
+ *         name: tournamentId
  *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             description:
- *               type: string
- *             startDate:
- *               type: string
- *               format: date
- *             endDate:
- *               type: string
- *               format: date
+ *           type: string
+ *         description: "The ID of the tournament to edit."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               entryFee:
+ *                 type: number
+ *               prizePool:
+ *                 type: number
  *     responses:
  *       "200":
- *         description: "Tournament edited successfully."
- *       "400":
- *         description: "Error editing tournament."
+ *         description: "Tournament updated successfully."
+ *       "404":
+ *         description: "Tournament not found."
+ *       "500":
+ *         description: "Server error."
  */
 router.post('/api/tournament/edit/:tournamentId', authenticateOrganiser, tournamentController.editTournament);

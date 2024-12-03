@@ -175,6 +175,13 @@ exports.createAdmin = async (req, res) => {
         });
 
         await newAdmin.save();
+        const token = jwt.sign({ id: newAdmin._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
+        res.cookie('user_jwt', token, {
+            httpOnly: true,
+            maxAge: 3600000,
+            secure: process.env.NODE_ENV === 'production'
+        });
 
         res.status(201).json({ message: 'Admin registered successfully' });
     } catch (error) {
@@ -200,14 +207,11 @@ exports.loginAdmin = async (req, res) => {
 
         const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
-        res.cookie('admin_jwt', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-
-        if (!req.session) {
-            req.session = {};
-        }
-
-        req.session.isLoggedIn = true;
-        req.session.admin = admin;
+        res.cookie('user_jwt', token, {
+            httpOnly: true,
+            maxAge: 3600000,
+            secure: process.env.NODE_ENV === 'production'
+        });
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {

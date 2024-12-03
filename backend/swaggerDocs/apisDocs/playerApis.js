@@ -376,23 +376,29 @@ router.post('/api/player/report-team', authenticateUser, reportController.report
  *   post:
  *     summary: "Report an Organiser"
  *     description: "This endpoint allows a player to report an organiser."
- *     parameters:
- *       - in: body
- *         name: report
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             organiserId:
- *               type: string
- *             reason:
- *               type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organiserName:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *             required:
+ *               - organiserName
+ *               - reason
  *     responses:
  *       "200":
  *         description: "Organiser reported successfully."
+ *       "404":
+ *         description: "Organiser not found."
  *       "400":
  *         description: "Error reporting the organiser."
  */
+
 router.post('/api/player/report-organiser', authenticateUser, reportController.reportOrganiser);
 
 /**

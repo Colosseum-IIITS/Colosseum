@@ -102,6 +102,16 @@ exports.getDashboard = async (req, res) => {
         });
         const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
         const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
+        const activeTournamentsCount = await Tournament.countDocuments({
+             startDate: { $lte: currentDate },
+             endDate: { $gte: currentDate },
+             status: 'Approved' // Only count approved tournaments
+          });
+
+        const completedTournamentsCount = await Tournament.countDocuments({
+            endDate: { $lte: currentDate },
+            status: 'Completed'
+          });
 
         // Calculate player stats
         const playersWithStats = await Promise.all(players.map(async (player) => {
@@ -127,6 +137,8 @@ exports.getDashboard = async (req, res) => {
             players: playersWithStats,
             tournaments,
             totalTeams,
+            activeTournamentsCount,
+            completedTournamentsCount,
             totalBannedPlayers,
             totalTournamentsConducted,
             totalBannedOrgs,

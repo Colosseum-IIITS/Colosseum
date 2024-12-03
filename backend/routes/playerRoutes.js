@@ -27,6 +27,7 @@ router.post('/report-organiser', authenticateUser, reportController.reportOrgani
 router.get('/dashboard', authenticateUser, playerController.getDashboard);
 router.get('/teamName', authenticateUser, teamController.getTeamsByName);
 router.get('/followedOrg',authenticateUser,organiserController.getMyOrganisers);
+router.get('/getUserName', authenticateUser, playerController.getUsername);
 router.get('/homepage', authenticateUser, playerController.getHomePage);
 router.post('/joinTeam', authenticateUser, teamController.joinTeam);
 

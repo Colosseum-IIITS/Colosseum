@@ -158,3 +158,16 @@ router.post('/api/organiser/delete/:tournamentId', authenticateAdmin,organiserCo
  *         description: "Error retrieving dashboard data."
  */
 router.get('/dashboard', authenticateAdmin, adminController.getDashboard);
+/**
+ * @swagger
+ * /admin/banhistory:
+ *   get:
+ *     summary: "Get ban history"
+ *     description: "This endpoint returns the ban history within the last month"
+ *     responses:
+ *       "200":
+ *         description: "Ban data retrieved successfully."
+ *       "400":
+ *         description: "Error retrieving Ban data."
+ */
+router.get('/banhistory', adminController.getBanHistory);

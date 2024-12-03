@@ -216,7 +216,6 @@ exports.getEnrolledTournaments = async (req, res) => {
     }
 };
   
-
 // Fetch tournament by ID
 exports.getTournamentById = async (req, res) => {
     try {
@@ -277,6 +276,7 @@ exports.getTournamentById = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+  
   
 
 // Tournament edit page

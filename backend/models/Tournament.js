@@ -3,7 +3,7 @@ const Organiser = require("../models/Organiser");
 
 const tournamentSchema = new mongoose.Schema(
   {
-    tid: { type: Number, required: true },
+    tid: { type: String, required: true },
     name: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },

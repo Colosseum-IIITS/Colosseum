@@ -252,6 +252,7 @@ exports.getTournamentById = async (req, res) => {
       // Initialize flags
       let isPlayerInTournament = false;
       let isCaptain = false;
+      //hello
   
       // Iterate through each team to check if the user is a player or captain
       tournament.teams.forEach((team) => {

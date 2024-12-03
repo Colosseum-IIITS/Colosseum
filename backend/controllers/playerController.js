@@ -403,20 +403,23 @@ exports.getTournamentsPlayed = async (req, res) => {
 // Fetch number of tournaments won by the player
 exports.getTournamentsWon = async (req, res) => {
     const { _id } = req.user;
-
+    console.log('User ID:', _id); // Log user ID to confirm it's correct
+  
     try {
-        const player = await Player.findOne({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        const tournamentsWon = player.tournaments.filter(t => t.won).length;
-        res.status(200).json({ tournamentsWon });
+      const player = await Player.findOne({ _id });
+      if (!player) {
+        return res.status(404).json({ message: 'Player not found' });
+      }
+  
+      const tournamentsWon = player.tournaments.filter(t => t.won).length;
+      console.log('Tournaments Won:', tournamentsWon); // Log the result
+      res.status(200).json({ tournamentsWon });
     } catch (error) {
-        console.error('Error fetching tournaments won:', error);
-        res.status(500).json({ error: 'Error fetching tournaments won' });
+      console.error('Error fetching tournaments won:', error);
+      res.status(500).json({ error: 'Error fetching tournaments won' });
     }
-};
+  };
+  
 
 // Fetch player ranking based on the number of tournaments played
 exports.getPlayerRanking = async (req, res) => {
@@ -597,7 +600,6 @@ exports.getDashboard = async (req, res) => {
         res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
 };
-
 exports.getUsername = async (req, res) => {
     try {
         const { _id } = req.user;  // Extract the _id from the authenticated user
@@ -625,4 +627,53 @@ exports.getUsername = async (req, res) => {
     }
 };
 
-
+exports.getPlayerProfile = async (req, res) => {
+    try {
+      // Ensure the user is authenticated and their ID is available
+      const playerId = req.user?.id;
+  
+      if (!playerId) {
+        return res.status(400).json({ message: 'Authentication error: Player ID not found in request.' });
+      }
+  
+      // Search the database for the player based on the player ID
+      const player = await Player.findById(playerId)
+        .populate('team')               // Populate team details
+        .populate('following')          // Populate following details
+        .populate('tournaments.tournament') // Populate tournament details
+        .exec();
+  
+      // Check if the player exists
+      if (!player) {
+        return res.status(404).json({ message: 'Player not found' });
+      }
+  
+      // Ensure following and tournaments are arrays to avoid errors when mapping
+      const following = player.following ? player.following.map(org => org.username) : [];
+      const tournaments = player.tournaments ? player.tournaments.map(t => ({
+        tournament: t.tournament?.name || 'Unknown tournament',
+        won: t.won,
+      })) : [];
+  
+      // Respond with the player data
+      res.status(200).json({
+        username: player.username,
+        email: player.email,
+        profilePhoto: player.profilePhoto,
+        team: player.team ? player.team.name : 'No team', // Include team name if available
+        following,  // List of following organisers' usernames
+        tournaments,  // List of tournaments with results
+        banned: player.banned,
+      });
+    } catch (error) {
+      // Enhanced error logging for better debugging
+      console.error('Error fetching player profile:', error);
+  
+      // Respond with a detailed error message
+      res.status(500).json({
+        error: 'Server error',
+        details: error.message,
+      });
+    }
+  };
+  

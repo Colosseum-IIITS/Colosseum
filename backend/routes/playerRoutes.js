@@ -9,6 +9,7 @@ const teamController = require('../controllers/teamControllers');
 const tournmentController = require('../controllers/tournmentController');
 const organiser = require('../models/Organiser');
 
+router.get('/profile',authenticateUser,playerController.getPlayerProfile);
 router.get('/searchTournaments', authenticateUser, playerController.searchTournaments);
 router.get('/searchPlayer', authenticateUser, playerController.searchPlayer);
 router.post('/followOrganiser', authenticateUser, playerController.followOrganiser);

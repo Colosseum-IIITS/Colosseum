@@ -12,6 +12,7 @@ router.post('/updateTeamName', authenticateUser, teamController.updateTeamName);
 router.get('/:teamId/requests', authenticateUser, teamController.getJoinRequests);
 router.post('/accept', authenticateUser, teamController.acceptJoinRequest);
 router.post('/reject', authenticateUser, teamController.rejectJoinRequest);
-
+router.get('/getTournamentsWon',authenticateUser,teamController.getTournamentsWon );
+router.get('/getTournamentsPlayed',authenticateUser,teamController.getTournamentsPlayed);
 
 module.exports = router;

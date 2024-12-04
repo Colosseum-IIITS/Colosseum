@@ -291,3 +291,56 @@ exports.rejectJoinRequest = async (req, res) => {
     return res.status(500).json({ error: 'Error rejecting join request', details: error.message });
   }
 };
+
+exports.getTournamentsWon = async (req, res) => {
+  const { teamId } = req.params;
+
+  try {
+    // Find the team by ID
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ message: "Team not found" });
+    }
+
+    // Query the Tournament model for tournaments won by this team
+    const tournamentsWon = await Tournament.find({ winner: team.name });
+
+    res.status(200).json({
+      message: "Tournaments won by the team retrieved successfully",
+      data: tournamentsWon,
+    });
+
+  } catch (error) {
+    console.error("Error retrieving tournaments won by the team:", error);
+    return res.status(500).json({
+      error: "Error retrieving tournaments won by the team",
+      details: error.message,
+    });
+  }
+};
+
+exports.getTournamentsPlayed = async (req, res) => {
+  const { teamId } = req.params;
+
+  try {
+    // Find the team by ID
+    const team = await Team.findById(teamId).populate("tournaments", "-__v");
+    if (!team) {
+      return res.status(404).json({ message: "Team not found" });
+    }
+
+    // Get the tournaments the team has participated in
+    const tournamentsPlayed = team.tournaments;
+
+    res.status(200).json({
+      message: "Tournaments played by the team retrieved successfully",
+      data: tournamentsPlayed,
+    });
+  } catch (error) {
+    console.error("Error retrieving tournaments played by the team:", error);
+    return res.status(500).json({
+      error: "Error retrieving tournaments played by the team",
+      details: error.message,
+    });
+  }
+};

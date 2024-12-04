@@ -298,7 +298,6 @@ exports.getTournamentById = async (req, res) => {
   };
   
   
-
 // Tournament edit page
 exports.getTournamentEditPage = async (req, res) => {
     try {

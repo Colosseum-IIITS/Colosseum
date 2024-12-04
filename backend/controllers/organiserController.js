@@ -396,7 +396,6 @@ exports.getMyOrganisers = async (req, res) => {
           return res.status(404).json({ message: "Player not found" });
       }
 
-      console.log("Followed Organisers:", player.following);
 
       return res.status(200).json({
           followedOrganisers: player.following

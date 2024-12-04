@@ -12,8 +12,13 @@ const playerSchema = new mongoose.Schema({
     won: { type: Boolean, default: false }
   }],
   banned: { type: Boolean, default: false },
+  notifications: [{
+    message: { type: String },
+    read: { type: Boolean, default: false },
+    date: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
+
 
 const Player = mongoose.model('Player', playerSchema);
 module.exports = Player;
-

@@ -12,57 +12,77 @@ exports.createTournamentForm = async (req, res) => {
 
 // Create a tournament.
 exports.createTournament = async (req, res) => {
-    const {
-        tid,
-        name,
-        startDate,
-        endDate,
-        entryFee,
-        prizePool,
-        description,
-    } = req.body;
+  const { tid, name, startDate, endDate, entryFee, prizePool, description } = req.body;
+  const organiser = req.user._id;
 
-    const organiser = req.user._id;
+  try {
+      const existingTournament = await Tournament.findOne({ tid });
+      if (existingTournament) {
+          return res.status(400).json({ message: "Tournament ID already exists" });
+      }
 
-    try {
-        const existingTournament = await Tournament.findOne({ tid });
-        if (existingTournament) {
-            return res.status(400).json({ message: "Tournament ID already exists" });
-        }
+      if (new Date(startDate) >= new Date(endDate)) {
+          return res.status(400).json({ message: "Start date must be earlier than end date" });
+      }
 
-        if (new Date(startDate) >= new Date(endDate)) {
-            return res.status(400).json({ message: "Start date must be earlier than end date" });
-        }
+      const tournament = new Tournament({
+          tid,
+          name,
+          startDate,
+          endDate,
+          entryFee,
+          prizePool,
+          status: "Pending",
+          description,
+          organiser,
+      });
 
-        const tournament = new Tournament({
-            tid,
-            name,
-            startDate,
-            endDate,
-            entryFee,
-            prizePool,
-            status: "Pending",
-            description,
-            organiser,
-        });
+      const savedTournament = await tournament.save();
 
-        const savedTournament = await tournament.save();
+      const organiserUpdate = await Organiser.findByIdAndUpdate(
+          organiser,
+          { $push: { tournaments: savedTournament._id } },
+          { new: true }
+      );
 
-        const organiserUpdate = await Organiser.findByIdAndUpdate(
-            organiser,
-            { $push: { tournaments: savedTournament._id } },
-            { new: true }
-        );
+      if (!organiserUpdate) {
+          return res.status(404).json({ message: "Organiser not found" });
+      }
 
-        if (!organiserUpdate) {
-            return res.status(404).json({ message: "Organiser not found" });
-        }
+      // Notify all players following the organiser
+      const followingPlayers = await Player.find({ following: organiser });
 
-        return res.status(200).json({ message: "Tournament created successfully", tournament: savedTournament });
-    } catch (error) {
-        res.status(500).json({ error: "Error creating tournament" });
-    }
+      followingPlayers.forEach(async (player) => {
+          const message = `${organiserUpdate.username} is conducting a new tournament: ${savedTournament.name}`;
+          await Player.findByIdAndUpdate(player._id, {
+              $push: { notifications: { message } }
+          });
+      });
+
+      return res.status(200).json({ message: "Tournament created successfully", tournament: savedTournament });
+  } catch (error) {
+      res.status(500).json({ error: "Error creating tournament" });
+  }
 };
+
+
+exports.getNotifications = async (req, res) => {
+  const playerId = req.user._id;
+  
+  console.log(`jjhdsdjsuhfsiufhdsuygdsinbgdgnbdsuhgdsindsugidnuhbg`, playerId);
+  try {
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({ message: "Player not found" });
+    }
+
+    res.status(200).json(player.notifications || []);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: "Error fetching notifications error at getNotification" });
+  }
+};
+
 
 // Check if player has joined the tournament
 exports.didPlayerJoin = async (req, res) => {

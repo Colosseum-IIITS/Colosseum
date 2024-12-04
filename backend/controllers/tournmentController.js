@@ -12,57 +12,77 @@ exports.createTournamentForm = async (req, res) => {
 
 // Create a tournament.
 exports.createTournament = async (req, res) => {
-    const {
-        tid,
-        name,
-        startDate,
-        endDate,
-        entryFee,
-        prizePool,
-        description,
-    } = req.body;
+  const { tid, name, startDate, endDate, entryFee, prizePool, description } = req.body;
+  const organiser = req.user._id;
 
-    const organiser = req.user._id;
+  try {
+      const existingTournament = await Tournament.findOne({ tid });
+      if (existingTournament) {
+          return res.status(400).json({ message: "Tournament ID already exists" });
+      }
 
-    try {
-        const existingTournament = await Tournament.findOne({ tid });
-        if (existingTournament) {
-            return res.status(400).json({ message: "Tournament ID already exists" });
-        }
+      if (new Date(startDate) >= new Date(endDate)) {
+          return res.status(400).json({ message: "Start date must be earlier than end date" });
+      }
 
-        if (new Date(startDate) >= new Date(endDate)) {
-            return res.status(400).json({ message: "Start date must be earlier than end date" });
-        }
+      const tournament = new Tournament({
+          tid,
+          name,
+          startDate,
+          endDate,
+          entryFee,
+          prizePool,
+          status: "Pending",
+          description,
+          organiser,
+      });
 
-        const tournament = new Tournament({
-            tid,
-            name,
-            startDate,
-            endDate,
-            entryFee,
-            prizePool,
-            status: "Pending",
-            description,
-            organiser,
-        });
+      const savedTournament = await tournament.save();
 
-        const savedTournament = await tournament.save();
+      const organiserUpdate = await Organiser.findByIdAndUpdate(
+          organiser,
+          { $push: { tournaments: savedTournament._id } },
+          { new: true }
+      );
 
-        const organiserUpdate = await Organiser.findByIdAndUpdate(
-            organiser,
-            { $push: { tournaments: savedTournament._id } },
-            { new: true }
-        );
+      if (!organiserUpdate) {
+          return res.status(404).json({ message: "Organiser not found" });
+      }
 
-        if (!organiserUpdate) {
-            return res.status(404).json({ message: "Organiser not found" });
-        }
+      // Notify all players following the organiser
+      const followingPlayers = await Player.find({ following: organiser });
 
-        return res.status(200).json({ message: "Tournament created successfully", tournament: savedTournament });
-    } catch (error) {
-        res.status(500).json({ error: "Error creating tournament" });
-    }
+      followingPlayers.forEach(async (player) => {
+          const message = `${organiserUpdate.username} is conducting a new tournament: ${savedTournament.name}`;
+          await Player.findByIdAndUpdate(player._id, {
+              $push: { notifications: { message } }
+          });
+      });
+
+      return res.status(200).json({ message: "Tournament created successfully", tournament: savedTournament });
+  } catch (error) {
+      res.status(500).json({ error: "Error creating tournament" });
+  }
 };
+
+
+exports.getNotifications = async (req, res) => {
+  const playerId = req.user._id;
+  
+  console.log(`jjhdsdjsuhfsiufhdsuygdsinbgdgnbdsuhgdsindsugidnuhbg`, playerId);
+  try {
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({ message: "Player not found" });
+    }
+
+    res.status(200).json(player.notifications || []);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: "Error fetching notifications error at getNotification" });
+  }
+};
+
 
 // Check if player has joined the tournament
 exports.didPlayerJoin = async (req, res) => {
@@ -278,7 +298,6 @@ exports.getTournamentById = async (req, res) => {
   };
   
   
-
 // Tournament edit page
 exports.getTournamentEditPage = async (req, res) => {
     try {
@@ -329,47 +348,45 @@ exports.editTournament = async (req, res) => {
 };
 
 exports.joinTournament = async (req, res) => {
-    const { tournamentId } = req.params;  // Get tournamentId from request parameters
-    const { _id } = req.user;  // Get the player ID from the authenticated user
-  
-    try {
-      const player = await Player.findOne({ _id }).populate('team');
-      if (!player) {
-        return res.status(404).json({ message: 'Player not found' });
-      }
-  
-      if (!player.team) {
-        return res.status(400).json({ message: 'Player must be part of a team' });
-      }
-  
-      // Use `tournamentId` directly if it's a string
-      const tournament = await Tournament.findOne({
-        tid: tournamentId,  // Now directly using `tid` field as a string match
-      });
-      
-      if (!tournament) {
-        return res.status(404).json({ message: 'Tournament not found' });
-      }
-  
-      // Check if the team is already registered for this tournament
-      if (tournament.teams.includes(player.team._id)) {
-        return res.status(400).json({ message: 'Team is already registered for this tournament' });
-      }
-  
-      // Register the team for the tournament
-      tournament.teams.push(player.team._id);
-      await tournament.save();
-  
-      // Add tournament to player's list of tournaments
-      player.tournaments.push({ tournament: tournament._id, won: false });
-      await player.save();
-  
-      return res.status(200).json({ message: 'Successfully joined the tournament' });
-    } catch (error) {
-      console.error("Error joining tournament:", error);
-      return res.status(500).json({ message: 'Server error', error });
+  const { tournamentId } = req.params;  // Tournament ID passed in URL
+  const { _id } = req.user;  // Player's ID from authenticated user
+
+  try {
+    const player = await Player.findOne({ _id }).populate('team');
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
     }
-  };
+
+    if (!player.team) {
+      return res.status(400).json({ message: 'Player must be part of a team' });
+    }
+    
+    const tournament = await Tournament.findOne({ tid: tournamentId });
+
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    if (tournament.teams.includes(player.team._id)) {
+      return res.status(400).json({ message: 'Team is already registered for this tournament' });
+    } 
+    
+    tournament.teams.push(player.team._id);
+    await tournament.save();
+    
+    const team = await Team.findById(player.team._id);
+    team.tournaments.push(tournament._id);
+    await team.save();
+    
+    player.tournaments.push({ tournament: tournament._id, won: false });
+    await player.save();
+
+    return res.status(200).json({ message: 'Successfully joined the tournament' });
+  } catch (error) {
+    console.error("Error joining tournament:", error);
+    return res.status(500).json({ message: 'Server error', error });
+  }
+};
 
 exports.getPointsTable = async (req, res) => {
   const { tournamentId } = req.params;

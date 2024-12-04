@@ -31,5 +31,5 @@ router.get('/followedOrg',authenticateUser,organiserController.getMyOrganisers);
 router.get('/getUserName', authenticateUser, playerController.getUsername);
 router.get('/homepage', authenticateUser, playerController.getHomePage);
 router.post('/joinTeam', authenticateUser, teamController.joinTeam);
-
+router.get('/winPercentage',authenticateUser,playerController.getWinPercentage);
 module.exports = router;

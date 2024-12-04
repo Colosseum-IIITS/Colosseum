@@ -197,7 +197,7 @@ exports.joinTournament = async (req, res) => {
       if (!player.team) {
         return res.status(400).json({ message: 'Player must be part of a team' });
       }
-  
+      
       const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
   
       if (!tournament) {
@@ -206,11 +206,15 @@ exports.joinTournament = async (req, res) => {
   
       if (tournament.teams.includes(player.team._id)) {
         return res.status(400).json({ message: 'Team is already registered for this tournament' });
-      }
-  
+      } 
+      
       tournament.teams.push(player.team._id);
       await tournament.save();
-  
+      
+      const team = await Team.findById(player.team._id);
+      team.tournaments.push(tournament._id);
+      await team.save();
+      
       player.tournaments.push({ tournament: tournament._id, won: false });
       await player.save();
   
@@ -654,4 +658,32 @@ exports.getPlayerProfile = async (req, res) => {
       });
     }
   };
+  exports.getWinPercentage = async (req, res) => {
+    try {
+      const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user
   
+      // Find player by their ID (you may want to adjust this based on your model schema)
+      const player = await Player.findById(playerId);
+  
+      if (!player) {
+        return res.status(404).json({ message: 'Player not found' });
+      }
+  
+      // Calculate win percentage
+      const totalTournaments = player.tournamentsPlayed; // Assuming the model has this field
+      const tournamentsWon = player.tournamentsWon; // Assuming the model has this field
+  
+      // If no tournaments were played, return winPercentage as 0
+      if (totalTournaments === 0 || tournamentsWon === 0) {
+        return res.status(200).json({ winPercentage: 0 });
+      }
+  
+      // Calculate win percentage (ensure it's not null)
+      const winPercentage = (tournamentsWon / totalTournaments) * 100 || 0;
+  
+      return res.status(200).json({ winPercentage });
+    } catch (error) {
+      console.error('Error fetching win percentage:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };

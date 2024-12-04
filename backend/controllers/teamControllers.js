@@ -217,7 +217,6 @@ exports.getJoinRequests = async (req, res) => {
 };
 
 
-
 // Accept a join request (only captains can accept)
 exports.acceptJoinRequest = async (req, res) => {
   const { playerId } = req.body;

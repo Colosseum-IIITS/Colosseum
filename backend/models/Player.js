@@ -4,7 +4,10 @@ const playerSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  profilePhoto: { type: String },
+  profilePhoto: {
+    data: String, // Base64 string
+    contentType: String, // MIME type
+  },
   team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organiser'}],
   tournaments: [{

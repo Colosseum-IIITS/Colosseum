@@ -8,33 +8,37 @@ const bcrypt = require("bcrypt");
 
 
 // Delete a tournament by tid
+// controllers/tournamentController.js
+
 exports.deleteTournament = async (req, res) => {
-    const { tournamentId } = req.params; // `tournamentId` refers to `tid` here
+  const { tournamentId } = req.params; // tournamentId refers to _id
 
-    try {
-        // Find the tournament by `tid` (not by `_id`)
-        const tournament = await Tournament.findOne({ tid: tournamentId });
+  try {
+      // Find the tournament by _id
+      const tournament = await Tournament.findById(tournamentId);
 
-        if (!tournament) {
-            return res.status(404).json({ message: "Tournament not found" });
-        }
+      if (!tournament) {
+          return res.status(404).json({ message: "Tournament not found" });
+      }
 
-        if (!tournament.organiser.equals(req.user._id)) {
-            return res.status(403).json({ message: "You are not authorized to delete this tournament" });
-        }
+      if (!tournament.organiser.equals(req.user._id)) {
+          return res.status(403).json({ message: "You are not authorized to delete this tournament" });
+      }
 
-        await Organiser.findByIdAndUpdate(tournament.organiser, {
-            $pull: { tournaments: tournament._id }
-        });
+      // Remove the tournament from the organiser's list
+      await Organiser.findByIdAndUpdate(tournament.organiser, {
+          $pull: { tournaments: tournament._id }
+      });
 
-        await Tournament.findOneAndDelete({ tid: tournamentId });
+      // Delete the tournament
+      await Tournament.findByIdAndDelete(tournamentId);
 
-        res.status(200).json({ message: "Tournament deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting tournament:", error);
-        res.status(500).json({ message: "Error deleting tournament", error });
-    }
-};
+      res.status(200).json({ message: "Tournament deleted successfully" });
+  } catch (error) {
+      console.error("Error deleting tournament:", error);
+      res.status(500).json({ message: "Error deleting tournament", error });
+  }
+};  
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
@@ -417,10 +421,11 @@ exports.banTeam = async (req, res) => {
   const { teamId } = req.body;
   const { _id } = req.user;
 
+
   try {
     const organiser = await Organiser.findById(_id);
     if (!organiser) {
-      return res.status(404).json({ message: "Organiser not found" });
+      return res.status(404).json({ message: "Organiser def not found" });
     }
 
     const team = await Team.findById(teamId);
@@ -489,3 +494,31 @@ exports.getOrganiserName = async (req, res) => {
 //      }
 // Ban Teams from organiser<DONE>
 // Ban Players from organiser
+
+
+exports.getOrganiserName = async (req, res) => {
+  try {
+    const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
+    
+    const organiser = await Organiser.findById(organiserId);
+    if (!organiser) {
+      return res.status(404).json({ message: 'Organiser not found' });
+    }
+
+    // Fetch tournaments based on the ObjectIds stored in organiser.tournaments
+    const tournaments = await Tournament.find({
+      '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
+    });
+
+    // Include username in the response
+    return res.json({
+      username: organiser.username,  // Add the username field to the response
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments: tournaments, // Send full tournament documents
+    });
+  } catch (error) {
+    console.error('Error fetching organiser:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+

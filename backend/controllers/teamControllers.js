@@ -24,8 +24,8 @@ exports.createTeam = async (req, res) => {
 
     const team = new Team({
       name,
-      captain: playerId,
-      players: [playerId]
+      captain: player._id,
+      players: [player._id]
     });
 
     await team.save();
@@ -292,6 +292,72 @@ exports.rejectJoinRequest = async (req, res) => {
   }
 };
 
+
+exports.getTeamDashboard = async (req, res) => {
+  const playerId= req.user._id;  // Get the playerId from the authenticated user
+
+  try {
+    console.log("Received API call from", playerId);
+
+    const player = await Player.findById(playerId);
+    if (!player || !player.team) {
+      return res.status(404).json({ message: 'Player or team not found' });
+    }
+
+    const teamId = player.team;
+    const team = await Team.findById(teamId);
+    const role = team.captain.toString() === playerId.toString() ? 'captain' : 'player'; // Check if the player is captain
+
+    await team.populate('players');
+    await team.populate('tournaments');
+
+    const captain = await Player.findById(team.captain._id);
+    const captainName = captain.username; 
+
+    res.status(200).json({ team, role, captainName });
+  } catch (error) {
+    console.error('Error fetching team dashboard data:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+exports.removePlayerFromTeam = async (req, res) => {
+  console.log("Handling request to remove player with ID:", req.params.playerId);
+
+  const { playerId } = req.params;
+  const captainId = req.user._id; 
+
+  try {
+    const captain = await Player.findById(captainId).populate('team');
+    if (!captain || !captain.team) {
+      return res.status(404).json({ message: 'Captain or team not found' });
+    }
+
+    const team = captain.team;
+    if (team.captain.toString() !== captainId.toString()) {
+      return res.status(403).json({ message: 'Only the captain can remove players' });
+    }
+
+    team.players = team.players.filter((id) => id.toString() !== playerId.toString());
+
+    await team.save();
+
+    const player = await Player.findById(playerId);
+    if (player) {
+      player.team = null;
+      await player.save();
+    }
+
+    res.status(200).json({ message: 'Player removed from team successfully', team });
+  } catch (error) {
+    console.error('Error removing player:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 exports.getTournamentsWon = async (req, res) => {
   const { teamId } = req.params;
 
@@ -344,3 +410,5 @@ exports.getTournamentsPlayed = async (req, res) => {
     });
   }
 };
+
+

@@ -197,7 +197,7 @@ exports.joinTournament = async (req, res) => {
       if (!player.team) {
         return res.status(400).json({ message: 'Player must be part of a team' });
       }
-  
+      
       const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
   
       if (!tournament) {
@@ -206,11 +206,15 @@ exports.joinTournament = async (req, res) => {
   
       if (tournament.teams.includes(player.team._id)) {
         return res.status(400).json({ message: 'Team is already registered for this tournament' });
-      }
-  
+      } 
+      
       tournament.teams.push(player.team._id);
       await tournament.save();
-  
+      
+      const team = await Team.findById(player.team._id);
+      team.tournaments.push(tournament._id);
+      await team.save();
+      
       player.tournaments.push({ tournament: tournament._id, won: false });
       await player.save();
   

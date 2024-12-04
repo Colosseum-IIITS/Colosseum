@@ -3,11 +3,25 @@ const Player = require('../models/Player');
 const Tournament = require('../models/Tournament');
 const Team = require('../models/Team');
 const Report = require('../models/Report');
+const BanHistory = require('../models/BanHistory');
 
-// Ban an organiser
+// Ban an organiser and create BanHistory entry
 exports.banOrganiser = async (req, res) => {
     try {
+        const organiser = await Organiser.findById(req.params.id);
+        if (!organiser) {
+            return res.status(404).json({ error: 'Organiser not found' });
+        }
         await Organiser.findByIdAndUpdate(req.params.id, { banned: true });
+
+        // Create BanHistory entry
+        const banHistory = new BanHistory({
+            bannedEntity: organiser._id,
+            entityType: 'Organiser',
+            reason: req.body.reason,  // Assume reason is passed in the body
+        });
+        await banHistory.save();
+
         res.status(200).json({ message: 'Organiser banned successfully.' });
     } catch (error) {
         res.status(400).json({ error: 'Error banning organiser', details: error.message });
@@ -17,13 +31,67 @@ exports.banOrganiser = async (req, res) => {
 // Unban an organiser
 exports.unBanOrganiser = async (req, res) => {
     try {
+        const organiser = await Organiser.findById(req.params.id);
+        if (!organiser) {
+            return res.status(404).json({ error: 'Organiser not found' });
+        }
         await Organiser.findByIdAndUpdate(req.params.id, { banned: false });
+
+        // Update BanHistory entry for unban
+        await BanHistory.findOneAndUpdate(
+            { bannedEntity: organiser._id, entityType: 'Organiser', active: true },
+            { active: false }  // Mark as reverted
+        );
+
         res.status(200).json({ message: 'Organiser unbanned successfully.' });
     } catch (error) {
         res.status(400).json({ error: 'Error unbanning organiser', details: error.message });
     }
 };
 
+// Ban a player and create BanHistory entry
+exports.banPlayer = async (req, res) => {
+    try {
+        const player = await Player.findById(req.params.id);
+        if (!player) {
+            return res.status(404).json({ error: 'Player not found' });
+        }
+        await Player.findByIdAndUpdate(req.params.id, { banned: true });
+
+        // Create BanHistory entry
+        const banHistory = new BanHistory({
+            bannedEntity: player._id,
+            entityType: 'Player',
+            reason: req.body.reason,  // Assume reason is passed in the body
+        });
+        await banHistory.save();
+
+        res.status(200).json({ message: 'Player banned successfully.' });
+    } catch (error) {
+        res.status(400).json({ error: 'Error banning player', details: error.message });
+    }
+};
+
+// Unban a player
+exports.unBanPlayer = async (req, res) => {
+    try {
+        const player = await Player.findById(req.params.id);
+        if (!player) {
+            return res.status(404).json({ error: 'Player not found' });
+        }
+        await Player.findByIdAndUpdate(req.params.id, { banned: false });
+
+        // Update BanHistory entry for unban
+        await BanHistory.findOneAndUpdate(
+            { bannedEntity: player._id, entityType: 'Player', active: true },
+            { active: false }  // Mark as reverted
+        );
+
+        res.status(200).json({ message: 'Player unbanned successfully.' });
+    } catch (error) {
+        res.status(400).json({ error: 'Error unbanning player', details: error.message });
+    }
+};
 // Delete an organiser
 exports.deleteOrganiser = async (req, res) => {
     try {
@@ -34,25 +102,6 @@ exports.deleteOrganiser = async (req, res) => {
     }
 };
 
-// Ban a player
-exports.banPlayer = async (req, res) => {
-    try {
-        await Player.findByIdAndUpdate(req.params.id, { banned: true });
-        res.status(200).json({ message: 'Player banned successfully.' });
-    } catch (error) {
-        res.status(400).json({ error: 'Error banning player', details: error.message });
-    }
-};
-
-// Unban a player
-exports.unBanPlayer = async (req, res) => {
-    try {
-        await Player.findByIdAndUpdate(req.params.id, { banned: false });
-        res.status(200).json({ message: 'Player unbanned successfully.' });
-    } catch (error) {
-        res.status(400).json({ error: 'Error unbanning player', details: error.message });
-    }
-};
 
 // Delete a player
 exports.deletePlayer = async (req, res) => {
@@ -149,5 +198,28 @@ exports.getDashboard = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching dashboard data', details: error.message });
+    }
+};
+
+
+// controllers/adminController.js
+
+exports.getBanHistory = async (req, res) => {
+    try {
+        // Get the current date
+        const currentDate = new Date();
+        
+        // Calculate the date 1 month ago
+        const lastMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+        
+        // Fetch BanHistory records created in the last month
+        const banHistory = await BanHistory.find({
+            createdAt: { $gte: lastMonthDate } // Filter to only get reports from the last month
+        }).populate('bannedEntity').exec();
+
+        // Return the populated ban history
+        res.status(200).json({ banHistory });
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching ban history', details: error.message });
     }
 };

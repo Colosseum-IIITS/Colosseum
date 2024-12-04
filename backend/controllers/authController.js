@@ -205,7 +205,7 @@ exports.loginAdmin = async (req, res) => {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: admin ._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
         res.cookie('user_jwt', token, {
             httpOnly: true,

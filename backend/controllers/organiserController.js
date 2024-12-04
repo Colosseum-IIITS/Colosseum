@@ -488,6 +488,9 @@ exports.getOrganiserName = async (req, res) => {
       username: organiser.username,  // Add the username field to the response
       visibilitySettings: organiser.visibilitySettings,
       tournaments: tournaments, // Send full tournament documents
+      email: organiser.email,
+      description: organiser.description,
+      followers: organiser.followers,
     });
   } catch (error) {
     console.error('Error fetching organiser:', error);

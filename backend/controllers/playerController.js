@@ -619,7 +619,7 @@ exports.getUsername = async (req, res) => {
 
 exports.getPlayerProfile = async (req, res) => {
     try {
-      // Ensure the user is authenticated and their ID is available
+      // Ensure the user is authenticated and their ID is availableF
       const playerId = req.user?.id;
   
       if (!playerId) {
@@ -666,6 +666,7 @@ exports.getPlayerProfile = async (req, res) => {
       });
     }
   };
+<<<<<<< Updated upstream
   exports.getWinPercentage = async (req, res) => {
     try {
       const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user
@@ -695,3 +696,74 @@ exports.getPlayerProfile = async (req, res) => {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
+=======
+  
+  exports.updateProfilePicture = async (req, res) => {
+    try {
+      console.log('Incoming request to update profile picture'); // Log the incoming request
+  
+      const playerId = req.user.id; // Extract the player ID from the authenticated user
+      console.log(`Player ID: ${playerId}`); // Log the player ID
+  
+      const file = req.file; // File is uploaded via multer middleware
+      console.log('File received:', file); // Log the received file
+  
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+  
+      // Convert file to Base64 string
+      const base64Image = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+      console.log('Base64 image generated'); // Log when the Base64 string is generated
+  
+      // Update the player's profile photo in the database
+      const updatedPlayer = await Player.findByIdAndUpdate(
+        playerId,
+        { profilePhoto: { data: base64Image, contentType: file.mimetype } },
+        { new: true }
+      );
+      console.log('Updated player:', updatedPlayer); // Log the updated player object
+  
+      if (!updatedPlayer) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+  
+      res.status(200).json({
+        message: "Profile photo updated successfully",
+        profilePhoto: updatedPlayer.profilePhoto,
+      });
+    } catch (error) {
+      console.error("Error updating profile picture:", error); // Log the error
+      res.status(500).json({ message: "An error occurred", error: error.message });
+    }
+  };
+  
+  
+  // Get Player's Profile Picture (GET)
+  exports.getProfilePicture = async (req, res) => {
+    try {
+      console.log('Incoming request to get profile picture'); // Log the incoming request
+  
+      const playerId = req.user.id; // Extract the player ID from the authenticated user
+      console.log(`Player ID: ${playerId}`); // Log the player ID
+  
+      // Find the player in the database
+      const player = await Player.findById(playerId);
+      console.log('Player found:', player.profilePhoto); // Log the retrieved player data
+  
+      if (!player || !player.profilePhoto) {
+        return res.status(404).json({ message: "Player or profile photo not found" });
+      }
+  
+      // Send the profile photo as a response (Base64)
+      res.status(200).json({
+        profilePhoto: player.profilePhoto,
+      });
+    } catch (error) {
+      console.error("Error fetching profile picture:", error); // Log the error
+      res.status(500).json({ message: "An error occurred", error: error.message });
+    }
+  };
+  
+  
+>>>>>>> Stashed changes

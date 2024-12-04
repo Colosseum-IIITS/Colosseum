@@ -8,6 +8,7 @@ const Player = require('../models/Player');
 const teamController = require('../controllers/teamControllers');
 const tournmentController = require('../controllers/tournmentController');
 const organiser = require('../models/Organiser');
+const upload = require("../middleware/multerConfig");
 
 router.get('/profile',authenticateUser,playerController.getPlayerProfile);
 router.get('/searchTournaments', authenticateUser, playerController.searchTournaments);
@@ -31,5 +32,23 @@ router.get('/followedOrg',authenticateUser,organiserController.getMyOrganisers);
 router.get('/getUserName', authenticateUser, playerController.getUsername);
 router.get('/homepage', authenticateUser, playerController.getHomePage);
 router.post('/joinTeam', authenticateUser, teamController.joinTeam);
+<<<<<<< Updated upstream
 router.get('/winPercentage',authenticateUser,playerController.getWinPercentage);
 module.exports = router;
+=======
+// Routes
+router.post(
+    "/updateprofilepicture",
+    authenticateUser, // Ensure user is authenticated
+    upload.single("profilePhoto"), // Handle file upload via multer
+    playerController.updateProfilePicture // Call controller to update the profile picture
+  );
+  
+  router.get(
+    "/profilepicture",
+    authenticateUser, // Ensure user is authenticated
+    playerController.getProfilePicture // Call controller to fetch the profile picture
+  );
+
+  module.exports = router;
+>>>>>>> Stashed changes

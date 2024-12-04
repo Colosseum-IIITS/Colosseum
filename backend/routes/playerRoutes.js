@@ -11,7 +11,7 @@ const organiser = require('../models/Organiser');
 
 router.get('/profile',authenticateUser,playerController.getPlayerProfile);
 router.get('/searchTournaments', authenticateUser, playerController.searchTournaments);
-router.get('/searchPlayer', authenticateUser, playerController.searchPlayer);
+router.get('/searchPlayer', playerController.searchPlayer);
 router.post('/followOrganiser', authenticateUser, playerController.followOrganiser);
 router.post('/unFollowOrganiser', authenticateUser, playerController.unfollowOrganiser);
 router.post('/joinTournament', authenticateUser, playerController.joinTournament);

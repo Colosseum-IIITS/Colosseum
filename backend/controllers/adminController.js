@@ -133,9 +133,81 @@ exports.fetchOrganiserReportsForAdmin = async (req, res) => {
     }
 };
 
-// Render the admin dashboard
+
+
 exports.getDashboard = async (req, res) => {
     try {
+        const currentDate = new Date();
+        const startDate4WeeksAgo = new Date();
+        startDate4WeeksAgo.setDate(currentDate.getDate() - 28); // 4 weeks ago
+        const startDate4MonthsAgo = new Date();
+        startDate4MonthsAgo.setMonth(currentDate.getMonth() - 4); // 4 months ago
+        const startDate4YearsAgo = new Date();
+        startDate4YearsAgo.setFullYear(currentDate.getFullYear() - 4); // 4 years ago
+
+        // Function to get the total prize pool grouped by week, month, and year
+        const getPrizePoolByPeriod = async (startDate, endDate, groupBy) => {
+            return await Tournament.aggregate([
+                { 
+                    $match: { 
+                        endDate: { $gte: startDate, $lte: endDate } 
+                    } 
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$endDate" },
+                            month: { $month: "$endDate" },
+                            week: { $week: "$endDate" },
+                        },
+                        totalPrizePool: { $sum: "$prizePool" },
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        period: {
+                            $cond: {
+                                if: { $eq: [groupBy, "week"] },
+                                then: "$_id.week",
+                                else: {
+                                    $cond: {
+                                        if: { $eq: [groupBy, "month"] },
+                                        then: "$_id.month",
+                                        else: "$_id.year"
+                                    }
+                                }
+                            }
+                        },
+                        totalPrizePool: 1
+                    }
+                },
+                { $sort: { period: -1 } },
+                { $limit: 4 }
+            ]);
+        };
+
+        // Function to calculate the average prize pool per week, month, or year
+        const calculateAveragePrizePool = async (startDate, groupBy) => {
+            const prizePoolData = await getPrizePoolByPeriod(startDate, currentDate, groupBy);
+            const totalPrizePool = prizePoolData.reduce((acc, data) => acc + data.totalPrizePool, 0);
+            const averagePrizePool = prizePoolData.length > 0 ? totalPrizePool / prizePoolData.length : 0;
+            return {
+                averagePrizePool,
+                prizePoolData,
+            };
+        };
+
+        // Calculate average prize pool per week (last 4 weeks)
+        const { averagePrizePool: avgWeeklyPrizePool, prizePoolData: weeklyPrizePoolData } = await calculateAveragePrizePool(startDate4WeeksAgo, "week");
+
+        // Calculate average prize pool per month (last 4 months)
+        const { averagePrizePool: avgMonthlyPrizePool, prizePoolData: monthlyPrizePoolData } = await calculateAveragePrizePool(startDate4MonthsAgo, "month");
+
+        // Calculate average prize pool per year (last 4 years)
+        const { averagePrizePool: avgYearlyPrizePool, prizePoolData: yearlyPrizePoolData } = await calculateAveragePrizePool(startDate4YearsAgo, "year");
+
+        // Your existing code for fetching other data
         const organisers = await Organiser.find();
         const players = await Player.find();
         const tournaments = await Tournament.find();
@@ -144,17 +216,17 @@ exports.getDashboard = async (req, res) => {
         const totalTournamentsConducted = organisers.reduce((acc, organiser) => acc + organiser.tournamentsConducted, 0);
         const totalBannedOrgs = await Organiser.countDocuments({ banned: true });
 
-        const currentDate = new Date();
         const ongoingTournamentsCount = await Tournament.countDocuments({
             startDate: { $lte: currentDate },
             endDate: { $gte: currentDate }
         });
+
         const pendingTournamentsCount = await Tournament.countDocuments({ status: 'Pending' });
         const tournamentToBeApproved = await Tournament.find({ status: 'Pending' }).populate('organiser');
         const activeTournamentsCount = await Tournament.countDocuments({
              startDate: { $lte: currentDate },
              endDate: { $gte: currentDate },
-             status: 'Approved' // Only count approved tournaments
+             status: 'Approved'
           });
 
         const completedTournamentsCount = await Tournament.countDocuments({
@@ -177,7 +249,7 @@ exports.getDashboard = async (req, res) => {
             };
         }));
 
-        const reports = await Report.find({ reportType: 'Organiser' })
+        const reports = await Report.find()
             .populate('reportedBy')
             .populate('reportedOrganiser');
 
@@ -194,14 +266,18 @@ exports.getDashboard = async (req, res) => {
             ongoingTournamentsCount,
             pendingTournamentsCount,
             tournamentToBeApproved,
-            reports
+            reports,
+            weeklyPrizePoolData,
+            avgWeeklyPrizePool,
+            monthlyPrizePoolData,
+            avgMonthlyPrizePool,
+            yearlyPrizePoolData,
+            avgYearlyPrizePool,
         });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching dashboard data', details: error.message });
     }
 };
-
-
 // controllers/adminController.js
 
 exports.getBanHistory = async (req, res) => {

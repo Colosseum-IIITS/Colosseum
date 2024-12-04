@@ -69,7 +69,6 @@ exports.createTournament = async (req, res) => {
 exports.getNotifications = async (req, res) => {
   const playerId = req.user._id;
   
-  console.log(`jjhdsdjsuhfsiufhdsuygdsinbgdgnbdsuhgdsindsugidnuhbg`, playerId);
   try {
     const player = await Player.findById(playerId);
     if (!player) {
@@ -370,6 +369,12 @@ exports.joinTournament = async (req, res) => {
     if (tournament.teams.includes(player.team._id)) {
       return res.status(400).json({ message: 'Team is already registered for this tournament' });
     } 
+
+    tournament.pointsTable.push({
+      ranking: tournament.pointsTable.length + 1,
+      teamName: player.team.name,
+      totalPoints: 0
+  });
     
     tournament.teams.push(player.team._id);
     await tournament.save();
@@ -415,7 +420,7 @@ exports.leaveTournament = async (req, res) => {
     const tournamentId = req.params.tournamentId;
     const playerId = req.user._id;
 
-    const tournament = await Tournament.findOne({ tid: tournamentId }).populate('teams');
+    const tournament = await Tournament.findOne({ _id: tournamentId }).populate('teams');
 
     if (!tournament) {
       return res.status(404).json({ message: 'Tournament not found' });

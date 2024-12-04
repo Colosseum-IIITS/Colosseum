@@ -189,41 +189,49 @@ exports.joinTournament = async (req, res) => {
     const { _id } = req.user;  // Player's ID from authenticated user
   
     try {
-      const player = await Player.findOne({ _id }).populate('team');
-      if (!player) {
-        return res.status(404).json({ message: 'Player not found' });
-      }
+        const player = await Player.findOne({ _id }).populate('team');
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
   
-      if (!player.team) {
-        return res.status(400).json({ message: 'Player must be part of a team' });
-      }
+        if (!player.team) {
+            return res.status(400).json({ message: 'Player must be part of a team' });
+        }
       
-      const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
+        const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
   
-      if (!tournament) {
-        return res.status(404).json({ message: 'Tournament not found' });
-      }
+        if (!tournament) {
+            return res.status(404).json({ message: 'Tournament not found' });
+        }
   
-      if (tournament.teams.includes(player.team._id)) {
-        return res.status(400).json({ message: 'Team is already registered for this tournament' });
-      } 
+        if (tournament.teams.includes(player.team._id)) {
+            return res.status(400).json({ message: 'Team is already registered for this tournament' });
+        }
+
+        // Add the team to the pointsTable with an initial score of 0
+        tournament.pointsTable.push({
+            ranking: tournament.pointsTable.length + 1,  // New ranking based on existing table size
+            teamName: player.team.name,  // Assuming `name` is the team's name field
+            totalPoints: 0  // Default points for new team
+        });
+
+        tournament.teams.push(player.team._id);
+        await tournament.save();
       
-      tournament.teams.push(player.team._id);
-      await tournament.save();
+        const team = await Team.findById(player.team._id);
+        team.tournaments.push(tournament._id);
+        await team.save();
       
-      const team = await Team.findById(player.team._id);
-      team.tournaments.push(tournament._id);
-      await team.save();
-      
-      player.tournaments.push({ tournament: tournament._id, won: false });
-      await player.save();
+        player.tournaments.push({ tournament: tournament._id, won: false });
+        await player.save();
   
-      return res.status(200).json({ message: 'Successfully joined the tournament' });
+        return res.status(200).json({ message: 'Successfully joined the tournament' });
     } catch (error) {
-      console.error("Error joining tournament:", error);
-      return res.status(500).json({ message: 'Server error', error });
+        console.error("Error joining tournament:", error);
+        return res.status(500).json({ message: 'Server error', error });
     }
-  };
+};
+
 
 
 exports.updateUsername = async (req, res) => {
@@ -536,52 +544,52 @@ exports.getTournamentPointsTable = async (req, res) => {
     }
 };
 
-
-
 exports.getDashboard = async (req, res) => {
-    const _id = req.user._id;
+    const playerId = req.user._id;
     const currentDate = new Date();
+    
     try {
-        const player = await Player.findById(_id).populate('tournaments.tournament');
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
+      const player = await Player.findById(playerId).populate('tournaments.tournament');
+      if (!player) {
+        return res.status(404).json({ message: 'Player not found' });
+      }
+  
+      const tournamentsWon = player.tournaments.filter(t => t.won).length;
+      const tournamentsPlayed = player.tournaments.length;
+  
+      let winPercentage = 0;
+      if (tournamentsPlayed !== 0) {
+        winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
+      }
+  
+      const ongoingTournaments = player.tournaments.filter(t => {
+        const tournament = t.tournament;
+        return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
+      }).length;
+  
+      const teamId = player.team;
+      const team = await Team.findById(teamId);
+  
+      res.status(200).json({
+        player: {
+          username: player.username,
+          email: player.email,
+          globalRank: player.globalRank || 'Unranked',
+          tournamentsWon: tournamentsWon || 0,
+          tournamentsPlayed: tournamentsPlayed || 0,
+          noOfOrgsFollowing: player.following.length || 0,
+          team,
+          winPercentage: winPercentage.toFixed(2),
+          ongoingTournaments,
         }
-
-        const tournamentsWon = player.tournaments.filter(t => t.won).length;
-        const tournamentsPlayed = player.tournaments.length;
-
-        let winPercentage = 0;
-        if (tournamentsPlayed != 0) {
-            winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
-        }
-
-        const ongoingTournaments = player.tournaments.filter(t => {
-            const tournament = t.tournament;
-            return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
-        }).length;
-
-        const teamId = player.team; 
-        const team = await Team.findById(teamId); 
-
-        res.status(200).json({
-            player: {
-                username: player.username,
-                email: player.email,
-                globalRank: player.globalRank || 'Unranked',
-                tournamentsWon: tournamentsWon || 0,
-                tournamentsPlayed: tournamentsPlayed || 0,
-                noOfOrgsFollowing: player.following.length || 0,
-                team,
-                winPercentage: winPercentage.toFixed(2),
-                ongoingTournaments,
-            }
-        });
-
+      });
     } catch (error) {
-        console.error("Error fetching dashboard:", error.message);  
-        res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
+      console.error("Error fetching dashboard:", error.message);
+      res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
-};
+  };
+  
+
 exports.getUsername = async (req, res) => {
     try {
         const { _id } = req.user;  // Extract the _id from the authenticated user

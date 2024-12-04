@@ -51,24 +51,38 @@ exports.createPlayer = async (req, res) => {
 // Player login
 exports.loginPlayer = async (req, res) => {
     const { username, password } = req.body;
-    
+
     try {
+        // Find the player by username
         const player = await Player.findOne({ username });
         if (!player) {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Player not found' });
         }
 
+        // Compare the provided password with the hashed password in the database
         const isPasswordValid = await bcrypt.compare(password, player.password);
         if (!isPasswordValid) {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Invalid username or password' });
         }
 
+        // Check if the player is banned
         if (player.banned) {
             return res.status(403).json({ statusCode: 403, errorMessage: 'Player is banned' });
         }
 
-        const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-        res.cookie('user_jwt', token, { httpOnly: true, maxAge: 3600000, secure: process.env.NODE_ENV === 'production' });
+        // Create a JWT token with the player's ID and role as 'player'
+        const token = jwt.sign(
+            { id: player._id, role: 'player' }, // Add role as 'player' to the payload
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '1h' }
+        );
+
+        // Set the token as an HttpOnly cookie (for secure storage)
+        res.cookie('user_jwt', token, {
+            httpOnly: true,
+            maxAge: 3600000, // 1 hour
+            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
+        });
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
@@ -76,7 +90,6 @@ exports.loginPlayer = async (req, res) => {
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
     }
 };
-
 // Register a new organiser
 exports.createOrganiser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -121,30 +134,40 @@ exports.createOrganiser = async (req, res) => {
 };
 
 // Organiser login
+
 exports.loginOrganiser = async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        // Find organiser by username
         const organiser = await Organiser.findOne({ username });
         if (!organiser) {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Organiser not found' });
         }
 
+        // Compare the provided password with the hashed password in the database
         const isPasswordValid = await bcrypt.compare(password, organiser.password);
         if (!isPasswordValid) {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Invalid username or password' });
         }
 
+        // Check if the organiser is banned
         if (organiser.banned) {
             return res.status(403).json({ statusCode: 403, errorMessage: 'Organiser is banned' });
         }
 
-        const token = jwt.sign({ id: organiser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        // Create a JWT token with the organiser's ID and role
+        const token = jwt.sign(
+            { id: organiser._id, role: 'organiser' }, // Add role as 'organiser' to the payload
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '1h' }
+        );
 
+        // Set the token as an HttpOnly cookie (for secure storage)
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
+            maxAge: 3600000, // 1 hour
+            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
         });
 
         res.status(200).json({ message: 'Login successful', token });
@@ -153,6 +176,7 @@ exports.loginOrganiser = async (req, res) => {
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
     }
 };
+
 
 // Register a new admin
 exports.createAdmin = async (req, res) => {
@@ -203,12 +227,18 @@ exports.loginAdmin = async (req, res) => {
             return res.status(401).json({ statusCode: 401, errorMessage: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ id: admin ._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        // Create a JWT token with the user ID and role
+        const token = jwt.sign(
+            { id: admin._id, role: 'admin' }, // Add role as 'admin' to the payload
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '1h' }
+        );
 
+        // Set the token as an HttpOnly cookie (for secure storage)
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
+            maxAge: 3600000, // 1 hour
+            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
         });
 
         res.status(200).json({ message: 'Login successful', token });

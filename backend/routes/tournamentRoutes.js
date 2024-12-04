@@ -5,7 +5,7 @@ const { authenticateOrganiser, authenticateUser } = require('../middleware/authM
 
 // Route to create a new tournament
 router.post('/create', authenticateOrganiser,tournamentController.createTournament);
-router.get('/create',authenticateOrganiser,tournamentController.createTournamentForm);
+
 router.get('/tournamentsEnrolled',authenticateUser, tournamentController.getEnrolledTournaments);
 router.get('/notifications', authenticateUser, tournamentController.getNotifications);
 router.get('/:tournamentId', authenticateUser, tournamentController.getTournamentById);
@@ -18,11 +18,11 @@ router.post('/update/:tournamentId', tournamentController.updateTournament);
 router.post('/updatePointsTable',tournamentController.updateTournament);
 
 // Route to update the winner by the Organiser of the tournamne
-router.put('/updateWinner', tournamentController.updateWinner);
+router.put('/updateWinner',authenticateOrganiser, tournamentController.updateWinner);
 
 router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);
 router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
-router.post('/edit/:tournamentId', tournamentController.editTournament);
-
+router.post('/edit/:tournamentId',authenticateOrganiser, tournamentController.editTournament);
+router.get('/tournament/:tournamentId', authenticateUser, tournamentController.getTournamentById);
 module.exports = router;
     

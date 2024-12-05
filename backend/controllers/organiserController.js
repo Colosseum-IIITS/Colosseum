@@ -453,31 +453,31 @@ exports.banTeam = async (req, res) => {
 };
 
 
-exports.getOrganiserName = async (req, res) => {
-  try {
-    const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
+// exports.getOrganiserName = async (req, res) => {
+//   try {
+//     const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
     
-    const organiser = await Organiser.findById(organiserId);
-    if (!organiser) {
-      return res.status(404).json({ message: 'Organiser not found' });
-    }
+//     const organiser = await Organiser.findById(organiserId);
+//     if (!organiser) {
+//       return res.status(404).json({ message: 'Organiser not found' });
+//     }
 
-    // Fetch tournaments based on the ObjectIds stored in organiser.tournaments
-    const tournaments = await Tournament.find({
-      '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
-    });
+//     // Fetch tournaments based on the ObjectIds stored in organiser.tournaments
+//     const tournaments = await Tournament.find({
+//       '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
+//     });
 
-    // Include username in the response
-    return res.json({
-      username: organiser.username,  // Add the username field to the response
-      visibilitySettings: organiser.visibilitySettings,
-      tournaments: tournaments, // Send full tournament documents
-    });
-  } catch (error) {
-    console.error('Error fetching organiser:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
+//     // Include username in the response
+//     return res.json({
+//       username: organiser.username,  // Add the username field to the response
+//       visibilitySettings: organiser.visibilitySettings,
+//       tournaments: tournaments, // Send full tournament documents
+//     });
+//   } catch (error) {
+//     console.error('Error fetching organiser:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// };
 
 
 // Route Has Been Tested and Is working successfully
@@ -496,10 +496,12 @@ exports.getOrganiserName = async (req, res) => {
 // Ban Players from organiser
 
 
+
 exports.getOrganiserName = async (req, res) => {
   try {
     const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
-    
+
+    // Fetch organiser from the database
     const organiser = await Organiser.findById(organiserId);
     if (!organiser) {
       return res.status(404).json({ message: 'Organiser not found' });
@@ -510,15 +512,19 @@ exports.getOrganiserName = async (req, res) => {
       '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
     });
 
-    // Include username in the response
+    // Send only the necessary fields in the response
     return res.json({
-      username: organiser.username,  // Add the username field to the response
+      username: organiser.username,  // Include username in the response
       visibilitySettings: organiser.visibilitySettings,
-      tournaments: tournaments, // Send full tournament documents
+      tournaments: tournaments, // Full tournament documents (if needed)
+      email: organiser.email,
+      description: organiser.description,
+      followers: organiser.followers.length,  // Send the count of followers
+      rating: organiser.rating,
+      banned: organiser.banned  // Include banned status
     });
   } catch (error) {
     console.error('Error fetching organiser:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-

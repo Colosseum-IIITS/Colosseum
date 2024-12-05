@@ -666,7 +666,6 @@ exports.getPlayerProfile = async (req, res) => {
       });
     }
   };
-<<<<<<< Updated upstream
   exports.getWinPercentage = async (req, res) => {
     try {
       const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user
@@ -696,7 +695,6 @@ exports.getPlayerProfile = async (req, res) => {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
-=======
   
   exports.updateProfilePicture = async (req, res) => {
     try {
@@ -766,4 +764,3 @@ exports.getPlayerProfile = async (req, res) => {
   };
   
   
->>>>>>> Stashed changes

@@ -174,39 +174,54 @@ exports.updateWinner = async (req, res) => {
 // Update points table
 // controllers/tournamentController.js
 
-
 exports.updatePointsTable = async (req, res) => {
   const organiserId = req.user._id;
-  const { tournamentId, teamId, additionalPoints } = req.body;
+  const { tournamentId, teamName, additionalPoints } = req.body;
 
   try {
+    console.log(teamName);
+
       const tournament = await Tournament.findById(tournamentId).populate('teams');
       if (!tournament) {
           return res.status(404).json({ message: 'Tournament not found' });
       }
 
-      if (tournament.organiser.toString() !== organiserId.toString()) {
+      const tname = await Team.findById(teamName);
+      if (!tname) {
+        return res.status(404).json({ message: 'Team not found' });
+      }
+
+      // Check if organiserId is valid
+      if (!tournament.organiser || tournament.organiser.toString() !== organiserId.toString()) {
           return res.status(403).json({ message: 'Unauthorized: You are not the organiser of this tournament' });
       }
 
-      const team = tournament.teams.find(t => t._id.toString() === teamId);
+      // Find the team by teamName instead of teamId
+      const team = tournament.teams.find(t => t.name === tname.name);
       if (!team) {
           return res.status(404).json({ message: 'Team not found in tournament' });
       }
 
-      // Update pointsTable to include teamId
-      const teamEntry = tournament.pointsTable.find(entry => entry.teamId.toString() === teamId);
+      console.log('Team found:', team);  // Debug: log team found
+
+      // Update pointsTable to include teamName
+      const teamEntry = tournament.pointsTable.find(entry => entry.teamName === tname.name);
       if (!teamEntry) {
           return res.status(404).json({ message: 'Team not found in points table' });
       }
 
+      // Update the team's points
       teamEntry.totalPoints = Number(teamEntry.totalPoints) + Number(additionalPoints);
+
+      // Sort pointsTable by totalPoints
       tournament.pointsTable.sort((a, b) => b.totalPoints - a.totalPoints);
 
+      // Update rankings
       tournament.pointsTable.forEach((entry, index) => {
           entry.ranking = index + 1;
       });
 
+      // Save updated tournament
       await tournament.save();
 
       // Return the updated tournament
@@ -216,6 +231,8 @@ exports.updatePointsTable = async (req, res) => {
       res.status(500).json({ message: 'Internal server error', error });
   }
 };
+
+
 
 // Fetch enrolled tournaments
 exports.getEnrolledTournaments = async (req, res) => {

@@ -149,7 +149,7 @@ exports.joinTeam = async (req, res) => {
     }
 
     // Check if the player is already in the team (optional)
-    if (team.players.includes(playerId)) {
+    if (team.players.includes(playerId)) {  
       return res.status(400).json({ message: 'You are already a member of this team.' });
     }
 

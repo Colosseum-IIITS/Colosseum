@@ -11,8 +11,8 @@
     router.post('/org/signup', authController.createOrganiser);
 
     // Admin routes
-    router.post('/admin/create', authController.createAdmin);
-    router.post('/admin/login', authController.loginAdmin);
+    router.post('/admin/signup', authController.createAdmin);
+    router.post('/admin/signin', authController.loginAdmin);
 
 
 

@@ -15,14 +15,14 @@ router.post("/updatePassword",authenticateOrganiser,organiserController.updatePa
 router.post("/updateDescription",authenticateOrganiser,organiserController.updateDescription);
 router.post("/updateProfilePhoto",authenticateOrganiser,organiserController.updateProfilePhoto);
 router.get('/UpdateProfile', authenticateOrganiser, (req, res) => {
-    res.render('updateOrganiserProfile', { organiser: req.user });  // Assuming req.user contains organiser data
+    res.render('updateOrganiserProfile', { organiser: req.user }); 
 });
 router.get("/update-visibility", authenticateOrganiser, organiserController.renderUpdateVisibilitySettings);
 router.post('/delete/:tournamentId', authenticateOrganiser,organiserController.deleteTournament);
 router.get('/:username/dashboard', authenticateUser,organiserController.getOrganiserDashboard);
 router.post("/dashboardVisibility",authenticateOrganiser,organiserController.updateVisibilitySettings);
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
-
+router.get('/getOrganiserName', authenticateOrganiser, organiserController.getOrganiserName);
 
 router.post('/create', authenticateOrganiser, tournamentController.createTournament);
 

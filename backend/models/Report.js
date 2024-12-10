@@ -14,12 +14,12 @@ const reportSchema = new mongoose.Schema(
     },
     reportedTeam: { 
       type: String, 
-      required: function() { return this.reportType === 'Team'; } // Only required for team reports
+      required: function() { return this.reportType === 'Team'; }
     },
     reportedOrganiser: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "Organiser",
-      required: function() { return this.reportType === 'Organiser'; } // Only required for organiser reports
+      required: function() { return this.reportType === 'Organiser'; }
     },
     reason: { 
       type: String, 

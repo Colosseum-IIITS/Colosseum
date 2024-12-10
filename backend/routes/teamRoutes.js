@@ -3,22 +3,21 @@ const router = express.Router();
 const teamController = require('../controllers/teamControllers');
 const { authenticateUser }= require('../middleware/authMiddleware');
 
-// Route to create a new team   
 router.post('/create', authenticateUser, teamController.createTeam);
-
-// Route to join an existing team
 router.post('/join', authenticateUser, teamController.joinTeam);
-
-// Route to leave a team
+router.post('/request', authenticateUser, teamController.requestToJoinTeam);
 router.post('/leave', authenticateUser, teamController.leaveTeam);
-
-// Route to search a team
 router.get('/search', teamController.getTeamsByName);
-
-
-// Route to update team name (only by captain)
-// working
 router.post('/updateTeamName', authenticateUser, teamController.updateTeamName);
+router.get('/:teamId/requests', authenticateUser, teamController.getJoinRequests);
+router.post('/accept', authenticateUser, teamController.acceptJoinRequest);
+router.post('/reject', authenticateUser, teamController.rejectJoinRequest);
+router.get('/getTournamentsWon',authenticateUser,teamController.getTournamentsWon );
+router.get('/getTournamentsPlayed',authenticateUser,teamController.getTournamentsPlayed);
+router.get('/dashboard', authenticateUser, teamController.getTeamDashboard);
+router.post('/remove/:playerId', authenticateUser, teamController.removePlayerFromTeam);
+
+
 
 
 module.exports = router;

@@ -11,7 +11,7 @@ const toSchema = new mongoose.Schema(
     tournamentsConducted: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },
     tournaments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
-    bannedTeams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
+    bannedTeams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], 
     banned: { type: Boolean, default: false },
     visibilitySettings: {
       descriptionVisible: { type: Boolean, default: true },
@@ -20,7 +20,7 @@ const toSchema = new mongoose.Schema(
       tournamentsVisible: { type: Boolean, default: true },
       followersVisible: { type: Boolean, default: true },
     },
-  },
+  }, 
   { timestamps: true }
 );
 

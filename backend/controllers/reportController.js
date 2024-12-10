@@ -2,64 +2,79 @@
 const Report = require('../models/Report');
 const Player = require('../models/Player');
 const Organiser = require('../models/Organiser');
+const Team = require('../models/Team');
 
 // Player reports a team
 exports.reportTeam = async (req, res) => {
     const { teamName, reason } = req.body;
-    const playerId = req.user._id; // Extracting user ID from token
-
+    const playerId = req.user._id;
+  
     try {
-        const report = new Report({
-            reportedBy: playerId,
-            reportType: 'Team',
-            reportedTeam: teamName, // Store teamName as a string
-            reason
-        });
-        await report.save();
-        res.redirect('/api/player/homepage'); // Redirect after successful report
+      // Validate if the team exists
+      const team = await Team.findOne({ name: teamName });
+  
+      if (!team) {
+        return res.status(404).json({ error: "Team not found" });
+      }
+  
+      // Create a new report entry
+      const report = new Report({
+        reportedBy: playerId,
+        reportType: "Team",
+        reportedTeam: teamName,
+        reason,
+      });
+  
+      // Save report to the database
+      await report.save();
+  
+      // Send response if everything is okay
+      res.status(200).json({ message: "Team reported successfully" });
     } catch (error) {
-        res.status(500).json({ error: "Error reporting team", details: error.message });
+      console.error("Error reporting team:", error);
+      res.status(500).json({
+        error: "Error reporting team",
+        details: error.message,
+      });
     }
-};
+};  
 
 // Player reports an organiser
 exports.reportOrganiser = async (req, res) => {
     const { organiserName, reason } = req.body;
-    const userId = req.user._id; // Extracting user ID from token
+    const userId = req.user._id;
     const isOrganiser = req.path.includes('OreportO2A'); // Check if the request is from an Organiser
-
+  
     try {
-        const organiser = await Organiser.findOne({ username: organiserName }); // Adjust if 'username' is different
-        if (!organiser) {
-            return res.status(404).json({ error: "Organiser not found" });
-        }
-
-        const report = new Report({
-            reportedBy: userId,
-            reportType: 'Organiser',
-            reportedOrganiser: organiser._id, // Link by ObjectId
-            reason
-        });
-        await report.save();
-
-        if (isOrganiser) {
-            // If the report was made by an organiser, redirect to that organiser's dashboard
-            return res.redirect(`/api/organiser/${req.user.username}/dashboard`);
-        } else {
-            // If the report was made by a player, redirect to player's homepage
-            return res.redirect('/api/player/homepage');
-        }
+      const organiser = await Organiser.findOne({ username: organiserName });
+      if (!organiser) {
+        return res.status(404).json({ error: "Organiser not found" });
+      }
+  
+      const report = new Report({
+        reportedBy: userId,
+        reportType: 'Organiser', // Must match the enum
+        reportedOrganiser: organiser._id,
+        reason
+      });
+      await report.save();
+  
+      if (isOrganiser) {
+        return res.status(200).json({ message: 'Organiser report submitted successfully' });
+      } else {
+        return res.status(200).json({ message: 'Organiser reported successfully' });
+      }
     } catch (error) {
-        res.status(500).json({ error: "Error reporting organiser", details: error.message });
+      console.error('Error reporting organiser:', error);
+      res.status(500).json({ error: "Error reporting organiser", details: error.message });
     }
 };
-
 
 // Organiser sees reported teams
 exports.getReportedTeams = async (req, res) => {
     try {
         const reports = await Report.find({ reportType: 'Team' })
-            .populate('reportedBy', 'name') // Populate reporter's name
+            .populate('reportedBy', 'name')
             .exec();
 
         res.status(200).json(reports);
@@ -72,8 +87,8 @@ exports.getReportedTeams = async (req, res) => {
 exports.getReportedOrganisers = async (req, res) => {
     try {
         const reports = await Report.find({ reportType: 'Organiser' })
-            .populate('reportedBy', 'name') // Populate reporter's name
-            .populate('reportedOrganiser', 'name') // Populate organiser's name
+            .populate('reportedBy', 'name')
+            .populate('reportedOrganiser', 'name')
             .exec();
 
         res.status(200).json(reports);

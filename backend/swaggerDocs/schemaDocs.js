@@ -32,7 +32,7 @@ module.exports = {
                     profilePhotoVisible: { type: 'boolean', description: 'Visibility of the profile photo' },
                     prizePoolVisible: { type: 'boolean', description: 'Visibility of the prize pool' },
                     tournamentsVisible: { type: 'boolean', description: 'Visibility of the tournaments' },
-                    followersVisible: { type: 'boolean', description: 'Visibility of the followers' },
+                    followersVisible: { type: 'boolean', description: 'Visibility of the followers' }
                 }
             }
         }
@@ -44,7 +44,10 @@ module.exports = {
             username: { type: 'string', unique: true, description: 'The username of the player' },
             email: { type: 'string', unique: true, description: 'The email address of the player' },
             password: { type: 'string', description: 'The password for the player\'s account' },
-            profilePhoto: { type: 'string', description: 'URL of the player\'s profile photo' },
+            profilePhoto: { type: 'object', properties: {
+                data: { type: 'string', description: 'Base64-encoded image data' },
+                contentType: { type: 'string', description: 'MIME type of the image' }
+            }},
             team: { type: 'string', description: 'Team ID the player is part of' },
             following: { type: 'array', items: { type: 'string' }, description: 'Organisers the player is following' },
             tournaments: { 
@@ -58,7 +61,15 @@ module.exports = {
                 },
                 description: 'List of tournaments the player has participated in'
             },
-            banned: { type: 'boolean', description: 'Ban status of the player' }
+            banned: { type: 'boolean', description: 'Ban status of the player' },
+            notifications: { type: 'array', items: {
+                type: 'object',
+                properties: {
+                    message: { type: 'string', description: 'Notification message' },
+                    read: { type: 'boolean', description: 'Read status' },
+                    date: { type: 'string', format: 'date-time', description: 'Timestamp of the notification' }
+                }
+            }, description: 'List of notifications for the player' }
         }
     },
     Report: {
@@ -66,19 +77,22 @@ module.exports = {
         required: ['reportedBy', 'reportType', 'reason', 'status'],
         properties: {
             reportedBy: { type: 'string', description: 'ID of the player who reported' },
-            reportType: { 
-                type: 'string', 
-                enum: ['Team', 'Organiser'], 
-                description: 'Type of report' 
-            },
-            reportedTeam: { type: 'string', description: 'Reported team ID', required: true },
-            reportedOrganiser: { type: 'string', description: 'Reported organiser ID', required: true },
+            reportType: { type: 'string', enum: ['Team', 'Organiser'], description: 'Type of report' },
+            reportedTeam: { type: 'string', description: 'Reported team ID', required: false },
+            reportedOrganiser: { type: 'string', description: 'Reported organiser ID', required: false },
             reason: { type: 'string', description: 'Reason for the report' },
-            status: { 
-                type: 'string', 
-                enum: ['Pending', 'Reviewed'], 
-                description: 'Current status of the report' 
-            }
+            status: { type: 'string', enum: ['Pending', 'Reviewed'], description: 'Current status of the report' }
+        }
+    },
+    BanHistory: {
+        type: 'object',
+        required: ['bannedEntity', 'entityType', 'reason'],
+        properties: {
+            bannedEntity: { type: 'string', description: 'ID of the banned entity (Player, Team, or Organiser)' },
+            entityType: { type: 'string', enum: ['Player', 'Team', 'Organiser'], description: 'Type of banned entity' },
+            reason: { type: 'string', description: 'Reason for banning' },
+            date: { type: 'string', format: 'date-time', description: 'Ban date' },
+            active: { type: 'boolean', description: 'Whether the ban is currently active' }
         }
     },
     Team: {

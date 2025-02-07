@@ -95,7 +95,8 @@ To configure the environment variables, update the `.env` file as follows:
 - **routes**: Defines the API routes for different entities (players, organizers, tournaments, etc.).
 - **views**: Contains EJS templates for rendering the frontend.
 
-## API Endpoints
+## ERD(Entity Relationship Diagram):
+![alt text](image.png)
 
 ### Auth Routes
 

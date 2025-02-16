@@ -7,8 +7,8 @@
     router.post('/player/signup', authController.createPlayer);
 
     // Organiser routes
-    router.post('/org/signin', authController.loginOrganiser);
-    router.post('/org/signup', authController.createOrganiser);
+    router.post('/organiser/signin', authController.loginOrganiser);
+    router.post('/organiser/signup', authController.createOrganiser);
 
     // Admin routes
     router.post('/admin/signup', authController.createAdmin);

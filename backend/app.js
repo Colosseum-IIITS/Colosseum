@@ -37,9 +37,6 @@ app.use('/api/report', reportRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
-// Swagger routes
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {
     useNewUrlParser: true,
@@ -56,3 +53,7 @@ app.listen(PORT, () => {
 
 
 console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY);  // For debugging
+
+
+// Swagger routes
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

@@ -6,11 +6,18 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Register a new player
+const nodemailer = require('nodemailer');
+
 exports.createPlayer = async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ statusCode: 400, errorMessage: 'Invalid Details' });
+    }
+
+    // Ensure email ends with @gmail.com
+    if (!email.endsWith('@gmail.com')) {
+        return res.status(400).json({ statusCode: 400, errorMessage: 'Only Gmail addresses are allowed' });
     }
 
     try {
@@ -41,12 +48,36 @@ exports.createPlayer = async (req, res) => {
             secure: process.env.NODE_ENV === 'production'
         });
 
+        // Send confirmation email
+        await sendConfirmationEmail(email, username);
+
         res.status(201).json({ message: 'Player registered successfully', token });
     } catch (error) {
         console.error('Error during player creation:', error.message);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
     }
 };
+
+// Function to send confirmation email
+const sendConfirmationEmail = async (email, username) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user:process.env.EMAIL_USER, // Your Gmail
+            pass:  process.env.EMAIL_PASS   // App Password
+        }
+    });
+
+    const mailOptions = {
+        from:process.env.EMAIL_USER,
+        to: email,
+        subject: 'Welcome to Tournament Platform!',
+        text: `Hello ${username},\n\nWelcome! Your account has been successfully created.\n\nBest Regards,\nTournament Team`
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
 
 // Player login
 exports.loginPlayer = async (req, res) => {

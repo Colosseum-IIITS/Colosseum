@@ -4,12 +4,12 @@ const tournamentController = require('../controllers/tournmentController');
 const { authenticateOrganiser, authenticateUser } = require('../middleware/authMiddleware');
 const cookieParser = require('cookie-parser');
 const csrf = require('csurf');
-
 // Route to create a new tournament
 router.use(cookieParser());
 const csrfProtection = csrf({cookie:true});
 
-router.post('/create',authenticateOrganiser,csrfProtection,tournamentController.createTournament);
+
+router.post('/craete',authenticateOrganiser,csrfProtection,tournamentController.createTournament);
 
 router.get('/tournamentsEnrolled',authenticateUser, tournamentController.getEnrolledTournaments);
 router.get('/notifications', authenticateUser, tournamentController.getNotifications);
@@ -28,6 +28,7 @@ router.put('/updateWinner',authenticateOrganiser, tournamentController.updateWin
 router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);
 router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
 router.post('/edit/:tournamentId',authenticateOrganiser, tournamentController.editTournament);
+router.post('/create',authenticateOrganiser,tournamentController.createTournament);
 router.get('/tournament/:tournamentId', authenticateUser, tournamentController.getTournamentById);
 module.exports = router;
     

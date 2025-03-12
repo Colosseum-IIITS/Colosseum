@@ -36,7 +36,6 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
   // Handle form submission
   const handleCreateTournament = async (e) => {
     e.preventDefault();
-
     const token = localStorage.getItem('token');
     if (!token) {
       setMessage('No authentication token found.');

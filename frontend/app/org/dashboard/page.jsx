@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // UI Components
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -16,7 +16,29 @@ import OrganiserNavbar from '@/components/org/NavOrg';
 
 const Dashboard = () => {
   const [isReportDialogOpen, setReportDialogOpen] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
 
+  // Fetch CSRF token once when dashboard loads
+  // useEffect(() => {
+  //   console.log('Dashboard - Fetching CSRF token');
+  //   fetch('http://localhost:5000/auth/csrfToken', {
+  //     credentials: 'include',
+  //     cache: 'no-store'
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     if (data && data.csrfToken) {
+  //       console.log('Dashboard - CSRF token received:', data.csrfToken);
+  //       setCsrfToken(data.csrfToken);
+  //       // Share token with other components via localStorage
+  //       localStorage.setItem('csrfToken', data.csrfToken);
+  //     }
+  //   })
+  //   .catch(error => {
+  //     console.error('Dashboard - Failed to fetch CSRF token:', error);
+  //   });
+  // }, []);
+  
   const handleOpenReportDialog = () => setReportDialogOpen(true);
   const handleCloseReportDialog = () => setReportDialogOpen(false);
 

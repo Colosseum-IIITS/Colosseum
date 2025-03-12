@@ -2,8 +2,12 @@ const express = require('express');
 const router = express.Router();
 const teamController = require('../controllers/teamControllers');
 const { authenticateUser }= require('../middleware/authMiddleware');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
+router.use(cookieParser());
+const csrfProtection = csrf({ cookie: true });
 
-router.post('/create', authenticateUser, teamController.createTeam);
+router.post('/create', authenticateUser,teamController.createTeam);
 router.post('/join', authenticateUser, teamController.joinTeam);
 router.post('/request', authenticateUser, teamController.requestToJoinTeam);
 router.post('/leave', authenticateUser, teamController.leaveTeam);

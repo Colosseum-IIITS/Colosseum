@@ -23,11 +23,19 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Manage dialog open state
   const [loadingSubmit, setLoadingSubmit] = useState(false); // Loading state for submit button
   const [message, setMessage] = useState('');
+  const [csrfToken,setCsrfToken] = useState('');
+
+  useEffect(() => {
+        fetch('http://localhost:5000/auth/csrfToken', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => setCsrfToken(data.csrfToken))
+            .catch(error => console.error('Error fetching CSRF token:', error));
+    }, []);
+
 
   // Handle form submission
   const handleCreateTournament = async (e) => {
     e.preventDefault();
-
     const token = localStorage.getItem('token');
     if (!token) {
       setMessage('No authentication token found.');
@@ -62,6 +70,7 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
           endDate,
           entryFee: Number(entryFee),
           prizePool: Number(prizePool),
+          _csrf:csrfToken,
         }),
       });
 

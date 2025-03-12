@@ -194,6 +194,7 @@ const TeamDashboard = () => {
                 required 
                 className="max-w-xs"
               />
+              <input type="hidden" name="_csrf" value={csrfToken} />
               <Button type="submit" disabled={loading}>
                 {loading ? 'Creating...' : 'Create Team'}
               </Button>
@@ -218,6 +219,7 @@ const TeamDashboard = () => {
             </div>
             {/* Leave Team Form */}
             <form onSubmit={handleLeaveTeam}>
+              <input type="hidden" name="_csrf" value={csrfToken} />
               <Button type="submit" variant="destructive" disabled={loading}>
                 {loading ? 'Leaving...' : 'Leave Team'}
               </Button>
@@ -297,6 +299,7 @@ const TeamDashboard = () => {
                   className="max-w-xs"
                 />
               </div>
+              <input type="hidden" name="_csrf" value={csrfToken} />
               <Button type="submit" disabled={loading}>
                 {loading ? 'Updating...' : 'Update Team Name'}
               </Button>

@@ -126,13 +126,42 @@ exports.approveTournament = async (req, res) => {
 // Fetch reports (for admin)
 exports.fetchOrganiserReportsForAdmin = async (req, res) => {
     try {
-        const reports = await Report.find().populate('reportedBy organiser');
+        const reports = await Report.find()
+            .populate("reportedBy", "username")// Populate the Player who reported
+            .populate("reportedOrganiser", "username") // Correct field name
+            .lean() 
+            .exec();// Ensures proper async behavior
+
         res.status(200).json(reports);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching reports', details: error.message });
+        res.status(500).json({ 
+            error: "Error fetching reports", 
+            details: error.message 
+        });
     }
 };
 
+exports.reviewedOrNot= async (req, res) => {
+    try {
+      const { status } = req.body; // Get the new status from request body
+  
+      // Find the report by ID and update the status
+      const updatedReport = await Report.findByIdAndUpdate(
+        req.params.id,
+        { status }, // Update only the status field
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedReport) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+  
+      res.json(updatedReport); // Send back the updated report
+    } catch (error) {
+      console.error("Error updating report:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
 
 
 exports.getDashboard = async (req, res) => {

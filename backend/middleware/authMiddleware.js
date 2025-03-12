@@ -4,12 +4,14 @@ const jwt = require("jsonwebtoken");
 const Player = require("../models/Player"); // Ensure Player model is imported
 const Organiser = require("../models/Organiser");
 const Admin = require("../models/Admin");
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 
 const authenticateOrganiser = async (req, res, next) => {
   const token =

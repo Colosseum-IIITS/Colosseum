@@ -12,6 +12,14 @@ const TeamActions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [csrfToken,setCsrfToken]=useState('');
+
+  useEffect(() => {
+    fetch('http://localhost:5000/auth/csrfToken', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => setCsrfToken(data.csrfToken))
+        .catch(error => console.error('Error fetching CSRF token:', error));
+      }, []);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
@@ -50,6 +58,7 @@ const TeamActions = () => {
       const response = await fetch('http://localhost:5000/api/team/leave', {
         method: 'POST',
         credentials: 'include',
+        body: JSON.stringify({ _csrf: csrfToken }),
       });
       
 
@@ -87,7 +96,7 @@ const TeamActions = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ newName }),
+        body: JSON.stringify({ newName, _csrf: csrfToken }),
       });
 
       const data = await response.json();

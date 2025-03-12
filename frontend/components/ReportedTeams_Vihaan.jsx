@@ -45,14 +45,35 @@ export default function ReportedTeams() {
   }, [dashboardData]); // This effect will run every time dashboardData is updated
 
   // Handle review report
-  const handleReviewReport = (reportId, status) => {
-    setReportedTeams((prevReports) =>
-      prevReports.map((report) =>
-        report._id === reportId ? { ...report, status: status } : report
-      )
-    );
-    setSelectedReport(null);
+  const handleReviewReport = async (reportId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/report/update-status/${reportId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "Reviewed" }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update report status");
+      }
+  
+      const updatedReport = await response.json();
+  
+      setReportedTeams((prevReports) =>
+        prevReports.map((report) =>
+          report._id === reportId ? { ...report, status: updatedReport.status } : report
+        )
+      );
+  
+      setSelectedReport(null); // Close the dialog
+    } catch (error) {
+      console.error("Error updating report:", error);
+    }
   };
+  
+  
 
   if (!dashboardData || !reportedTeams) {
     return <div>Loading...</div>;
@@ -78,7 +99,10 @@ export default function ReportedTeams() {
             {reportedTeams.length > 0 ? (
               reportedTeams.map((report) => (
                 <TableRow key={report._id}>
-                  <TableCell>{report.reportedBy.username}</TableCell>
+                  <TableCell>
+  {report.reportedBy && report.reportedBy.username ? report.reportedBy.username : "Unknown"}
+</TableCell>
+
                   <TableCell>{report.reportedTeam}</TableCell>
                   <TableCell>{report.reason}</TableCell>
                   <TableCell>{report.status}</TableCell>
@@ -113,7 +137,10 @@ export default function ReportedTeams() {
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="font-medium">Reported By:</span>
-                  <span className="col-span-3">{selectedReport.reportedBy.username}</span>
+                  <span className="col-span-3">
+  {selectedReport?.reportedBy?.username || "Unknown"}
+</span>
+
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="font-medium">Team Name:</span>
@@ -129,12 +156,17 @@ export default function ReportedTeams() {
                 </div>
               </div>
               <DialogFooter>
-                <Button
-                  onClick={() => handleReviewReport(selectedReport._id, "Reviewed")}
-                  variant="default"
-                >
-                  Mark as Reviewed
-                </Button>
+              <DialogFooter>
+  {selectedReport.status === "Reviewed" ? (
+    <span className="text-gray-600">You already reviewed this report.</span>
+  ) : (
+    <Button onClick={() => handleReviewReport(selectedReport._id)} variant="default">
+      Mark as Reviewed
+    </Button>
+  )}
+</DialogFooter>
+
+
               </DialogFooter>
             </>
           )}

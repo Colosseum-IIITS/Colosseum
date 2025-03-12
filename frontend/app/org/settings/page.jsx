@@ -31,12 +31,12 @@ export default function OrganiserSettings() {
     setLoading(true);
     setError("");
 
-    const body = {
+    const body = type === "Password" ? { newPassword } :{
       newUsername,
       newEmail,
-      newPassword,
       newDescription,
     };
+    console.log("Sending request body:", body);
 
     try {
       const response = await fetch(`http://localhost:5000/api/organiser/update${type}`, {
@@ -52,7 +52,7 @@ export default function OrganiserSettings() {
 
       if (response.ok) {
         alert(`${type} updated successfully!`);
-        router.push("/dashboard"); // Redirect after successful update
+        router.push("/org/dashboard"); // Redirect after successful update
       } else {
         setError(data.message || "Failed to update");
       }
@@ -149,6 +149,7 @@ export default function OrganiserSettings() {
                         >
                           {loading ? "Updating..." : "Update Password"}
                         </Button>
+                        
                       </div>
                     </div>
                   </CardContent>

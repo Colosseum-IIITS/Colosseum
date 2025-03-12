@@ -1,5 +1,5 @@
 "use client"
-
+import { useEffect } from 'react'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,27 +28,47 @@ export default function OrganizerManagement() {
   const { dashboardData, setDashboardData } = useAdminDashboard()
   const { toast } = useToast()
 
+
+
   const handleSearch = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/organiser/search?username=${encodeURIComponent(searchQuery)}`)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/organiser/search?username=${encodeURIComponent(searchQuery)}`
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch organisers')
+        throw new Error("Failed to fetch organisers");
       }
-      const data = await response.json()
-      setOrganizers(data.organisationResults)
+      const data = await response.json();
+      
+      setOrganizers(data.organisationResults);
+  
+      // Store organizers in localStorage
+      localStorage.setItem("organizers", JSON.stringify(data.organisationResults));
     } catch (error) {
-      console.error('Error fetching organisers:', error)
+      console.error("Error fetching organisers:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to fetch organisers.",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
+  useEffect(() => {
+    const savedOrganizers= localStorage.getItem("organizers");
+    if (savedOrganizers) {
+      try {
+        setOrganizers(JSON.parse(savedOrganizers));
+      } catch (error) {
+        console.error("Error parsing players from localStorage:", error);
+        localStorage.removeItem("organizers"); // Clear corrupted data
+      }
+    }
+  }, []);
+  
  const { triggerBanHistoryRefetch } = useBanContext();
  const handleToggleBan = async () => {
   if (!selectedOrganizer) return;

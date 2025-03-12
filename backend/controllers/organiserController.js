@@ -171,15 +171,14 @@ exports.updateEmail = async (req, res) => {
 };
 
 exports.updatePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
+  const { newPassword } = req.body;  // Only take newPassword from the request
   const { _id } = req.user;
 
-  // Log the request body to check the input
   console.log("Request Body:", req.body);
 
-  // Validate if both current and new passwords are provided
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: "Both current and new passwords are required" });
+  // Validate if new password is provided
+  if (!newPassword) {
+    return res.status(400).json({ message: "New password is required" });
   }
 
   console.log("Updating password for:", _id);
@@ -189,13 +188,7 @@ exports.updatePassword = async (req, res) => {
       return res.status(404).json({ message: "Organiser not found" });
     }
 
-    const isMatch = await bcrypt.compare(currentPassword, organiser.password);
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ message: "Incorrect current password" });
-    }
-
+    // Hash and update the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     organiser.password = hashedPassword;
     await organiser.save();
@@ -208,6 +201,7 @@ exports.updatePassword = async (req, res) => {
       .json({ error: "Error updating password", details: error.message });
   }
 };
+
 
 exports.updateDescription = async (req, res) => {
   const { newDescription } = req.body;

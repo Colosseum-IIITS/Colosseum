@@ -627,54 +627,94 @@ exports.getUsername = async (req, res) => {
 };
 
 exports.getPlayerProfile = async (req, res) => {
-    try {
-      // Ensure the user is authenticated and their ID is availableF
-      const playerId = req.user?.id;
-  
-      if (!playerId) {
-        return res.status(400).json({ message: 'Authentication error: Player ID not found in request.' });
-      }
-  
-      // Search the database for the player based on the player ID
-      const player = await Player.findById(playerId)
-        .populate('team')               // Populate team details
-        .populate('following')          // Populate following details
-        .populate('tournaments.tournament') // Populate tournament details
-        .exec();
-  
-      // Check if the player exists
-      if (!player) {
-        return res.status(404).json({ message: 'Player not found' });
-      }
-  
-      // Ensure following and tournaments are arrays to avoid errors when mapping
-      const following = player.following ? player.following.map(org => org.username) : [];
-      const tournaments = player.tournaments ? player.tournaments.map(t => ({
-        tournament: t.tournament?.name || 'Unknown tournament',
-        won: t.won,
-      })) : [];
-  
-      // Respond with the player data
-      res.status(200).json({
-        username: player.username,
-        email: player.email,
-        profilePhoto: player.profilePhoto,
-        team: player.team ? player.team.name : 'No team', // Include team name if available
-        following,  // List of following organisers' usernames
-        tournaments,  // List of tournaments with results
-        banned: player.banned,
-      });
-    } catch (error) {
-      // Enhanced error logging for better debugging
-      console.error('Error fetching player profile:', error);
-  
-      // Respond with a detailed error message
-      res.status(500).json({
-        error: 'Server error',
-        details: error.message,
+  try {
+    const playerId = req.user?._id;
+
+    if (!playerId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required' 
       });
     }
-  };
+
+    const player = await Player.findById(playerId)
+      .populate('team')
+      .populate('teamPayment.payment')
+      .populate('following')
+      .populate('tournaments.tournament')
+      .populate('tournaments.payment')
+      .lean();
+
+    if (!player) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Player not found' 
+      });
+    }
+
+    // Format the response data
+    const profileData = {
+      username: player.username,
+      email: player.email,
+      profilePhoto: player.profilePhoto,
+      
+      // Team details
+      team: player.team ? {
+        id: player.team._id,
+        name: player.team.name
+      } : null,
+      
+      // Team payment status
+      teamPayment: {
+        paid: player.teamPayment?.paid || false,
+        paymentDetails: player.teamPayment?.payment ? {
+          id: player.teamPayment.payment._id,
+          amount: player.teamPayment.payment.amount,
+          status: player.teamPayment.payment.status,
+          date: player.teamPayment.payment.createdAt
+        } : null
+      },
+
+      // Tournaments with payment info
+      tournaments: player.tournaments?.map(t => ({
+        id: t.tournament?._id,
+        name: t.tournament?.name,
+        won: t.won,
+        payment: t.payment ? {
+          id: t.payment._id,
+          status: t.payment.status,
+          amount: t.payment.amount
+        } : null
+      })) || [],
+
+      // Following list
+      following: player.following?.map(org => ({
+        id: org._id,
+        username: org.username
+      })) || [],
+
+      banned: player.banned,
+      
+      // Additional user info
+      createdAt: player.createdAt,
+      updatedAt: player.updatedAt
+    };
+
+    res.status(200).json({
+      success: true,
+      data: profileData
+    });
+
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch profile',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+  
   exports.getWinPercentage = async (req, res) => {
     try {
       const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user
@@ -772,4 +812,4 @@ exports.getPlayerProfile = async (req, res) => {
     }
   };
   
-  
+

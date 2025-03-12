@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button'; // Assuming you're using ShadCN components
@@ -112,27 +111,58 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
       {/* Points Table Section */}
       <div>
         <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Points Table</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-700 border">
-            <thead className="bg-gray-200 dark:bg-gray-600">
-              <tr>
-                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Rank
+        <div className="overflow-x-auto rounded-lg border-2 border-orange-500 shadow-[0_0_15px_rgba(251,146,60,0.3)]">
+          <table className="min-w-full bg-black">
+            <thead>
+              <tr className="bg-gradient-to-r from-orange-950 to-black">
+                <th className="px-6 py-4 border-b-2 border-orange-500 text-left text-sm font-bold text-orange-400 uppercase tracking-wider">
+                  Position
                 </th>
-                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-700 dark:text-gray-200">
+                <th className="px-6 py-4 border-b-2 border-orange-500 text-left text-sm font-bold text-orange-400 uppercase tracking-wider">
                   Team Name
                 </th>
-                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-700 dark:text-gray-200">
+                <th className="px-6 py-4 border-b-2 border-orange-500 text-left text-sm font-bold text-orange-400 uppercase tracking-wider">
                   Points
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-black/95">
               {tournament.pointsTable.map((entry, index) => (
-                <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-600">
-                  <td className="px-4 py-2 border-b text-sm text-gray-700 dark:text-gray-300">{entry.ranking}</td>
-                  <td className="px-4 py-2 border-b text-sm text-gray-700 dark:text-gray-300">{entry.teamName}</td>
-                  <td className="px-4 py-2 border-b text-sm text-gray-700 dark:text-gray-300">{entry.totalPoints}</td>
+                <tr 
+                  key={index} 
+                  className={`
+                    hover:bg-orange-950/30 
+                    transition-all duration-300 ease-in-out
+                    ${index === 0 ? 'bg-orange-950/20' : ''}
+                    ${index === 1 ? 'bg-orange-900/10' : ''}
+                    ${index === 2 ? 'bg-orange-800/5' : ''}
+                  `}
+                >
+                  <td className="px-6 py-4 border-b border-orange-500/20">
+                    <div className="flex items-center space-x-2">
+                      <span className={`
+                        flex items-center justify-center w-8 h-8 rounded-full 
+                        ${index === 0 ? 'bg-orange-500 text-black' : ''}
+                        ${index === 1 ? 'bg-orange-400/80 text-black' : ''}
+                        ${index === 2 ? 'bg-orange-300/60 text-black' : ''}
+                        ${index > 2 ? 'bg-gray-800 text-orange-50' : ''}
+                        font-bold text-sm
+                      `}>
+                        {entry.ranking}
+                      </span>
+                      {index === 0 && <span className="text-orange-500">👑</span>}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 border-b border-orange-500/20">
+                    <span className="text-orange-50 font-medium hover:text-orange-400 transition-colors">
+                      {entry.teamName}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 border-b border-orange-500/20">
+                    <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-orange-950/50 text-orange-400 font-semibold">
+                      {entry.totalPoints}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const TeamDashboard = () => {
   const [team, setTeam] = useState(null);
@@ -13,36 +16,86 @@ const TeamDashboard = () => {
   const [captainName, setCaptainName] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  // Add new states for user data
+  const [userData, setUserData] = useState(null);
+  const [hasTeamPayment, setHasTeamPayment] = useState(false);
+  const router = useRouter();
 
+  // Modified useEffect to better handle payment status
   useEffect(() => {
-    const fetchTeamData = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/team/dashboard', {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found, redirecting to login...');
+          router.push('/auth');
+          return;
+        }
+
+        console.log('Fetching user profile...');
+        const profileResponse = await fetch('http://localhost:5000/api/player/profile', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('user_jwt')}`,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
           credentials: 'include',
         });
 
-        if (!response.ok) {
-        //   console.error('Failed to fetch team data');
-          return;
+        if (!profileResponse.ok) {
+          throw new Error('Failed to fetch user profile');
         }
 
-        const data = await response.json();
-        setTeam(data.team);
-        setPlayerRole(data.role);
-        setCaptainName(data.captainName);
+        const profileData = await profileResponse.json();
+        console.log('User Profile Data:', profileData);
+        
+        setUserData(profileData.data);
+        setHasTeamPayment(profileData.data?.teamPayment?.paid || false);
+        
+        // Now fetch team data if needed
+        fetchTeamData(token);
+
       } catch (error) {
-        console.error('Error fetching team data:', error);
-      } finally {
+        console.error('Error fetching user data:', error);
+        setError('Failed to load user data');
         setLoading(false);
       }
     };
 
-    fetchTeamData();
-  }, []);
+    fetchUserData();
+  }, [router]);
+
+  const fetchTeamData = async (token) => {
+    try {
+      console.log('Fetching team data...');
+      const response = await fetch('http://localhost:5000/api/team/dashboard', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.log('No team data found or error');
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Team Data:', data);
+      
+      setTeam(data.team);
+      setPlayerRole(data.role);
+      setCaptainName(data.captainName);
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+      setError('Failed to load team data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRemovePlayer = async (playerId) => {
     try {
@@ -85,16 +138,26 @@ const TeamDashboard = () => {
     setMessage('');
 
     try {
+      // Check payment status from state
+      if (!hasTeamPayment) {
+        console.log('No payment found, redirecting to payment page...');
+        router.push('/payment');
+        return;
+      }
+
+      console.log('Creating team with name:', teamName);
       const response = await fetch('http://localhost:5000/api/team/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('user_jwt')}`,
         },
         credentials: 'include',
         body: JSON.stringify({ name: teamName }),
       });
 
       const data = await response.json();
+      console.log('Team creation response:', data);
 
       if (response.ok) {
         setMessage(data.message);
@@ -104,7 +167,7 @@ const TeamDashboard = () => {
       }
     } catch (err) {
       console.error('Error creating team:', err);
-      setError('Something went wrong. Please try again later.');
+      setError('Failed to create team');
     } finally {
       setLoading(false);
     }
@@ -177,82 +240,156 @@ const TeamDashboard = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+      </div>
+    );
+  }
 
   if (!team) {
-    // If not part of a team, show the "Create Team" form
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="space-y-8 w-full max-w-5xl px-6">
-          <Card className="p-8 bg-black shadow-xl rounded-lg">
-            <h2 className="text-4xl font-bold text-white">Create Team</h2>
-            <form onSubmit={handleCreateTeam} className="flex items-center space-x-4">
-              <Input 
-                type="text" 
-                name="name" 
-                placeholder="Team Name" 
-                required 
-                className="max-w-xs"
-              />
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Creating...' : 'Create Team'}
-              </Button>
-            </form>
-            {error && <p className="text-red-500">{error}</p>}
-            {message && <p className="text-green-500">{message}</p>}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="overflow-hidden bg-white shadow-xl rounded-2xl">
+            <div className="bg-gradient-to-r from-gray-900 to-black px-8 py-6">
+              <h2 className="text-3xl font-bold text-white">Create Your Team</h2>
+              <p className="text-gray-300 mt-2">Join the competition with your own team</p>
+            </div>
+
+            <div className="p-8 space-y-6">
+              {/* Payment Status Card */}
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Payment Status</h3>
+                    <p className={`mt-1 ${hasTeamPayment ? "text-green-600" : "text-red-600"}`}>
+                      {hasTeamPayment ? '✓ Payment Complete' : '○ Payment Required'}
+                    </p>
+                  </div>
+                  {!hasTeamPayment && (
+                    <Button 
+                      onClick={() => router.push('/payment')}
+                      className="bg-black hover:bg-gray-800 text-white transition-colors"
+                    >
+                      Make Payment
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Team Creation Form */}
+              <form onSubmit={handleCreateTeam} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Team Name
+                  </label>
+                  <Input 
+                    type="text" 
+                    name="name" 
+                    placeholder="Enter your team name" 
+                    required 
+                    className="w-full rounded-lg border-gray-300 focus:border-black focus:ring-black"
+                    disabled={!hasTeamPayment}
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={loading || !hasTeamPayment}
+                  className={`w-full py-3 ${
+                    hasTeamPayment 
+                      ? 'bg-black hover:bg-gray-800' 
+                      : 'bg-gray-400 cursor-not-allowed'
+                  } text-white font-medium rounded-lg transition-colors`}
+                >
+                  {loading ? 'Creating...' : 'Create Team'}
+                </Button>
+              </form>
+            </div>
           </Card>
         </div>
       </div>
     );
   }
 
+  // Team Dashboard View
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="space-y-8 w-full max-w-5xl px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Team Header */}
-        <Card className="p-8 bg-black shadow-xl rounded-lg">
-          <div className="flex items-center justify-between space-x-8">
-            <div className="flex flex-col space-y-3">
-              <h2 className="text-5xl font-bold text-white">{team?.name}</h2>
-              <p className="text-xl text-gray-100">Captain: {captainName}</p>
+        <Card className="overflow-hidden bg-gradient-to-r from-gray-900 to-black shadow-xl rounded-2xl">
+          <div className="relative">
+            {/* Default Cover Image */}
+            <div className="w-full h-32 relative overflow-hidden">
+              <Image
+                src="/team-cover.webp" // Add this image to your public folder
+                alt="Team Cover"
+                fill
+                className="object-cover opacity-40"
+                priority
+              />
             </div>
-            {/* Leave Team Form */}
-            <form onSubmit={handleLeaveTeam}>
-              <Button type="submit" variant="destructive" disabled={loading}>
-                {loading ? 'Leaving...' : 'Leave Team'}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <div className="absolute bottom-0 w-full px-8 py-6 flex items-center justify-between">
+              <div className="space-y-2">
+                <h2 className="text-4xl font-bold text-white">{team?.name}</h2>
+                <p className="text-gray-300">Captain: {captainName}</p>
+              </div>
+              <Button 
+                onClick={handleLeaveTeam}
+                variant="outline"
+                className="hover:bg-red-50 text-red-600 border-red-200 bg-white/90"
+              >
+                Leave Team
               </Button>
-            </form>
-          </div>
-        </Card>
-
-        {/* Team Information */}
-        <Card className="space-y-6 p-8">
-          <h3 className="text-xl font-semibold">Team Info</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <p><strong className="text-lg">Team Name:</strong> {team?.name}</p>
-              <p><strong className="text-lg">Captain:</strong> {captainName}</p>
-            </div>
-            <div>
-              <p><strong className="text-lg">Tournaments Participating:</strong> {team?.tournaments?.length || 0}</p>
-              <p><strong className="text-lg">Tournaments Won:</strong> {team?.tournaments?.filter((t) => t.won).length || 0}</p>
             </div>
           </div>
         </Card>
 
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { label: 'Total Members', value: team?.players?.length || 0 },
+            { label: 'Active Tournaments', value: team?.tournaments?.filter(t => t.status === 'ongoing').length || 0 },
+            { label: 'Tournaments Won', value: team?.tournaments?.filter(t => t.won).length || 0 },
+            { label: 'Win Rate', value: `${Math.round((team?.tournaments?.filter(t => t.won).length || 0) / (team?.tournaments?.length || 1) * 100)}%` }
+          ].map((stat, idx) => (
+            <div 
+              key={idx} 
+              className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center min-h-[140px] hover:border-gray-200 transition-colors"
+            >
+              <p className="text-4xl font-bold text-gray-900 mb-2">{stat.value}</p>
+              <p className="text-sm font-medium text-gray-500 text-center">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+        
+
+        {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Team Members */}
-          <Card className="space-y-6 p-8">
-            <h3 className="text-xl font-semibold">Team Members</h3>
-            <div className="space-y-4">
+          <Card className="p-6 overflow-hidden">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Team Members</h3>
+            <div className="space-y-3">
               {team?.players?.map((player) => (
-                <div key={player._id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-200">
-                  <p className="text-lg">{player.username}</p>
+                <div 
+                  key={player._id} 
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-medium">
+                        {player.username[0].toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="font-medium text-gray-900">{player.username}</p>
+                  </div>
                   {playerRole === 'captain' && (
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       onClick={() => handleRemovePlayer(player._id)}
-                      className="bg-red-600 text-white hover:bg-red-700"
+                      className="text-red-600 hover:bg-red-50"
                     >
                       Remove
                     </Button>
@@ -262,46 +399,54 @@ const TeamDashboard = () => {
             </div>
           </Card>
 
-          {/* Participating Tournaments */}
-          <Card className="space-y-6 p-8">
-            <h3 className="text-xl font-semibold">Participating Tournaments</h3>
+          {/* Tournaments */}
+          <Card className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Tournaments</h3>
             {team?.tournaments?.length === 0 ? (
-              <p className="text-lg">No tournaments participated yet.</p>
+              <div className="text-center py-8 text-gray-500">
+                No tournaments yet
+              </div>
             ) : (
-              <ul className="space-y-4">
+              <div className="space-y-3">
                 {team?.tournaments?.map((tournament) => (
-                  <li key={tournament._id} className="p-4 border rounded-lg bg-gray-200">
-                    <div className="flex justify-between items-center">
-                      <p className="text-lg">{tournament.name}</p>
-                      <Badge variant="outline">{tournament.status}</Badge>
-                    </div>
-                  </li>
+                  <div 
+                    key={tournament._id}
+                    className="p-4 bg-gray-50 rounded-lg flex items-center justify-between"
+                  >
+                    <p className="font-medium text-gray-900">{tournament.name}</p>
+                    <Badge 
+                      variant="outline"
+                      className={`${
+                        tournament.status === 'completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {tournament.status}
+                    </Badge>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </Card>
         </div>
 
-        {/* Update Team Name Form for Captain */}
+        {/* Captain Controls */}
         {playerRole === 'captain' && (
-          <div className="space-y-6">
-            <form onSubmit={handleUpdateTeamName} className="flex items-center space-x-4">
-              <div className="flex-grow">
-                <label htmlFor="newName" className="text-sm font-medium text-gray-700 block mb-1">New Team Name:</label>
-                <Input 
-                  type="text" 
-                  id="newName" 
-                  name="newName" 
-                  required 
-                  placeholder="Enter New Team Name" 
-                  className="max-w-xs"
-                />
-              </div>
+          <Card className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Team Settings</h3>
+            <form onSubmit={handleUpdateTeamName} className="flex gap-4">
+              <Input 
+                type="text" 
+                name="newName" 
+                placeholder="New team name" 
+                className="max-w-xs"
+              />
               <Button type="submit" disabled={loading}>
-                {loading ? 'Updating...' : 'Update Team Name'}
+                {loading ? 'Updating...' : 'Update Name'}
               </Button>
             </form>
-          </div>
+          </Card>
         )}
       </div>
     </div>

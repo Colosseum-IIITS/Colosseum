@@ -1,48 +1,77 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function PaymentSuccess() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setLoading(false);
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    setTimeout(() => {
+      router.push('/player/team');
+    }, 3000);
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">Processing your payment...</h2>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+      <div className="max-w-sm w-full bg-white rounded-3xl shadow-xl p-8">
+        {/* Success Animation Container */}
+        <div className="relative w-28 h-28 mx-auto mb-6">
+          <div className="absolute inset-0 bg-green-50 rounded-full animate-pulse"></div>
+          <svg
+            className="checkmark"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 52 52"
+          >
+            <circle className="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path className="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-        <p className="text-gray-600 mb-4">Your team will be created shortly.</p>
-        <p className="text-sm text-gray-500">Redirecting to dashboard...</p>
+
+        {/* Simple Message */}
+        <h1 className="text-2xl font-semibold text-center text-gray-800 mb-2">
+          Payment Complete
+        </h1>
+        <p className="text-gray-500 text-center text-sm">Redirecting...</p>
       </div>
+
+      <style jsx>{`
+        .checkmark {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          display: block;
+          stroke-width: 4;
+          stroke: #22c55e;
+          stroke-miterlimit: 10;
+          position: relative;
+          z-index: 10;
+          animation: scale .5s ease-in-out .3s forwards;
+        }
+
+        .checkmark__circle {
+          stroke-dasharray: 166;
+          stroke-dashoffset: 166;
+          animation: stroke .5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark__check {
+          transform-origin: 50% 50%;
+          stroke-dasharray: 48;
+          stroke-dashoffset: 48;
+          stroke-width: 4;
+          animation: stroke .4s cubic-bezier(0.65, 0, 0.45, 1) .5s forwards;
+        }
+
+        @keyframes stroke {
+          100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes scale {
+          0%, 100% { transform: none; }
+          50% { transform: scale3d(1.1, 1.1, 1); }
+        }
+      `}</style>
     </div>
   );
 }

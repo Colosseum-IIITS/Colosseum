@@ -6,6 +6,24 @@ import { Button } from '@/components/ui/button';
 import Navbar from '@/components/player/profileNavbar/Navbar';
 import ProfilePicture from '@/components/player/profileNavbar/ProfilePicture';
 import { UserProvider } from '@/context/UserContext';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
+const WinRateCircle = ({ percentage }) => (
+  <div className="w-32 h-32 mx-auto">
+    <CircularProgressbar
+      value={percentage || 0}
+      text={`${percentage || 0}%`}
+      styles={buildStyles({
+        textSize: '16px',
+        pathColor: '#000000',
+        textColor: '#000000',
+        trailColor: '#e5e7eb',
+      })}
+    />
+  </div>
+);
 
 const PlayerProfile = () => {
   const [playerData, setPlayerData] = useState(null);
@@ -93,7 +111,7 @@ const PlayerProfile = () => {
                 </div>
                 <div className="flex-grow"> {/* Content container */}
                   <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-                    Player Profile
+                    Profile
                   </h2>
                   <div className="space-y-4">
                     <div className="flex items-center">
@@ -123,43 +141,83 @@ const PlayerProfile = () => {
             </UserProvider>
           </section>
 
-
-
           {/* Player Stats Section */}
-          <section className="bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-lg">
+          <section className="bg-white p-10 rounded-3xl shadow-lg">
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-              Player Stats
+              Statistics
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Global Rank</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.globalRank || 'N/A'}</p>
+            
+            {/* Two-column layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left column - Stats Grid */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: 'Global Rank', value: `${playerData.globalRank || 'N/A'}` },
+                    { label: 'Tournaments Played', value: playerData.tournamentsPlayed || 0 },
+                    { label: 'Tournaments Won', value: playerData.tournamentsWon || 0 },
+                    { label: 'Win Rate', value: `${playerData.winPercentage || 0}%` },
+                    { label: 'Active Tournaments', value: playerData.ongoingTournaments || 0 },
+                    { label: 'Organisers following', value: playerData.noOfOrgsFollowing || 0 }
+                  ].map((stat, idx) => (
+                    <div 
+                      key={idx} 
+                      className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center justify-center min-h-[140px] hover:border-gray-200 transition-colors"
+                    >
+                      <p className="text-4xl font-bold text-gray-900 mb-2">{stat.value}</p>
+                      <p className="text-sm font-medium text-gray-500 text-center">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Tournaments Played</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.tournamentsPlayed || 0}</p>
-              </div>
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Tournaments Won</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.tournamentsWon || 0}</p>
-              </div>
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Ongoing Tournaments</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.ongoingTournaments || 0}</p>
-              </div>
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Orgs Following</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.noOfOrgsFollowing || 0}</p>
-              </div>
-              {/* Stat Card */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-inner">
-                <p className="text-xl font-semibold text-gray-800 dark:text-white">Win Percentage</p>
-                <p className="mt-2 text-2xl text-blue-600 dark:text-blue-400">{playerData.winPercentage ? `${playerData.winPercentage}%` : 'N/A'}</p>
+
+              {/* Right column - Performance Overview */}
+              <div className="bg-white p-6 rounded-xl border border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Performance Overview</h3>
+                <div className="h-[400px] w-full"> {/* Increased height for better visibility */}
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart outerRadius={130} data={[
+                      {
+                        subject: 'Win Rate',
+                        value: playerData.winPercentage || 0,
+                        fullMark: 100,
+                      },
+                      {
+                        subject: 'Tournaments',
+                        value: Math.min((playerData.tournamentsPlayed || 0) * 10, 100),
+                        fullMark: 100,
+                      },
+                      {
+                        subject: 'Global Rank',
+                        value: Math.max(100 - ((playerData.globalRank || 100) / 10), 0),
+                        fullMark: 100,
+                      },
+                      {
+                        subject: 'Tournaments Participating',
+                        value: (playerData.ongoingTournaments || 0) * 20,
+                        fullMark: 100,
+                      },
+                      {
+                        subject: 'Organisers Following',
+                        value: (playerData.noOfOrgsFollowing || 0) * 10,
+                        fullMark: 100,
+                      },
+                    ]}>
+                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarAngleAxis 
+                        dataKey="subject" 
+                        tick={{ fill: '#4b5563', fontSize: 12 }} 
+                      />
+                      <Radar
+                        name="Player Stats"
+                        dataKey="value"
+                        stroke="#000000"
+                        fill="#000000"
+                        fillOpacity={0.2}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
           </section>

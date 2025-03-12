@@ -382,6 +382,7 @@ exports.joinTournament = async (req, res) => {
   const { tournamentId } = req.params;  // Tournament ID from URL
   const { _id } = req.user;  // Player's ID from authenticated user
 
+
   try {
       // Validate tournamentId format
       if (!mongoose.isValidObjectId(tournamentId)) {
@@ -402,7 +403,7 @@ exports.joinTournament = async (req, res) => {
       if (!tournament) {
           return res.status(404).json({ message: "Tournament not found" });
       }
-
+      
       // Ensure the team is not already registered
       if (tournament.teams.some(teamId => teamId.toString() === player.team._id.toString())) {
           return res.status(400).json({ message: "Team is already registered for this tournament" });
@@ -423,7 +424,11 @@ exports.joinTournament = async (req, res) => {
       tournament.teams.push(player.team._id);
 
       // Update tournament revenue
+
+      console.log("Tournament entry fee:", tournament.entryFee);
+      console.log("Tournament revenue before:", tournament.revenue);
       tournament.revenue += tournament.entryFee;
+      console.log("Tournament revenue:", tournament.revenue);
       await tournament.save();
 
       // Update organiser revenue if organiser exists

@@ -71,4 +71,4 @@ app.listen(PORT, () => {
 console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY); // For debugging
 
 // Swagger routes
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

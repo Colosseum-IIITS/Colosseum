@@ -11,7 +11,7 @@ const TournamentResult = ({ tournament }) => {
     const token = localStorage.getItem('user_jwt'); // Get token from localStorage
 
     try {
-      const response = await fetch(`http://localhost:5000/api/tournament/join/${tournament.tid}`, {
+      const response = await fetch(`http://localhost:5000/api/tournament/join/${tournament._id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

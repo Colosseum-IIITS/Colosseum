@@ -3,50 +3,52 @@ const Payment = require('../models/Payment');
 const Player = require('../models/Player');
 
 exports.createPaymentIntent = async (req, res) => {
-    try {
-      const { amount, tournamentId, playerId, paymentType } = req.body;
-  
-      const paymentData = {
-        player: playerId,
-        amount,
-        paymentType,
-        stripePaymentId: 'pending'
-      };
-  
-      // Add tournament reference only for tournament registrations
-      if (paymentType === 'TOURNAMENT_REGISTRATION') {
-        paymentData.tournament = tournamentId;
+  try {
+    const { amount } = req.body;
+    const playerId = req.user._id;
+
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100, // Convert to cents
+      currency: 'inr',
+      metadata: {
+        playerId: playerId.toString(),
+        type: 'TEAM_CREATION'
       }
-  
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100,
-        currency: 'inr',
-        metadata: {
-          playerId,
-          paymentType,
-          ...(tournamentId && { tournamentId })
-        }
-      });
-  
-      // Update payment with Stripe payment ID
-      paymentData.stripePaymentId = paymentIntent.id;
-      const payment = await Payment.create(paymentData);
-  
-      res.json({
-        clientSecret: paymentIntent.client_secret,
-        paymentId: payment._id
-      });
-    } catch (error) {
-      console.error('Payment error:', error);
-      res.status(500).json({ error: 'Payment initialization failed' });
-    }
-  };
+    });
+
+    // Create payment record
+    const payment = new Payment({
+      player: playerId,
+      amount,
+      type: 'TEAM_CREATION',
+      stripePaymentId: paymentIntent.id
+    });
+    await payment.save();
+
+    res.json({ 
+      clientSecret: paymentIntent.client_secret 
+    });
+  } catch (error) {
+    console.error('Payment Intent Error:', error);
+    res.status(500).json({ error: 'Error creating payment' });
+  }
+};
 
 exports.confirmPayment = async (req, res) => {
   try {
-    const { paymentId } = req.body;
+    const { paymentIntentId } = req.body;
+    const playerId = req.user._id;
+
+    // Verify payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     
-    const payment = await Payment.findById(paymentId);
+    if (paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({ error: 'Payment not successful' });
+    }
+
+    // Update payment record
+    const payment = await Payment.findOne({ stripePaymentId: paymentIntentId });
     if (!payment) {
       return res.status(404).json({ error: 'Payment not found' });
     }
@@ -54,19 +56,17 @@ exports.confirmPayment = async (req, res) => {
     payment.status = 'completed';
     await payment.save();
 
-    // Add notification to player
-    await Player.findByIdAndUpdate(payment.player, {
-      $push: {
-        notifications: {
-          message: `Payment of ₹${payment.amount} for tournament registration confirmed`,
-          read: false
-        }
-      }
-    });
+    // Update player's payment status
+    const player = await Player.findById(playerId);
+    player.teamPayment = {
+      paid: true,
+      payment: payment._id
+    };
+    await player.save();
 
-    res.json({ message: 'Payment confirmed successfully' });
+    res.json({ success: true });
   } catch (error) {
-    console.error('Payment confirmation error:', error);
-    res.status(500).json({ error: 'Payment confirmation failed' });
+    console.error('Payment Confirmation Error:', error);
+    res.status(500).json({ error: 'Error confirming payment' });
   }
 };

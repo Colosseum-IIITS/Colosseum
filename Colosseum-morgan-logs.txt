@@ -1,0 +1,10 @@
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/ HTTP/1.1" 304 - - 5.618 ms
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 304 - - 3.100 ms
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 304 - - 2.803 ms
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 304 - - 2.680 ms
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 304 - - 0.581 ms
+::1 - - [12/Mar/2025:16:44:02 +0000] "GET /api-docs/favicon-32x32.png HTTP/1.1" 304 - - 0.466 ms
+::1 - - [12/Mar/2025:16:44:59 +0000] "POST /auth/player/signup HTTP/1.1" 400 68 - 16.150 ms
+::1 - - [12/Mar/2025:16:45:10 +0000] "POST /auth/player/signup HTTP/1.1" 500 57 - 92.399 ms
+::1 - - [12/Mar/2025:16:45:19 +0000] "POST /auth/player/signup HTTP/1.1" 400 56 - 8.238 ms
+::1 - - [12/Mar/2025:16:45:30 +0000] "POST /auth/player/signup HTTP/1.1" 400 56 - 4.040 ms

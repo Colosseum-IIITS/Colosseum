@@ -7,7 +7,9 @@ const { authenticateUser } = require('./middleware/authMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swaggerConfig');
 require('dotenv').config();
+const morgan = require('morgan');
 const cors = require('cors');
+const rfs = require("rotating-file-stream");
 
 // Import routes
 const playerRoutes = require('./routes/playerRoutes');
@@ -24,7 +26,20 @@ const app = express();
 // Allow requests from the frontend
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
+// Create a log stream
+const logStream = rfs.createStream("Colosseum-morgan-logs.txt", {
+  size: '10M', // rotate every 10 MegaBytes written
+  interval: '1d', // rotate daily
+  compress: 'gzip' // compress rotated files
+});
+
+// Custom Morgan format for more informative logs
+const customFormat = ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms';
+
 // Middleware setup
+app.use(morgan(customFormat, { stream: logStream }));
+app.use(morgan(customFormat)); // To log to console as well
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,21 +56,19 @@ app.use('/admin', adminRoutes);
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/tournamentDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 })
-    .then(() => console.log('Connected to MongoDB successfully'))
-    .catch(err => console.error('Could not connect to MongoDB', err));
+  .then(() => console.log('Connected to MongoDB successfully'))
+  .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
-
-console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY);  // For debugging
-
+console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY); // For debugging
 
 // Swagger routes
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

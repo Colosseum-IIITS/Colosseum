@@ -26,96 +26,94 @@ const SearchBar = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!searchTerm.trim()) {
       setMessage("Please enter a search term.");
       return;
     }
-
-    // Parse the search term for initial character
+  
     const initialChar = searchTerm.trim().charAt(0);
     let actionUrl = '';
     let updatedSearchTerm = searchTerm.trim();
-
+    let newSearchType = '';
+  
     if (initialChar === '&') {
       actionUrl = '/api/player/searchPlayer';
       updatedSearchTerm = updatedSearchTerm.slice(1).trim();
-      setSearchType('player');
+      newSearchType = 'player';
     } else if (initialChar === '>') {
       actionUrl = '/api/team/search';
       updatedSearchTerm = updatedSearchTerm.slice(1).trim();
-      setSearchType('team');
+      newSearchType = 'team';
     } else {
       setMessage('Invalid search format. Use "&" for player and ">" for team.');
       return;
     }
-
+  
     if (!updatedSearchTerm) {
       setMessage('Please provide a term to search after the symbol.');
       return;
     }
-
+  
     setLoading(true);
     setResults([]);
     setIsOpen(false);
-    setMessage(''); // Clear previous messages
-
+    setMessage('');
+    setSearchType(newSearchType);
+  
     try {
-      const token = localStorage.getItem('user_jwt');
-
-      let response;
-      if (searchType === 'player') {
-        // Fetch Players
-        response = await fetch(
-          `${baseUrl}${actionUrl}?searchTerm=${encodeURIComponent(updatedSearchTerm)}`,
-          {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-          }
-        );
-      } else if (searchType === 'team') {
-        // Fetch Teams
-        response = await fetch(
-          `${baseUrl}${actionUrl}?searchTerm=${encodeURIComponent(updatedSearchTerm)}`,
-          {
-            method: 'GET',
-            credentials: 'include',
-          }
-        );
+      const token = localStorage.getItem('token');
+  
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
       }
-
-      if (response.ok) {
-        const data = await response.json();
-        if (searchType === 'player') {
-          const fetchedPlayers = data.results || [];
-          setResults(fetchedPlayers);
-        } else if (searchType === 'team') {
-          const fetchedTeams = data.teams || [];
-          setResults(fetchedTeams);
-        }
-
-        if ((searchType === 'player' && (data.results || []).length > 0) ||
-            (searchType === 'team' && (data.teams || []).length > 0)) {
-          setIsOpen(true); // Open dialog if there are results
-        } else {
-          setMessage(`No ${searchType === 'player' ? 'players' : 'teams'} found for "${updatedSearchTerm}".`);
-        }
+  
+      const url = `${baseUrl}${actionUrl}?searchTerm=${encodeURIComponent(updatedSearchTerm)}`;
+      console.log("🔍 Fetching search results from:", url);
+  
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+  
+      if (!response) {
+        throw new Error("No response received from the server.");
+      }
+  
+      console.log("📡 API Response Status:", response.status);
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch. Status: ${response.status} - ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log("✅ Search Results:", data);
+  
+      if (newSearchType === 'player') {
+        setResults(data.results || []);
+      } else if (newSearchType === 'team') {
+        setResults(data.teams || []);
+      }
+  
+      if ((newSearchType === 'player' && (data.results || []).length > 0) ||
+          (newSearchType === 'team' && (data.teams || []).length > 0)) {
+        setIsOpen(true);
       } else {
-        const errorData = await response.json();
-        setMessage(errorData.error || `Failed to search ${searchType === 'player' ? 'players' : 'teams'}.`);
+        setMessage(`No ${newSearchType} found for "${updatedSearchTerm}".`);
       }
-
+  
     } catch (error) {
-      console.error('Error fetching search results:', error);
-      setMessage("An error occurred while searching. Please try again.");
+      console.error("🚨 Error fetching search results:", error);
+      setMessage(error.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="relative">

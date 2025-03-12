@@ -52,8 +52,7 @@ const EmailForm = () => {
             type="email"
             id="email"
             name="email"
-            defaultValue={user ? user.email : ''}
-            placeholder="Enter your email"
+            placeholder="Enter your new email"
             required
             className="max-w-xs"
           />

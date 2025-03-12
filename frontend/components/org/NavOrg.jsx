@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import OrganiserDropdown from "./OrganiserDropdown";
 import { Button } from "@/components/ui/button"; // ShadCN Button
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog"; // ShadCN Dialog components
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog"; // ShadCN Dialog components
 import { Input } from "@/components/ui/input"; // ShadCN Input
 import { Textarea } from "@/components/ui/textarea"; // ShadCN Textarea
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // ShadCN Card
@@ -141,7 +141,7 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
         <DialogTrigger />
         <DialogContent className="max-w-md w-full rounded-xl bg-white p-4 shadow-xl transition-all duration-300 transform max-h-[80vh] overflow-y-auto scrollbar-hide">
           <DialogHeader>
-            <h2 className="text-xl font-semibold text-gray-900">Create a New Tournament</h2>
+            <DialogTitle className="text-xl font-semibold text-gray-900">Create a New Tournament</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateTournament} className="space-y-4">
             <div>

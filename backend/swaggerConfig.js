@@ -7,7 +7,7 @@ const swaggerOptions = {
     info: {
       title: "Colloseum API's",
       version: "1.0.0",
-      description: "API Information for the Tournament App",
+      description: "API Information for the COlloseum App",
     },
     components: {
       schemas: require("./swaggerDocs/schemaDocs"),

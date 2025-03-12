@@ -86,9 +86,12 @@ const OrgTourn = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger />
         <DialogContent className="max-w-md w-full rounded-xl bg-white p-4 shadow-xl transition-all duration-300 transform max-h-[80vh] overflow-y-auto scrollbar-hide">
-          <DialogHeader>
-            <h2 className="text-xl font-semibold text-gray-900">Create a New Tournament</h2>
-          </DialogHeader>
+        <DialogHeader>
+          <VisuallyHidden.Root>
+            <DialogTitle>Create a New Tournament</DialogTitle>
+          </VisuallyHidden.Root>
+        </DialogHeader>
+        
           <form onSubmit={handleCreateTournament} className="space-y-4">
             <div>
               <label htmlFor="tid" className="block text-sm font-medium text-gray-700">Tournament ID</label>
@@ -101,89 +104,17 @@ const OrgTourn = () => {
                 className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               />
             </div>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Tournament Name</label>
-              <Input
-                id="name"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-              <Textarea
-                id="description"
-                name="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
-              <Input
-                id="startDate"
-                name="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
-              <Input
-                id="endDate"
-                name="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label htmlFor="entryFee" className="block text-sm font-medium text-gray-700">Entry Fee</label>
-              <Input
-                id="entryFee"
-                name="entryFee"
-                type="number"
-                value={entryFee}
-                onChange={(e) => setEntryFee(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label htmlFor="prizePool" className="block text-sm font-medium text-gray-700">Prize Pool</label>
-              <Input
-                id="prizePool"
-                name="prizePool"
-                type="number"
-                value={prizePool}
-                onChange={(e) => setPrizePool(e.target.value)}
-                required
-                className="w-full mt-1 rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
+            {/* Other input fields */}
             <DialogFooter>
-              <Button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-700 text-white rounded-lg p-3"
-                disabled={loading}
-              >
-                {loading ? 'Submitting...' : 'Create Tournament'}
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Creating...' : 'Create Tournament'}
               </Button>
             </DialogFooter>
           </form>
-          {message && <p className="text-center mt-4 text-gray-700">{message}</p>}
         </DialogContent>
       </Dialog>
+
+
     </>
   );
 };

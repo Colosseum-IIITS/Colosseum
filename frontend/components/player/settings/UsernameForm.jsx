@@ -54,8 +54,7 @@ const   UsernameForm = () => {
             type="text"
             id="username"
             name="username"
-            defaultValue={user ? user.username : ''}
-            placeholder="Enter your name"
+            placeholder="Enter your new name"
             required
             className="max-w-xs"
           />

@@ -17,11 +17,12 @@ const teamRoutes = require('./routes/teamRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
 // Allow requests from the frontend
-app.use(cors({ origin: 'http://localhost:3000', credentials: true}));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 // Middleware setup
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use('/api/tournament', tournamentRoutes);
 app.use('/api/organiser', organiserRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/report', reportRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 

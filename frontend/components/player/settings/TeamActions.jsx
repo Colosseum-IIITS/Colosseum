@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const TeamActions = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -20,24 +26,13 @@ const TeamActions = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/team/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ name: teamName }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message);
-      } else {
-        setError(data.error || 'Failed to create team');
-      }
+      // Store team name in localStorage for later use
+      localStorage.setItem('pendingTeamName', teamName);
+      
+      // Redirect to payment page
+      router.push(`/payment?type=TEAM_CREATION&amount=500`);
     } catch (err) {
-      console.error('Error creating team:', err);
+      console.error('Error:', err);
       setError('Something went wrong. Please try again later.');
     } finally {
       setLoading(false);

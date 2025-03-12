@@ -9,10 +9,15 @@ const playerSchema = new mongoose.Schema({
     contentType: String, // MIME type
   },
   team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+  teamPayment: {
+    paid: { type: Boolean, default: false },
+    payment: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' }
+  },
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organiser'}],
   tournaments: [{
     tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
-    won: { type: Boolean, default: false }
+    won: { type: Boolean, default: false },
+    payment: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' }
   }],
   banned: { type: Boolean, default: false },
   notifications: [{
@@ -22,6 +27,10 @@ const playerSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
+// Middleware to check if team creation is allowed
+playerSchema.methods.canCreateTeam = function() {
+  return this.teamPayment.paid === true;
+};
 
 const Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

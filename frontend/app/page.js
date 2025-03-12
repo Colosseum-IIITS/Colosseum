@@ -13,7 +13,7 @@ export default function HomePage() {
         <Button className="w-64" onClick={() => router.push("/auth?role=admin")}>
           I'm an Admin
         </Button>
-        <Button className="w-64" onClick={() => router.push("/auth?role=org")}>
+        <Button className="w-64" onClick={() => router.push("/auth?role=organiser")}>
           I'm an Organizer
         </Button>
         <Button className="w-64" onClick={() => router.push("/auth?role=player")}>

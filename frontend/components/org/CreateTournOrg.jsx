@@ -17,6 +17,14 @@ const OrgTourn = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Manage dialog open state
+  const [csrfToken,setCsrfToken] = useState('');
+  
+  useEffect(() => {
+    fetch('http://localhost:5000/auth/csrfToken', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => setCsrfToken(data.csrfToken))
+        .catch(error => console.error('Error fetching CSRF token:', error));
+        }, []);
 
   // Handle form submission
   const handleCreateTournament = async (e) => {
@@ -58,6 +66,7 @@ const OrgTourn = () => {
           endDate,
           entryFee: Number(entryFee), // Convert entryFee to number
           prizePool: Number(prizePool), // Convert prizePool to number
+          _csrf: csrfToken,
         }),
       });
 

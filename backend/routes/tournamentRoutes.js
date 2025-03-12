@@ -2,9 +2,14 @@ const express = require('express');
 const router = express.Router();
 const tournamentController = require('../controllers/tournmentController');
 const { authenticateOrganiser, authenticateUser } = require('../middleware/authMiddleware');
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
 
 // Route to create a new tournament
-router.post('/create', authenticateOrganiser,tournamentController.createTournament);
+router.use(cookieParser());
+const csrfProtection = csrf({cookie:true});
+
+router.post('/create',authenticateOrganiser,csrfProtection,tournamentController.createTournament);
 
 router.get('/tournamentsEnrolled',authenticateUser, tournamentController.getEnrolledTournaments);
 router.get('/notifications', authenticateUser, tournamentController.getNotifications);

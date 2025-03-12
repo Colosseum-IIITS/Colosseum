@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 
 // UI Components
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog';
+
 
 // Organiser Components
 import TournamentsSection from '@/components/org/TournamentsSection';
 import OrganiserReport from '@/components/org/OrgReports';
+import RevenueGraph from '@/components/org/RevenueGraph'
 import OrganiserStats from '@/components/org/OrgStats';
 import ReportedTeams from '@/components/org/ReportedTeams';
 import OrganiserNavbar from '@/components/org/NavOrg';
@@ -41,12 +42,13 @@ const Dashboard = () => {
           {/* Reports */}
           <Card className="shadow-lg border border-gray-200 rounded-xl p-4 col-span-1">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Reports</CardTitle>
+              <CardTitle className="text-xl font-semibold">Revenue Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <OrganiserReport />
+              <RevenueGraph />
             </CardContent>
           </Card>
+
 
           {/* Stats (Now Properly Aligned) */}
           <Card className="shadow-lg border border-gray-200 rounded-xl p-4 col-span-2">
@@ -70,15 +72,8 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* ✅ Report Dialog (Fixed) */}
-      <Dialog open={isReportDialogOpen} onOpenChange={setReportDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Organiser Report</DialogTitle>
-          </DialogHeader>
-          <OrganiserReport />
-        </DialogContent>
-      </Dialog>
+      {/* Report Dialog */}
+      <OrganiserReport open={isReportDialogOpen} onOpenChange={handleCloseReportDialog} />
     </div>
   );
 };

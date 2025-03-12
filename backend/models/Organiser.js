@@ -12,6 +12,7 @@ const toSchema = new mongoose.Schema(
     rating: { type: Number, default: 0 },
     tournaments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
     bannedTeams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], 
+    totalRevenue: { type: Number, default: 0 },
     banned: { type: Boolean, default: false },
     visibilitySettings: {
       descriptionVisible: { type: Boolean, default: true },

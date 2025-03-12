@@ -44,7 +44,7 @@ export default function AuthPage() {
         if (responseData.token) {
           localStorage.setItem("token", responseData.token);
         }
-
+        
         if (role === "player") {
           router.push("/player/home");
         } else if( role == "admin") {

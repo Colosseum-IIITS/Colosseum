@@ -413,10 +413,6 @@ exports.getMyOrganisers = async (req, res) => {
   }
 };
 
-
-
-
-
 exports.banTeam = async (req, res) => {
   const { teamId } = req.body;
   const { _id } = req.user;
@@ -526,5 +522,43 @@ exports.getOrganiserName = async (req, res) => {
   } catch (error) {
     console.error('Error fetching organiser:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Get revenue data for an organiser
+exports.getOrganiserRevenue = async (req, res) => {
+  try {
+      // Extract organiser ID from authenticated user in middleware
+      const organiserId = req.user._id; 
+
+      if (!organiserId) {
+          return res.status(401).json({ message: "Unauthorized access" });
+      }
+
+      // Fetch the organiser along with their tournaments
+      const organiser = await Organiser.findById(organiserId).populate("tournaments");
+
+      if (!organiser) {
+          return res.status(404).json({ message: "Organiser not found" });
+      }
+
+      // Calculate total revenue from all tournaments
+      const totalRevenue = organiser.tournaments.reduce((sum, tournament) => {
+          return sum + (tournament.revenue || 0);
+      }, 0);
+
+      // Format data for bar graph (each tournament's revenue)
+      const tournamentRevenueData = organiser.tournaments.map((tournament) => ({
+          name: tournament.name,
+          revenue: tournament.revenue || 0,
+      }));
+
+      return res.status(200).json({
+          totalRevenue,
+          tournamentRevenueData,
+      });
+  } catch (error) {
+      console.error("Error fetching organiser revenue:", error);
+      return res.status(500).json({ message: "Server error", error });
   }
 };

@@ -9,6 +9,7 @@ const tournamentSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
     entryFee: { type: Number, default: 0 },
     prizePool: { type: Number, default: 0 },
+    revenue: { type: Number, default: 0 },
     status: {
       type: String,
       enum: ["Pending", "Approved", "Completed"],

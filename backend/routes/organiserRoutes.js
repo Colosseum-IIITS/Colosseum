@@ -23,6 +23,7 @@ router.get('/:username/dashboard', authenticateUser,organiserController.getOrgan
 router.post("/dashboardVisibility",authenticateOrganiser,organiserController.updateVisibilitySettings);
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 router.get('/getOrganiserName', authenticateOrganiser, organiserController.getOrganiserName);
+router.get("/revenue", authenticateOrganiser, organiserController.getOrganiserRevenue);
 
 router.post('/create', authenticateOrganiser, tournamentController.createTournament);
 

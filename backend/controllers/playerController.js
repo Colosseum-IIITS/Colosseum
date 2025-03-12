@@ -182,9 +182,11 @@ exports.searchPlayer = async (req, res) => {
     }
 };
 
-
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
+    if (!mongoose.isValidObjectId(tournamentId)) {
+        return res.status(400).json({ message: "Invalid tournament ID" });
+    }
     const { tournamentId } = req.params;  // Tournament ID passed in URL
     const { _id } = req.user;  // Player's ID from authenticated user
   
@@ -198,7 +200,7 @@ exports.joinTournament = async (req, res) => {
             return res.status(400).json({ message: 'Player must be part of a team' });
         }
       
-        const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) });
+        const tournament = await Tournament.findOne({ _id: mongoose.Types.ObjectId(tournamentId) }).populate("organiser");
   
         if (!tournament) {
             return res.status(404).json({ message: 'Tournament not found' });
@@ -216,7 +218,16 @@ exports.joinTournament = async (req, res) => {
         });
 
         tournament.teams.push(player.team._id);
+
+        // Update revenue for the tournament and organiser
+        tournament.revenue += tournament.entryFee;
         await tournament.save();
+
+        const organiser = await Organiser.findById(tournament.organiser._id);
+        if (organiser) {
+            organiser.totalRevenue += tournament.entryFee;
+            await organiser.save();
+        }
       
         const team = await Team.findById(player.team._id);
         team.tournaments.push(tournament._id);
@@ -231,8 +242,6 @@ exports.joinTournament = async (req, res) => {
         return res.status(500).json({ message: 'Server error', error });
     }
 };
-
-
 
 exports.updateUsername = async (req, res) => {
     try {

@@ -1,7 +1,17 @@
 /**
  * @swagger
+ * tags:
+ *   - name: Player
+ *     description: All player-related operations
+ */
+
+/**
+ * 
+ * 
+ * @swagger
  * /api/player/searchTournaments:
  *   get:
+ *     tags: [Player]
  *     summary: "Search for Tournaments"
  *     description: "This endpoint allows a player to search for tournaments by their name or ID. Only approved tournaments are included in the results."
  *     parameters:
@@ -71,6 +81,7 @@ router.get('/api/player/searchTournaments', authenticateUser, playerController.s
  * @swagger
  * /api/player/searchPlayer:
  *   get:
+ *     tags: [Player]
  *     summary: "Search Player"
  *     description: "This endpoint allows a player to search for another player using username or email."
  *     parameters:
@@ -107,6 +118,7 @@ router.get('/api/player/searchPlayer', authenticateUser, playerController.search
  * @swagger
  * /api/player/followOrganiser:
  *   post:
+ *     tags: [Player]
  *     summary: "Follow an Organiser"
  *     description: "This endpoint allows a player to follow an organiser."
  *     requestBody:
@@ -135,6 +147,7 @@ router.post('/api/player/followOrganiser', authenticateUser, playerController.fo
  * @swagger
  * /api/player/unFollowOrganiser:
  *   post:
+ *     tags: [Player]
  *     summary: "Unfollow an Organiser"
  *     description: "This endpoint allows a player to unfollow an organiser."
  *     requestBody:
@@ -163,6 +176,7 @@ router.post('/api/player/unFollowOrganiser', authenticateUser, playerController.
  * @swagger
  * /api/player/joinTournament:
  *   post:
+ *     tags: [Player]
  *     summary: "Join a Tournament"
  *     description: "This endpoint allows a player to join a tournament."
  *     parameters:
@@ -185,6 +199,7 @@ router.post('/api/player/joinTournament', authenticateUser, playerController.joi
  * @swagger
  * /api/player/updateUsername:
  *   post:
+ *     tags: [Player]
  *     summary: "Update Player Username"
  *     description: "This endpoint allows a player to update their username."
  *     requestBody:
@@ -209,6 +224,7 @@ router.post('/api/player/updateUsername', authenticateUser, playerController.upd
  * @swagger
  * /api/player/updatePassword:
  *   post:
+ *     tags: [Player]
  *     summary: "Update Player Password"
  *     description: "This endpoint allows a player to update their password."
  *     requestBody:
@@ -234,6 +250,7 @@ router.post('/api/player/updatePassword', authenticateUser, playerController.upd
  * @swagger
  * /api/player/updateEmail:
  *   post:
+ *     tags: [Player]
  *     summary: "Update Player Email"
  *     description: "This endpoint allows a player to update their email."
  *     requestBody:
@@ -258,6 +275,7 @@ router.post('/api/player/updateEmail', authenticateUser, playerController.update
  * @swagger
  * /api/player/updateProfile:
  *   post:
+ *     tags: [Player]
  *     summary: "Update Player Profile"
  *     description: "This endpoint allows a player to update their profile information."
  *     parameters:
@@ -285,6 +303,7 @@ router.post('/api/player/updateProfile', authenticateUser, playerController.upda
  * @swagger
  * /api/player/tournamentsPlayed:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Tournaments Played"
  *     description: "This endpoint allows a player to get the list of tournaments they have played in."
  *     responses:
@@ -299,6 +318,7 @@ router.get('/api/player/tournamentsPlayed', authenticateUser, playerController.g
  * @swagger
  * /api/player/tournamentsWon:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Tournaments Won"
  *     description: "This endpoint allows a player to get the list of tournaments they have won."
  *     responses:
@@ -313,6 +333,7 @@ router.get('/api/player/tournamentsWon', authenticateUser, playerController.getT
  * @swagger
  * /api/player/ranking:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Player Ranking"
  *     description: "This endpoint allows a player to get their ranking."
  *     responses:
@@ -327,6 +348,7 @@ router.get('/api/player/ranking', authenticateUser, playerController.getPlayerRa
  * @swagger
  * /api/player/searchOrganisers:
  *   get:
+ *     tags: [Player]
  *     summary: "Search Organisers"
  *     description: "This endpoint allows a player to search for organisers."
  *     parameters:
@@ -348,6 +370,7 @@ router.get('/api/player/searchOrganisers', authenticateUser, organiserController
  * @swagger
  * /api/player/report-team:
  *   post:
+ *     tags: [Player]
  *     summary: "Report a Team"
  *     description: "This endpoint allows a player to report a team."
  *     requestBody:
@@ -374,6 +397,7 @@ router.post('/api/player/report-team', authenticateUser, reportController.report
  * @swagger
  * /api/player/report-organiser:
  *   post:
+ *     tags: [Player]
  *     summary: "Report an Organiser"
  *     description: "This endpoint allows a player to report an organiser."
  *     requestBody:
@@ -405,6 +429,7 @@ router.post('/api/player/report-organiser', authenticateUser, reportController.r
  * @swagger
  * /api/player/dashboard:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Player Dashboard"
  *     description: "This endpoint allows a player to view their dashboard."
  *     responses:
@@ -419,6 +444,7 @@ router.get('/api/player/dashboard', authenticateUser, playerController.getDashbo
  * @swagger
  * /api/player/teamName:
  *   get:
+ *     tags: [Player]
  *     summary: "Search Teams by Name"
  *     description: "This endpoint allows a player to search for teams by name."
  *     parameters:
@@ -441,6 +467,7 @@ router.get('/api/player/teamName', authenticateUser, teamController.getTeamsByNa
  * @swagger
  * /api/player/followedOrg:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Followed Organisers"
  *     description: "This endpoint allows a player to get the list of organisers they are following."
  *     responses:
@@ -471,6 +498,7 @@ router.get('/api/player/teamName', authenticateUser, teamController.getTeamsByNa
  * @swagger
  * /player/homepage:
  *   get:
+ *     tags: [Player]
  *     summary: "Get Player Homepage"
  *     description: "This endpoint allows a player to view their homepage with relevant information."
  *     responses:
@@ -479,12 +507,13 @@ router.get('/api/player/teamName', authenticateUser, teamController.getTeamsByNa
  *       "404":
  *         description: "Player not found."
  */
-router.get('/homepage', authenticateUser, playerController.getHomePage);
+router.get('/api/player/homepage', authenticateUser, playerController.getHomePage);
 
 /**
  * @swagger
  * /player/joinTeam:
  *   post:
+ *     tags: [Player]
  *     summary: "Join a Team"
  *     description: "This endpoint allows a player to join a team."
  *     parameters:
@@ -502,4 +531,4 @@ router.get('/homepage', authenticateUser, playerController.getHomePage);
  *       "400":
  *         description: "Error joining the team."
  */
-router.post('/joinTeam', authenticateUser, teamController.joinTeam);
+router.post('/api/team/joinTeam', authenticateUser, teamController.joinTeam);

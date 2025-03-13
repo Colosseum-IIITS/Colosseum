@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   - name: Tournament
+ *     description: All tournament-related operations
+ */
+
+/**
+ * @swagger
  * /api/tournament/create:
  *   post:
+ *     tags: [Tournament]
  *     summary: "Create a Tournament"
  *     description: "This endpoint allows an organiser to create a new tournament."
  *     requestBody:
@@ -52,6 +60,7 @@ router.post('/api/tournament/create', authenticateOrganiser, tournamentControlle
  * @swagger
  * /api/tournament/{tournamentId}:
  *   get:
+ *     tags: [Tournament]
  *     summary: "Get Tournament by ID"
  *     description: "This endpoint allows anyone to get the details of a specific tournament by its ID."
  *     parameters:
@@ -74,6 +83,7 @@ router.get('/api/tournament/:tournamentId', authenticateUser, tournamentControll
  * @swagger
  * /api/tournament/edit/{tournamentId}:
  *   get:
+ *     tags: [Tournament]
  *     summary: "Edit Tournament"
  *     description: "This endpoint allows an organiser to edit a tournament."
  *     parameters:
@@ -96,6 +106,7 @@ router.get('/api/tournament/edit/:tournamentId', authenticateOrganiser, tourname
  * @swagger
  * /api/tournament/join/{tournamentId}:
  *   post:
+ *     tags: [Tournament]
  *     summary: "Join a Tournament"
  *     description: "This endpoint allows a player to join a tournament."
  *     parameters:
@@ -118,6 +129,7 @@ router.post('/api/tournament/join/:tournamentId', authenticateUser, tournamentCo
  * @swagger
  * /api/tournament/leave/{tournamentId}:
  *   post:
+ *     tags: [Tournament]
  *     summary: "Leave a Tournament"
  *     description: "This endpoint allows a player to leave a tournament."
  *     parameters:
@@ -140,6 +152,7 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  * @swagger
  * /api/tournament/update/{tournamentId}:
  *   post:
+*      tags: [Tournament]
  *     summary: "Update Tournament"
  *     description: "This endpoint allows an organiser to update a tournament."
  *     parameters:
@@ -175,6 +188,7 @@ router.post('/api/tournament/update/:tournamentId', authenticateOrganiser, tourn
  * @swagger
  * /api/tournament/updatePointsTable:
  *   post:
+ *     tags: [Tournament]
  *     summary: "Update Points Table"
  *     description: "This endpoint allows an organiser to update the points table of the tournament."
  *     requestBody:
@@ -258,6 +272,7 @@ router.post('/api/tournament/updatePointsTable', authenticateOrganiser, tourname
  * @swagger
  * /api/tournament/pointsTable/{tournamentId}:
  *   get:
+ *     tags: [Tournament]
  *     summary: "Get Points Table"
  *     description: "This endpoint allows anyone to view the points table of a specific tournament."
  *     parameters:
@@ -280,6 +295,7 @@ router.get('/api/tournament/pointsTable/:tournamentId', authenticateUser, tourna
  * @swagger
  * /api/tournament/updateWinner:
  *   put:
+ *     tags: [Tournament]
  *     summary: "Update Tournament Winner"
  *     description: "Allows an organiser to update the winner of a specific tournament."
  *     requestBody:
@@ -359,6 +375,7 @@ router.put('/api/tournament/updateWinner', authenticateOrganiser, tournamentCont
  * @swagger
  * /api/tournament/edit/{tournamentId}:
  *   post:
+ *     tags: [Tournament]
  *     summary: "Edit Tournament"
  *     description: "Allows an organiser to edit tournament details."
  *     parameters:

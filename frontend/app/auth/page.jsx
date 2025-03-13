@@ -143,7 +143,7 @@ export default function AuthPage() {
           </div>
 
           <div className="mt-4 text-center">
-            <Button variant="link" onClick={() => router.push("/")}>
+            <Button variant="link" onClick={() => router.push("http://localhost:3010/")}>
               Back to Role Selection
             </Button>
           </div>

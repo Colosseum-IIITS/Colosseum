@@ -557,4 +557,161 @@ exports.getOrganiserRevenue = async (req, res) => {
   }
 };
 
+exports.getTopOrganisers = async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const weekStart = new Date(currentDate);
+    weekStart.setDate(currentDate.getDate() - 7);
+    
+    const monthStart = new Date(currentDate);
+    monthStart.setMonth(currentDate.getMonth() - 1);
+    
+    const yearStart = new Date(currentDate);
+    yearStart.setFullYear(currentDate.getFullYear() - 1);
+
+    // Get all organisers with their tournaments
+    const organisers = await Organiser.find().populate('tournaments');
+
+    // Process data for different time periods
+    const processOrganisers = (startDate) => {
+      return organisers
+        .map(org => ({
+          name: org.username,
+          tournaments: org.tournaments.filter(t => 
+            new Date(t.createdAt) >= startDate && 
+            new Date(t.createdAt) <= currentDate
+          ).length
+        }))
+        .sort((a, b) => b.tournaments - a.tournaments)
+        .slice(0, 5); // Get top 5
+    };
+
+    const response = {
+      weekly: processOrganisers(weekStart),
+      monthly: processOrganisers(monthStart),
+      yearly: processOrganisers(yearStart)
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error getting top organisers:", error);
+    res.status(500).json({ 
+      error: "Error getting top organisers",
+      details: error.message 
+    });
+  }
+};
+
+exports.getTournamentPrizePoolAverages = async (req, res) => {
+  try {
+    const currentDate = new Date();
+    
+    // Calculate date ranges
+    const weekStart = new Date(currentDate);
+    weekStart.setDate(currentDate.getDate() - 28); // Last 4 weeks
+    
+    const monthStart = new Date(currentDate);
+    monthStart.setMonth(currentDate.getMonth() - 12); // Last 12 months
+    
+    const yearStart = new Date(currentDate);
+    yearStart.setFullYear(currentDate.getFullYear() - 4); // Last 4 years
+
+    // Get weekly averages
+    const weeklyAverages = await Tournament.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: weekStart },
+          prizePool: { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: { $week: "$createdAt" },
+          average: { $avg: "$prizePool" },
+          period: { $first: { $week: "$createdAt" } }
+        }
+      },
+      { $sort: { period: 1 } },
+      {
+        $project: {
+          period: { $concat: ["Week ", { $toString: "$period" }] },
+          average: { $round: ["$average", 2] }
+        }
+      }
+    ]);
+
+    // Get monthly averages
+    const monthlyAverages = await Tournament.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: monthStart },
+          prizePool: { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          average: { $avg: "$prizePool" }
+        }
+      },
+      {
+        $project: {
+          period: {
+            $let: {
+              vars: {
+                monthsInString: [
+                  "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ]
+              },
+              in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] }
+            }
+          },
+          average: { $round: ["$average", 2] }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    // Get yearly averages
+    const yearlyAverages = await Tournament.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: yearStart },
+          prizePool: { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: { $year: "$createdAt" },
+          average: { $avg: "$prizePool" }
+        }
+      },
+      {
+        $project: {
+          period: { $toString: "$_id" },
+          average: { $round: ["$average", 2] }
+        }
+      },
+      { $sort: { period: 1 } }
+    ]);
+
+    res.status(200).json({
+      weekly: weeklyAverages,
+      monthly: monthlyAverages,
+      yearly: yearlyAverages
+    });
+
+  } catch (error) {
+    console.error("Error getting prize pool averages:", error);
+    res.status(500).json({
+      error: "Error getting prize pool averages",
+      details: error.message
+    });
+  }
+};
+
 

@@ -17,31 +17,6 @@ import {
 } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Sample data - replace with actual data
-const weeklyData = [
-  { name: "Organizer A", tournaments: 5 },
-  { name: "Organizer B", tournaments: 4 },
-  { name: "Organizer C", tournaments: 3 },
-  { name: "Organizer D", tournaments: 3 },
-  { name: "Organizer E", tournaments: 2 },
-];
-
-const monthlyData = [
-  { name: "Organizer A", tournaments: 20 },
-  { name: "Organizer B", tournaments: 18 },
-  { name: "Organizer C", tournaments: 15 },
-  { name: "Organizer D", tournaments: 12 },
-  { name: "Organizer E", tournaments: 10 },
-];
-
-const yearlyData = [
-  { name: "Organizer A", tournaments: 240 },
-  { name: "Organizer B", tournaments: 220 },
-  { name: "Organizer C", tournaments: 180 },
-  { name: "Organizer D", tournaments: 150 },
-  { name: "Organizer E", tournaments: 120 },
-];
-
 const chartConfig = {
   tournaments: {
     label: "Tournaments",
@@ -51,19 +26,45 @@ const chartConfig = {
 
 export function TopOrganisersChart() {
   const [activeTab, setActiveTab] = React.useState("weekly");
+  const [chartData, setChartData] = React.useState({
+    weekly: [],
+    monthly: [],
+    yearly: []
+  });
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/organiser/top-organisers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        setChartData(data);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching top organisers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getChartData = () => {
-    switch (activeTab) {
-      case "weekly":
-        return weeklyData;
-      case "monthly":
-        return monthlyData;
-      case "yearly":
-        return yearlyData;
-      default:
-        return weeklyData;
-    }
+    return chartData[activeTab] || [];
   };
+
+  if (loading) {
+    return <Card><CardContent>Loading...</CardContent></Card>;
+  }
+
+  if (error) {
+    return <Card><CardContent>Error: {error}</CardContent></Card>;
+  }
 
   return (
     <Card>

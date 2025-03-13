@@ -18,14 +18,15 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
  *             properties:
  *               name:
  *                 type: string
  *               logo:
  *                 type: string
  *                 description: "URL of the team logo."
- *             required:
- *               - name
+ *             
  *     responses:
  *       "201":
  *         description: "Team created successfully."
@@ -41,7 +42,7 @@ router.post('/api/team/create', authenticateUser, teamController.createTeam);
  * @swagger
  * /api/player/joinTeam:
  *   post:
-*      tags: [Team]
+ *     tags: [Team]
  *     summary: "Join a Team"
  *     description: "This endpoint allows a player to join an existing team."
  *     requestBody:

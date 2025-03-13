@@ -11,29 +11,35 @@ import {
   Tooltip
 } from "recharts"
 
-const weeklyData = [
-  { period: "Week 1", average: 5000 },
-  { period: "Week 2", average: 5500 },
-  { period: "Week 3", average: 4800 },
-  { period: "Week 4", average: 6000 }
-]
-
-const monthlyData = [
-  { period: "Jan", average: 22000 },
-  { period: "Feb", average: 24000 },
-  { period: "Mar", average: 21000 },
-  { period: "Apr", average: 25000 }
-]
-
-const yearlyData = [
-  { period: "2020", average: 250000 },
-  { period: "2021", average: 280000 },
-  { period: "2022", average: 300000 },
-  { period: "2023", average: 320000 }
-]
-
 export function TournamentPrizePoolChart() {
   const [activeTab, setActiveTab] = React.useState("weekly")
+  const [chartData, setChartData] = React.useState({
+    weekly: [],
+    monthly: [],
+    yearly: []
+  })
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState(null)
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/organiser/tournament-prize-pool-averages')
+        if (!response.ok) {
+          throw new Error('Failed to fetch data')
+        }
+        const data = await response.json()
+        setChartData(data)
+      } catch (err) {
+        setError(err.message)
+        console.error('Error fetching prize pool data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const renderChart = data => (
     <ResponsiveContainer width="100%" height={350}>
@@ -78,6 +84,28 @@ export function TournamentPrizePoolChart() {
     </ResponsiveContainer>
   )
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Tournament Prize Pool Averages</CardTitle>
+        </CardHeader>
+        <CardContent>Loading...</CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Tournament Prize Pool Averages</CardTitle>
+        </CardHeader>
+        <CardContent>Error: {error}</CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -94,9 +122,9 @@ export function TournamentPrizePoolChart() {
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
             <TabsTrigger value="yearly">Yearly</TabsTrigger>
           </TabsList>
-          <TabsContent value="weekly">{renderChart(weeklyData)}</TabsContent>
-          <TabsContent value="monthly">{renderChart(monthlyData)}</TabsContent>
-          <TabsContent value="yearly">{renderChart(yearlyData)}</TabsContent>
+          <TabsContent value="weekly">{renderChart(chartData.weekly)}</TabsContent>
+          <TabsContent value="monthly">{renderChart(chartData.monthly)}</TabsContent>
+          <TabsContent value="yearly">{renderChart(chartData.yearly)}</TabsContent>
         </Tabs>
       </CardContent>
     </Card>

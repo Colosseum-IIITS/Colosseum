@@ -152,7 +152,7 @@ router.post('/api/tournament/leave/:tournamentId', authenticateUser, tournamentC
  * @swagger
  * /api/tournament/update/{tournamentId}:
  *   post:
-*      tags: [Tournament]
+ *     tags: [Tournament]
  *     summary: "Update Tournament"
  *     description: "This endpoint allows an organiser to update a tournament."
  *     parameters:

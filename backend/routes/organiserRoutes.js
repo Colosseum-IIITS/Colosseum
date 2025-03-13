@@ -24,8 +24,9 @@ router.post("/dashboardVisibility",authenticateOrganiser,organiserController.upd
 router.post("/banTeam",authenticateOrganiser,organiserController.banTeam);
 router.get('/getOrganiserName', authenticateOrganiser, organiserController.getOrganiserName);
 router.get("/revenue", authenticateOrganiser, organiserController.getOrganiserRevenue);
-
 router.post('/create', authenticateOrganiser, tournamentController.createTournament);
+router.get('/top-organisers', organiserController.getTopOrganisers);
+router.get('/tournament-prize-pool-averages', organiserController.getTournamentPrizePoolAverages);
 
 // router.get("/getReports", async(req,res=>{
 //     const organiserId = req.body.organiserId;

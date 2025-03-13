@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node backend/app.js",
-    "devStart": "nodemon backend/app.js"
+    "devStart": "nodemon backend/app.js",
+    "populate-db": "node backend/test/populateDB.js"
   },
   "author": "",
   "license": "ISC",

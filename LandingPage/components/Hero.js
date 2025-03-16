@@ -146,12 +146,12 @@ const Hero = () => {
               Enter the Colloseum <br /> Unleash your skills
             </p>
 
-            <Button
+            {/* <Button
               id="watch-trailer"
               title="Watch trailer"
               leftIcon={<TiLocationArrow />}
               containerClass="bg-yellow-300 flex-center gap-1"
-            />
+            /> */}
           </div>
         </div>
       </div>

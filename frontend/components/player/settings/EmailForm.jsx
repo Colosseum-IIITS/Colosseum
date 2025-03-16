@@ -56,6 +56,14 @@ const EmailForm = () => {
             required
             className="max-w-xs"
           />
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="conform your email"
+            required
+            className="max-w-xs"
+          />
         </div>
         <Button type="submit" className="mt-6" disabled={loading}>
           {loading ? 'Saving...' : 'Save'}

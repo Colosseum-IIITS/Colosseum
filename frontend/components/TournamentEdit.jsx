@@ -14,6 +14,7 @@ const TournamentEdit = ({ tournamentId }) => {
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedTeamId, setSelectedTeamId] = useState('');
     const [additionalPoints, setAdditionalPoints] = useState('');
+    const [bannedTeams, setBannedTeams] = useState([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -78,37 +79,56 @@ const handleBanTeam = async (teamId) => {
 
     try {
         const token = localStorage.getItem('user_jwt');
+        
+        const teamToBan = tournament.teams.find(team => team._id === teamId);
+        if (!teamToBan) {
+            setError('Team not found');
+            return;
+        }
 
-        const response = await fetch(`http://localhost:5000/api/organiser/banTeam`, {
+        const response = await fetch('http://localhost:5000/api/organiser/banTeam', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,  // Passing the token as Bearer
+                'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify({ teamId }), // Include teamId in the body
+            body: JSON.stringify({
+                teamId,
+                tournamentId: tournament._id
+            }),
             credentials: 'include',
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Ban Team Response:', data);
-            setError(''); // Clear any existing error
-            setSuccessMessage('Team banned successfully.');
+        const data = await response.json();
 
-            // Remove the banned team from the state
-            setTournament((prev) => ({
-                ...prev,
-                teams: prev.teams.filter((team) => team._id !== teamId),
-                pointsTable: prev.pointsTable.filter((entry) => entry.teamName !== getTeamNameById(teamId)),
-            }));
+        if (response.ok) {
+            // Add to banned teams list
+            setBannedTeams(prev => [...prev, teamToBan]);
+            
+            // Update tournament state
+            setTournament(prev => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    teams: prev.teams.map(team => 
+                        team._id === teamId 
+                            ? { ...team, status: 'BANNED' }
+                            : team
+                    ),
+                    pointsTable: prev.pointsTable.filter(
+                        entry => entry.teamName !== teamToBan.name
+                    )
+                };
+            });
+
+            setSuccessMessage(`Team "${teamToBan.name}" has been banned`);
+            setError('');
         } else {
-            const errorData = await response.json();
-            setError(errorData.message || 'Failed to ban team');
-            setSuccessMessage('');
+            throw new Error(data.message || 'Failed to ban team');
         }
     } catch (error) {
         console.error('Ban Team Error:', error);
-        setError('Error banning team');
+        setError(error.message || 'Error banning team');
         setSuccessMessage('');
     }
 };

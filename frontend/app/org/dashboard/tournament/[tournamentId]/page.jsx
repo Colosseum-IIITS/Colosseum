@@ -1,6 +1,6 @@
 // app/org/dashboard/tournament/[tournamentId]/page.jsx
 
-import TournamentEdit from '@/components/TournamentEdit';
+import TournamentEdit from '@/components/org/TournamentEdit';
 
 const TournamentPage = async ({ params }) => {
     // Await the params object (if necessary based on your Next.js version)

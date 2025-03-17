@@ -16,12 +16,11 @@ const TeamDashboard = () => {
   const [captainName, setCaptainName] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  // Add new states for user data
+  const [ongoingTournamentsCount, setOngoingTournamentsCount] = useState(0); // Add state for ongoing tournaments count
   const [userData, setUserData] = useState(null);
   const [hasTeamPayment, setHasTeamPayment] = useState(false);
   const router = useRouter();
 
-  // Modified useEffect to better handle payment status
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -89,6 +88,7 @@ const TeamDashboard = () => {
       setTeam(data.team);
       setPlayerRole(data.role);
       setCaptainName(data.captainName);
+      setOngoingTournamentsCount(data.ongoingTournamentsCount); // Set ongoing tournaments count
     } catch (error) {
       console.error('Error fetching team data:', error);
       setError('Failed to load team data');
@@ -351,7 +351,7 @@ const TeamDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { label: 'Total Members', value: team?.players?.length || 0 },
-            { label: 'Active Tournaments', value: team?.tournaments?.filter(t => t.status === 'ongoing').length || 0 },
+            { label: 'Active Tournaments', value: ongoingTournamentsCount || 0 }, // Use ongoingTournamentsCount
             { label: 'Tournaments Won', value: team?.tournaments?.filter(t => t.won).length || 0 },
             { label: 'Win Rate', value: `${Math.round((team?.tournaments?.filter(t => t.won).length || 0) / (team?.tournaments?.length || 1) * 100)}%` }
           ].map((stat, idx) => (

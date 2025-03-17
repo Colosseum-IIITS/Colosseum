@@ -29,6 +29,8 @@ router.post('/updateTable', authenticateOrganiser, tournamentController.updatePo
 router.get('/pointsTable/:tournamentId', authenticateUser, tournamentController.getPointsTable);
 router.post('/edit/:tournamentId',authenticateOrganiser, tournamentController.editTournament);
 router.post('/create',authenticateOrganiser,tournamentController.createTournament);
+
 router.get('/tournament/:tournamentId', authenticateUser, tournamentController.getTournamentById);
 module.exports = router;
+
     

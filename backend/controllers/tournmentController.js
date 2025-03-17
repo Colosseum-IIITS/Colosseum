@@ -255,33 +255,34 @@ exports.updatePointsTable = async (req, res) => {
 
 // Fetch enrolled tournaments
 exports.getEnrolledTournaments = async (req, res) => {
-    try {
-      // Extract player ID from the authenticated user
-      const playerId = req.user._id;
-  
-      // Find the player by ID and populate the tournaments field
-      const player = await Player.findById(playerId).populate({
-        path: 'tournaments.tournament', // Populate tournament field
-        select: 'name startDate endDate status organiser prizePool entryFee', // Specify fields to select
-        populate: {
-          path: 'organiser', // Populate organiser details
-          select: 'name email',  // Select only the necessary fields from organiser
-        },
-      });
-  
-      if (!player) {
-        console.log("Player not found");
-        return res.status(404).json({ message: 'Player not found' });
-      }
-  
-      // Extract the tournaments the player is enrolled in
-      const tournaments = player.tournaments.map((t) => t.tournament);
-  
-      return res.status(200).json({ tournaments }); // Return tournaments to frontend
-    } catch (error) {
-      console.error('Error fetching enrolled tournaments:', error);
-      return res.status(500).json({ message: 'Internal server error' });
+  try {
+    // Extract player ID from the authenticated user
+    const playerId = req.user._id;
+
+    // Find the player by ID and populate the team field
+    const player = await Player.findById(playerId).populate('team');
+    if (!player) {
+      console.log("Player not found");
+      return res.status(404).json({ message: 'Player not found' });
     }
+
+    // Check if the player has a team
+    if (!player.team) {
+      return res.status(400).json({ message: 'Player is not part of any team' });
+    }
+
+    // Find the tournaments that the team is enrolled in
+    const teamId = player.team._id;
+    const tournaments = await Tournament.find({ teams: teamId }).populate({
+      path: 'organiser',
+      select: 'name email',
+    });
+
+    return res.status(200).json({ tournaments }); // Return tournaments to frontend
+  } catch (error) {
+    console.error('Error fetching enrolled tournaments:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
   
 // Fetch tournament by ID
@@ -574,3 +575,4 @@ exports.getTournamentById = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
   }
 };
+

@@ -2,7 +2,7 @@ const Team = require('../models/Team');
 const Player = require('../models/Player');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-
+const Tournament = require('../models/Tournament');
 // Create a new team
 exports.createTeam = async (req, res) => {
   const { name } = req.body;
@@ -291,9 +291,9 @@ exports.rejectJoinRequest = async (req, res) => {
   }
 };
 
-
 exports.getTeamDashboard = async (req, res) => {
-  const playerId= req.user._id;  // Get the playerId from the authenticated user
+  const playerId = req.user._id;  // Get the playerId from the authenticated user
+  const currentDate = new Date();
 
   try {
     console.log("Received API call from", playerId);
@@ -311,15 +311,22 @@ exports.getTeamDashboard = async (req, res) => {
     await team.populate('tournaments');
 
     const captain = await Player.findById(team.captain._id);
-    const captainName = captain.username; 
+    const captainName = captain.username;
 
-    res.status(200).json({ team, role, captainName });
+    // Find ongoing tournaments that the team is participating in
+    const ongoingTournamentsCount = await Tournament.countDocuments({
+      teams: teamId,
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+      status: "Approved"
+    });
+
+    res.status(200).json({ team, role, captainName, ongoingTournamentsCount });
   } catch (error) {
     console.error('Error fetching team dashboard data:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 
 exports.removePlayerFromTeam = async (req, res) => {

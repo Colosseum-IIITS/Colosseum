@@ -34,7 +34,7 @@ export default function OrganizerManagement() {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/organiser/search?username=${encodeURIComponent(searchQuery)}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/organiser/search?searchTerm=${encodeURIComponent(searchQuery)}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch organisers");

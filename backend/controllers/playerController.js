@@ -155,8 +155,9 @@ exports.searchPlayer = async (req, res) => {
         const { searchTerm } = req.query; // No fallback to an empty string here
         console.log('Search Term:', searchTerm); 
 
-        if (!searchTerm) {
-            return res.status(400).json({ error: 'Search term is required.' });
+        if (!searchTerm || searchTerm.trim() === '') {
+            const allPlayers = await Player.find().populate('team').populate('tournaments.tournament');
+
         }
 
         const players = await Player.find({

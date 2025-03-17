@@ -45,12 +45,24 @@ exports.getOrganiserByUsername = async (req, res) => {
   const { searchTerm } = req.query;
 
   try {
-      const organisers = await Organiser.find({ username: { $regex: new RegExp(searchTerm, 'i') } })
+      let organisers;
+
+      if (!searchTerm || searchTerm.trim() === '') {
+          // Fetch all organisers if searchTerm is empty
+          organisers = await Organiser.find()
+              .populate('followers')
+              .populate('tournaments');
+      } else {
+          // Search organisers by username
+          organisers = await Organiser.find({
+              username: { $regex: new RegExp(searchTerm, 'i') }
+          })
           .populate('followers')
           .populate('tournaments');
+      }
 
       console.log(`Search term received: ${searchTerm}`);
-      
+
       if (organisers.length === 0) {
           console.log(`No organisers found for the username: ${searchTerm}`);
           return res.status(404).json({
@@ -66,7 +78,7 @@ exports.getOrganiserByUsername = async (req, res) => {
           organisationResults: organisers,
           searchTerm: searchTerm
       });
-      
+
   } catch (error) {
       console.error('Error fetching organisers:', error);
       return res.status(500).json({

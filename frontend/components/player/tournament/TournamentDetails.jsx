@@ -8,140 +8,14 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'; // 
 import ReactConfetti from 'react-confetti';
 import { useWindowSize } from 'react-use'; // Add this import
 import { motion } from "framer-motion";
-import Particles from "@tsparticles/react";
-import { loadOptions } from "@tsparticles/engine";
 
 // Add these configurations at the top of your component
-const particlesConfig = {
-  particles: {
-    number: {
-      value: 200,
-      density: {
-        enable: true,
-        value_area: 1600
-      }
-    },
-    color: {
-      value: ["#FFD700", "#FFA500", "#FF4500", "#ff61d2", "#48f2ff", "#ff6b6b"]
-    },
-    shape: {
-      type: ["circle", "star"],
-      options: {
-        star: {
-          sides: 5
-        }
-      }
-    },
-    opacity: {
-      value: 0.8,
-      random: true,
-      animation: {
-        enable: true,
-        speed: 0.5,
-        minimumValue: 0.1,
-        sync: false
-      }
-    },
-    size: {
-      value: 6,
-      random: {
-        enable: true,
-        minimumValue: 3
-      }
-    },
-    move: {
-      enable: true,
-      speed: 10,
-      direction: "bottom",
-      random: true,
-      straight: false,
-      outModes: {
-        default: "out"
-      },
-      attract: {
-        enable: false // Disabled attract to make movement more natural
-      },
-      gravity: {
-        enable: true,
-        acceleration: 0.5
-      }
-    },
-    life: {
-      duration: {
-        sync: false,
-        value: 3
-      },
-      count: 1
-    },
-    rotate: {
-      value: {
-        min: 0,
-        max: 360
-      },
-      direction: "random",
-      animation: {
-        enable: true,
-        speed: 60
-      }
-    },
-    tilt: {
-      direction: "random",
-      enable: true,
-      value: {
-        min: 0,
-        max: 360
-      },
-      animation: {
-        enable: true,
-        speed: 60
-      }
-    }
-  },
-  emitters: [
-    {
-      direction: "bottom",
-      position: {
-        x: 0,
-        y: 0
-      },
-      rate: {
-        delay: 0,
-        quantity: 2
-      },
-      size: {
-        width: 100,
-        height: 0
-      }
-    },
-    {
-      direction: "bottom",
-      position: {
-        x: 100,
-        y: 0
-      },
-      rate: {
-        delay: 0,
-        quantity: 2
-      },
-      size: {
-        width: 100,
-        height: 0
-      }
-    }
-  ],
-  fullScreen: {
-    enable: true,
-    zIndex: 100
-  },
-  detectRetina: true
-};
 
 const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
   const { width, height } = useWindowSize(); // Get window dimensions
   const [showConfetti, setShowConfetti] = useState(false);
   const [message, setMessage] = useState('');
   const [captainStatus, setCaptainStatus] = useState(isCaptain); // Track if player is captain
-  const [showParticles, setShowParticles] = useState(false);
   const router = useRouter();
 
   const handleBackButton = () => {
@@ -167,10 +41,6 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
     }
   };
 
-  const particlesInit = async (engine) => {
-    await loadOptions (engine);
-  };
-
   useEffect(() => {
     setCaptainStatus(isCaptain);
   }, [isCaptain]);
@@ -180,14 +50,6 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
     if (tournament.status === 'Completed') {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 5000); // Stop after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [tournament.status]);
-
-  useEffect(() => {
-    if (tournament.status === 'Completed') {
-      setShowParticles(true);
-      const timer = setTimeout(() => setShowParticles(false), 8000);
       return () => clearTimeout(timer);
     }
   }, [tournament.status]);
@@ -208,25 +70,6 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
 
   return (
     <div className="relative">
-      {showParticles && tournament.status === 'Completed' && (
-        <Particles
-          id="tsparticles"
-          init={particlesInit}
-          options={particlesConfig}
-          className="!fixed inset-0 pointer-events-none"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100vw',
-            height: '100vh',
-            margin: 0,
-            padding: 0
-          }}
-        />
-      )}
 
       <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-6 relative">
         {/* Add Confetti when tournament is completed */}
@@ -254,7 +97,7 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
           >
             <div className="relative overflow-hidden rounded-lg shadow-2xl">
               {/* Background Pattern */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-800 via-orange-500 to-orange-800 opacity-90" />
               
               {/* Content */}
               <div className="relative p-8">

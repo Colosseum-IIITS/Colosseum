@@ -22,7 +22,7 @@ router.post('/leave/:tournamentId',authenticateUser,tournamentController.leaveTo
 router.post('/update/:tournamentId', tournamentController.updateTournament);
 router.post('/updatePointsTable',tournamentController.updateTournament);
 
-// Route to update the winner by the Organiser of the tournamne
+// Route to update the winner by the Organiser of the tournament
 router.put('/updateWinner',authenticateOrganiser, tournamentController.updateWinner);
 
 router.post('/updateTable', authenticateOrganiser, tournamentController.updatePointsTable);

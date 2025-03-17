@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Loader2 } from 'lucide-react';
 
 const TournamentEdit = ({ tournamentId }) => {
     const [tournament, setTournament] = useState(null);
@@ -15,6 +19,8 @@ const TournamentEdit = ({ tournamentId }) => {
     const [selectedTeamId, setSelectedTeamId] = useState('');
     const [additionalPoints, setAdditionalPoints] = useState('');
     const [bannedTeams, setBannedTeams] = useState([]);
+    const [selectedWinnerTeam, setSelectedWinnerTeam] = useState('');
+    const [declaringWinner, setDeclaringWinner] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -201,7 +207,71 @@ const handleUpdatePoints = async (e) => {
     }
 };
 
+// Handler to declare winner
+const handleDeclareWinner = async (e) => {
+    e.preventDefault();
+    
+    // Get the team at the top of the points table
+    const topTeam = tournament.pointsTable[0];
+    if (!topTeam) {
+        setError('No teams found in points table');
+        return;
+    }
 
+    // Find the team ID from the team name
+    const winningTeam = tournament.teams.find(team => team.name === topTeam.teamName);
+    if (!winningTeam) {
+        setError('Could not find winning team details');
+        return;
+    }
+
+    setDeclaringWinner(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+        const token = localStorage.getItem('user_jwt');
+        const response = await fetch('http://localhost:5000/api/tournament/updateWinner', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                tournamentId: tournament._id,
+                winningTeamId: winningTeam._id
+            }),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to declare winner');
+        }
+
+        // First update success message
+        setSuccessMessage(`Congratulations! ${topTeam.teamName} has been declared the winner!`);
+        
+        // Then update tournament state
+        const updatedTournament = {
+            ...tournament,
+            winner: winningTeam._id,
+            status: 'Completed'
+        };
+        setTournament(updatedTournament);
+
+        // Clear form states
+        setSelectedTeamId('');
+        setAdditionalPoints('');
+        setDeclaringWinner(false);
+
+    } catch (error) {
+        console.error('Declare Winner Error:', error);
+        setError(error.message || 'Error declaring winner');
+        setDeclaringWinner(false);
+    }
+};
 
     if (error && !tournament) {
         return (
@@ -230,9 +300,16 @@ const handleUpdatePoints = async (e) => {
 
             {/* Winner Display */}
             {tournament.winner && (
-                <div className="text-6xl font-bold text-center text-blue-600">
-                    Winner: {tournament.winner}
-                </div>
+                <Card className="mb-6">
+                    <CardHeader>
+                        <h3 className="text-lg font-semibold">Tournament Winner</h3>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-xl font-medium">
+                            {tournament.teams.find(team => team._id === tournament.winner)?.name || 'Unknown Team'}
+                        </p>
+                    </CardContent>
+                </Card>
             )}
 
             {/* Tournament Details */}
@@ -356,56 +433,69 @@ const handleUpdatePoints = async (e) => {
             </div>
 
             {/* Update Points Table Section */}
-<div>
-    <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Update Points Table</h3>
-    <form onSubmit={handleUpdatePoints} className="space-y-4">
-        {/* Team Selection */}
-        <div>
-            <label htmlFor="team" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Select Team
-            </label>
-            <select
-                id="team"
-                name="team"
-                value={selectedTeamId}
-                onChange={(e) => setSelectedTeamId(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-gray-300"
-            >
-                <option value="">-- Select a Team --</option>
-                {tournament.teams.map((team) => (
-                    <option key={team._id} value={team._id}>
-                        {team.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-        {/* Additional Points Input */}
-        <div>
-            <label htmlFor="points" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Additional Points
-            </label>
-            <input
-                type="number"
-                id="points"
-                name="points"
-                value={additionalPoints}
-                onChange={(e) => setAdditionalPoints(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-12 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-gray-300"
-                placeholder="Enter points to add"
-                min="1"
-                required
-            />
-        </div>
-        {/* Submit Button */}
-        <div>
-            <Button type="submit" variant="primary">
-                Update Points
-            </Button>
-        </div>
-    </form>
-</div>
+            <Card className="mb-6">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Update Points Table</h3>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleUpdatePoints} className="space-y-4">
+                        <div className="space-y-2">
+                            <label htmlFor="team" className="text-sm font-medium">
+                                Select Team
+                            </label>
+                            <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a team" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {tournament.teams.map((team) => (
+                                        <SelectItem key={team._id} value={team._id}>
+                                            {team.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <label htmlFor="points" className="text-sm font-medium">
+                                Additional Points
+                            </label>
+                            <Input 
+                                type="number"
+                                id="points"
+                                value={additionalPoints}
+                                onChange={(e) => setAdditionalPoints(e.target.value)}
+                                placeholder="Enter points to add"
+                                min="1"
+                                required
+                            />
+                        </div>
 
-
+                        <div className="flex justify-end space-x-2">
+                            <Button type="submit" variant="default">
+                                Update Points
+                            </Button>
+                            {tournament.status != 'Completed' && tournament.pointsTable.length > 0 && (
+                                <Button 
+                                    onClick={handleDeclareWinner}
+                                    disabled={declaringWinner}
+                                    variant="secondary"
+                                >
+                                    {declaringWinner ? (
+                                        <span className="flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Declaring...
+                                        </span>
+                                    ) : (
+                                        'Declare Winner'
+                                    )}
+                                </Button>
+                            )}
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
 
             {/* Success Message */}
             {successMessage && (

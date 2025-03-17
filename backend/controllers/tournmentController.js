@@ -134,42 +134,57 @@ exports.updateTournament = async (req, res) => {
 
 // Update winner
 // controllers/tournamentController.js
-
 exports.updateWinner = async (req, res) => {
-  const { tournamentId, winnerId } = req.body;
+    const { tournamentId, winningTeamId } = req.body;
 
-  try {
-      const tournament = await Tournament.findById(tournamentId);
-      if (!tournament) {
-          return res.status(404).json({ message: "Tournament not found" });
-      }
+    try {
+        // Find the tournament
+        const tournament = await Tournament.findById(tournamentId);
+        if (!tournament) {
+            return res.status(404).json({ message: "Tournament not found" });
+        }
 
-      if (!tournament.organiser.equals(req.user.id)) {
-          return res.status(403).json({ message: "Only the organiser can update the winner" });
-      }
+        // Check if the logged-in user is the organiser
+        if (!tournament.organiser.equals(req.user.id)) {
+            return res.status(403).json({ message: "Only the organiser can update the winner" });
+        }
 
-      tournament.winner = winnerId;
-      await tournament.save();
+        // Find the winning team
+        const winningTeam = await Team.findById(winningTeamId).populate("players");
+        if (!winningTeam) {
+            return res.status(404).json({ message: "Winning team not found" });
+        }
 
-      const player = await Player.findById(winnerId);
-      if (!player) {
-          return res.status(404).json({ message: "Player not found" });
-      }
+        // Update the tournament winner and status
+        tournament.winner = winningTeamId;
+        tournament.status = "Completed";
+        await tournament.save();
 
-      const tournamentIndex = player.tournaments.findIndex((t) =>
-          t.tournament.equals(tournamentId)
-      );
-      if (tournamentIndex !== -1) {
-          player.tournaments[tournamentIndex].won = true;
-          await player.save();
-      }
+        // Update all players in the winning team to mark this tournament as won
+        await Promise.all(
+            winningTeam.players.map(async (playerId) => {
+                const player = await Player.findById(playerId);
+                if (player) {
+                    const tournamentIndex = player.tournaments.findIndex(t =>
+                        t.tournament.equals(tournamentId)
+                    );
+                    if (tournamentIndex !== -1) {
+                        player.tournaments[tournamentIndex].won = true;
+                    } else {
+                        player.tournaments.push({ tournament: tournamentId, won: true });
+                    }
+                    await player.save();
+                }
+            })
+        );
 
-      res.status(200).json({ message: "Winner updated successfully", tournament });
-  } catch (error) {
-      console.error("Error updating winner:", error);
-      res.status(500).json({ error: "Error updating winner" });
-  }
+        res.status(200).json({ message: "Winner updated successfully", tournament });
+    } catch (error) {
+        console.error("Error updating winner:", error);
+        res.status(500).json({ error: "Error updating winner" });
+    }
 };
+
 
 // Update points table
 // controllers/tournamentController.js

@@ -27,7 +27,9 @@ const TournamentList = () => {
           console.log(data);
 
           setJoinedTournaments(data.tournaments);
-        } else {
+        }else if (response.status === 400) {
+          setJoinedTournaments([]);
+        }else {
           console.error('Failed to fetch tournaments');
         }
         setLoading(false);

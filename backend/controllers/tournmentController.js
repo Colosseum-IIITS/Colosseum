@@ -268,6 +268,7 @@ exports.getEnrolledTournaments = async (req, res) => {
 
     // Check if the player has a team
     if (!player.team) {
+      console.log("kjhsahf");
       return res.status(400).json({ message: 'Player is not part of any team' });
     }
 

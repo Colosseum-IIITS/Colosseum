@@ -433,7 +433,6 @@ exports.joinTournament = async (req, res) => {
       if (!player.team.name) {
           return res.status(400).json({ message: "Team name is missing" });
       }
-
       // Add the team to the pointsTable
       tournament.pointsTable.push({
           ranking: tournament.pointsTable.length + 1,
@@ -445,10 +444,7 @@ exports.joinTournament = async (req, res) => {
 
       // Update tournament revenue
 
-      console.log("Tournament entry fee:", tournament.entryFee);
-      console.log("Tournament revenue before:", tournament.revenue);
       tournament.revenue += tournament.entryFee;
-      console.log("Tournament revenue:", tournament.revenue);
       await tournament.save();
 
       // Update organiser revenue if organiser exists

@@ -321,13 +321,17 @@ exports.getTeamDashboard = async (req, res) => {
       status: "Approved"
     });
 
-    res.status(200).json({ team, role, captainName, ongoingTournamentsCount });
+    // Count the number of tournaments won by the team
+    const tournamentsWonCount = await Tournament.countDocuments({
+      winner: teamId
+    });
+
+    res.status(200).json({ team, role, captainName, ongoingTournamentsCount, tournamentsWonCount });
   } catch (error) {
     console.error('Error fetching team dashboard data:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 exports.removePlayerFromTeam = async (req, res) => {
   console.log("Handling request to remove player with ID:", req.params.playerId);

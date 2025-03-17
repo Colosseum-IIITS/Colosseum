@@ -33,6 +33,7 @@ router.get('/getUserName', authenticateUser, playerController.getUsername);
 router.get('/homepage', authenticateUser, playerController.getHomePage);
 router.post('/joinTeam', authenticateUser, teamController.joinTeam);
 router.get('/winPercentage',authenticateUser,playerController.getWinPercentage);
+router.get('/ranking', playerController.getGlobalPlayerRanking);
 module.exports = router;
 // Routes
 router.post(

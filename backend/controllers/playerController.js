@@ -553,18 +553,43 @@ exports.getTournamentPointsTable = async (req, res) => {
         });
     }
 };
+exports.getGlobalPlayerRanking = async (req, res) => {
+    try {
+      const players = await Player.find().lean();
+  
+      const rankedPlayers = players
+        .map(player => ({
+          _id: player._id,
+          username: player.username,
+          tournamentsWon: player.tournaments.filter(t => t.won).length,
+          tournamentsPlayed: player.tournaments.length
+        }))
+        .sort((a, b) =>
+          b.tournamentsWon - a.tournamentsWon || // Primary sorting by tournaments won
+          b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker by tournaments played
+        );
+  
+      res.status(200).json(rankedPlayers);
+    } catch (error) {
+      console.error('Error fetching player rankings:', error);
+      res.status(500).json({ message: 'Error retrieving player rankings', error });
+    }
+};
 
-exports.getDashboard = async (req, res) => {
+  exports.getDashboard = async (req, res) => {
     const playerId = req.user._id;
     const currentDate = new Date();
-    
+  
     try {
+      // Populate tournaments with tournament details
       const player = await Player.findById(playerId).populate('tournaments.tournament');
       if (!player) {
         return res.status(404).json({ message: 'Player not found' });
       }
   
+      // Calculate tournaments won and played
       const tournamentsWon = player.tournaments.filter(t => t.won).length;
+      console.log('Tournaments Won:', tournamentsWon);
       const tournamentsPlayed = player.tournaments.length;
   
       let winPercentage = 0;
@@ -572,34 +597,53 @@ exports.getDashboard = async (req, res) => {
         winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
       }
   
+      // Calculate ongoing tournaments based on current date
       const ongoingTournaments = player.tournaments.filter(t => {
         const tournament = t.tournament;
         return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
       }).length;
   
+      // Get team details if exists
       const teamId = player.team;
       const team = await Team.findById(teamId);
+  
+      // Compute global rankings for all players
+      const players = await Player.find().lean();
+      const rankings = players
+        .map(p => ({
+          _id: p._id,
+          username: p.username,
+          tournamentsWon: p.tournaments.filter(t => t.won).length,
+          tournamentsPlayed: p.tournaments.length
+        }))
+        .sort((a, b) =>
+          b.tournamentsWon - a.tournamentsWon || // Primary: tournaments won
+          b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker: tournaments played
+        );
+  
+      // Find the current player's rank (1-based index)
+      const globalRank = rankings.findIndex(p => p._id.toString() === playerId.toString()) +1;
   
       res.status(200).json({
         player: {
           username: player.username,
           email: player.email,
-          globalRank: player.globalRank || 'Unranked',
-          tournamentsWon: tournamentsWon || 0,
-          tournamentsPlayed: tournamentsPlayed || 0,
+          globalRank: globalRank || 'Unranked',
+          tournamentsWon,
+          tournamentsPlayed,
           noOfOrgsFollowing: player.following.length || 0,
           team,
           winPercentage: winPercentage.toFixed(2),
           ongoingTournaments,
-        }
+        },
+        // Return the full global ranking for cross-checking
+        globalRanking: rankings
       });
     } catch (error) {
       console.error("Error fetching dashboard:", error.message);
       res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
   };
-  
-
 exports.getUsername = async (req, res) => {
     try {
         const { _id } = req.user;  // Extract the _id from the authenticated user

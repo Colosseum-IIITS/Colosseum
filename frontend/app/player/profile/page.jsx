@@ -54,6 +54,7 @@ const PlayerProfile = () => {
         }
 
         const data = await response.json();
+        // Expecting the dashboard data to be in the "player" field
         setPlayerData(data.player);
       } catch (error) {
         console.error('Error fetching player data:', error);
@@ -73,7 +74,7 @@ const PlayerProfile = () => {
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
-        <Navbar /> {/* Ensure Navbar is part of the loading screen */}
+        <Navbar /> {/* Navbar remains visible during loading */}
         <div className="flex-grow flex items-center justify-center">
           <div className="text-xl font-semibold text-gray-700">Loading...</div>
         </div>
@@ -84,7 +85,7 @@ const PlayerProfile = () => {
   if (!playerData) {
     return (
       <div className="flex flex-col min-h-screen">
-        <Navbar /> {/* Ensure Navbar is part of the error screen */}
+        <Navbar /> {/* Navbar remains visible on error */}
         <div className="flex-grow flex items-center justify-center">
           <div className="text-xl font-semibold text-red-500">
             Unable to load profile data.
@@ -94,22 +95,24 @@ const PlayerProfile = () => {
     );
   }
 
+  // Ensure globalRank is a valid number before using it in calculations
+  const globalRankValue = typeof playerData.globalRank === 'number' ? playerData.globalRank : 0;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="w-[70%] mt-[20px] mx-auto">
-        <Navbar /> {/* Integrate Navbar at the top */}
+        <Navbar /> {/* Navbar at the top */}
       </div>
       <main className="flex-grow container mx-auto px-6 py-12">
         <div className="space-y-8">
-          
           {/* Player Profile Section */}
           <section className="bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-lg">
             <UserProvider>
-            <div className="ml-[40px] flex items-center space-x-16">
-                <div className="w-48 h-48 rounded-full overflow-hidden"> {/* Profile Picture container */}
+              <div className="ml-[40px] flex items-center space-x-16">
+                <div className="w-48 h-48 rounded-full overflow-hidden">
                   <ProfilePicture />
                 </div>
-                <div className="flex-grow"> {/* Content container */}
+                <div className="flex-grow">
                   <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
                     Profile
                   </h2>
@@ -146,19 +149,17 @@ const PlayerProfile = () => {
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
               Statistics
             </h2>
-            
-            {/* Two-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left column - Stats Grid */}
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Global Rank', value: `${playerData.globalRank || 'N/A'}` },
+                    { label: 'Global Rank', value: playerData.globalRank ? playerData.globalRank : 'N/A' },
                     { label: 'Tournaments Played', value: playerData.tournamentsPlayed || 0 },
                     { label: 'Tournaments Won', value: playerData.tournamentsWon || 0 },
                     { label: 'Win Rate', value: `${playerData.winPercentage || 0}%` },
                     { label: 'Active Tournaments', value: playerData.ongoingTournaments || 0 },
-                    { label: 'Organisers following', value: playerData.noOfOrgsFollowing || 0 }
+                    { label: 'Organisers Following', value: playerData.noOfOrgsFollowing || 0 }
                   ].map((stat, idx) => (
                     <div 
                       key={idx} 
@@ -174,7 +175,7 @@ const PlayerProfile = () => {
               {/* Right column - Performance Overview */}
               <div className="bg-white p-6 rounded-xl border border-gray-100">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Performance Overview</h3>
-                <div className="h-[400px] w-full"> {/* Increased height for better visibility */}
+                <div className="h-[400px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart outerRadius={130} data={[
                       {
@@ -189,11 +190,12 @@ const PlayerProfile = () => {
                       },
                       {
                         subject: 'Global Rank',
-                        value: Math.max(100 - ((playerData.globalRank || 100) / 10), 0),
+                        // Normalize the global rank: lower rank is better, so we invert the score
+                        value: globalRankValue > 0 ? Math.max(100 - globalRankValue, 0) : 0,
                         fullMark: 100,
                       },
                       {
-                        subject: 'Tournaments Participating',
+                        subject: 'Active Tournaments',
                         value: (playerData.ongoingTournaments || 0) * 20,
                         fullMark: 100,
                       },

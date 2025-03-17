@@ -27,10 +27,16 @@ const playerSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-// Middleware to check if team creation is allowed
+// Virtual field for tournaments won
+playerSchema.virtual('tournamentsWon').get(function () {
+  return this.tournaments.filter(t => t.won).length;
+});
+
+// Method to check if a player can create a team
 playerSchema.methods.canCreateTeam = function() {
   return this.teamPayment.paid === true;
 };
 
 const Player = mongoose.model('Player', playerSchema);
+
 module.exports = Player;

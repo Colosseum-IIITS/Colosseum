@@ -17,6 +17,7 @@ const TeamDashboard = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [ongoingTournamentsCount, setOngoingTournamentsCount] = useState(0); // Add state for ongoing tournaments count
+  const [tournamentsWonCount, setTournamentsWonCount] = useState(0); // Add state for tournaments won count
   const [userData, setUserData] = useState(null);
   const [hasTeamPayment, setHasTeamPayment] = useState(false);
   const router = useRouter();
@@ -89,6 +90,7 @@ const TeamDashboard = () => {
       setPlayerRole(data.role);
       setCaptainName(data.captainName);
       setOngoingTournamentsCount(data.ongoingTournamentsCount); // Set ongoing tournaments count
+      setTournamentsWonCount(data.tournamentsWonCount); // Set tournaments won count
     } catch (error) {
       console.error('Error fetching team data:', error);
       setError('Failed to load team data');
@@ -352,8 +354,8 @@ const TeamDashboard = () => {
           {[
             { label: 'Total Members', value: team?.players?.length || 0 },
             { label: 'Active Tournaments', value: ongoingTournamentsCount || 0 }, // Use ongoingTournamentsCount
-            { label: 'Tournaments Won', value: team?.tournaments?.filter(t => t.won).length || 0 },
-            { label: 'Win Rate', value: `${Math.round((team?.tournaments?.filter(t => t.won).length || 0) / (team?.tournaments?.length || 1) * 100)}%` }
+            { label: 'Tournaments Won', value: tournamentsWonCount || 0 }, // Use tournamentsWonCount
+            { label: 'Win Rate', value: `${Math.round((tournamentsWonCount || 0) / (team?.tournaments?.length || 1) * 100)}%` } // Use tournamentsWonCount
           ].map((stat, idx) => (
             <div 
               key={idx} 

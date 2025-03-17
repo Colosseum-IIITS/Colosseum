@@ -158,6 +158,10 @@ exports.updateWinner = async (req, res) => {
         // Update the tournament winner and status
         tournament.winner = winningTeamId;
         tournament.status = "Completed";
+        tournament.winningDetails = {
+          prizeAmount: tournament.prizePool,
+          winningDate: new Date()
+        };
         await tournament.save();
 
         // Update all players in the winning team to mark this tournament as won

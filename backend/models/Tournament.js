@@ -22,8 +22,14 @@ const tournamentSchema = new mongoose.Schema(
     },
     teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
     description: { type: String, default: "Hello World!!" },
-    winner: { type: String },
-    // messageBox: [{type: String}],
+    winner: { 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team'
+    },
+    winningDetails: {
+      prizeAmount: Number,
+      winningDate: Date
+    },
     pointsTable: [
       {
         ranking: Number,

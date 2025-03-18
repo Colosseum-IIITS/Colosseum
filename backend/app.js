@@ -55,7 +55,7 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/tournamentDB', {
+mongoose.connect('mongodb://localhost:27017/tournamentDB2', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

@@ -27,47 +27,65 @@ export default function PlayerManagement() {
   const [selectedPlayer, setSelectedPlayer] = useState(null)
   const { dashboardData, setDashboardData } = useAdminDashboard()
   const { toast } = useToast()
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   const handleSearch = async () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/player/searchPlayer?searchTerm=${encodeURIComponent(searchQuery)}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/player/searchPlayer?` + 
+        `searchTerm=${encodeURIComponent(searchQuery)}&page=${page}&limit=${ITEMS_PER_PAGE}`
       );
+      
       if (!response.ok) {
         throw new Error("Failed to fetch players");
       }
+      
       const data = await response.json();
       setPlayers(data.results);
-  
-      // Save players to localStorage
-      localStorage.setItem("players", JSON.stringify(data.results));
+
+      // Only store essential data fields
+      const minimalPlayerData = data.results.map(player => ({
+        _id: player._id,
+        username: player.username,
+        email: player.email,
+        banned: player.banned
+      }));
+
+      // Store only current page data
+      try {
+        localStorage.setItem(`players_page_${page}`, JSON.stringify(minimalPlayerData));
+      } catch (storageError) {
+        console.warn('Storage quota exceeded, clearing old data');
+        localStorage.clear(); // Clear all stored data if quota is exceeded
+      }
+
     } catch (error) {
       console.error("Error fetching players:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch players.",
+        description: "Failed to fetch players."
       });
     } finally {
       setLoading(false);
     }
   };
-  
-  // Load players from localStorage when component mounts
+
   useEffect(() => {
-    const savedPlayers = localStorage.getItem("players");
-    if (savedPlayers) {
+    // Load cached data for current page if available
+    const cachedData = localStorage.getItem(`players_page_${page}`);
+    if (cachedData) {
       try {
-        setPlayers(JSON.parse(savedPlayers));
+        setPlayers(JSON.parse(cachedData));
       } catch (error) {
-        console.error("Error parsing players from localStorage:", error);
-        localStorage.removeItem("players"); // Clear corrupted data
+        console.error("Error parsing cached players:", error);
+        localStorage.removeItem(`players_page_${page}`);
       }
     }
-  }, []);
-  
-  
+  }, [page]);
+
 const { triggerBanHistoryRefetch } = useBanContext(); // Get the trigger function
 
 const handleToggleBan = async () => {

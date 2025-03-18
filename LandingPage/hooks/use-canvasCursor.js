@@ -2,6 +2,10 @@
 import { useEffect } from "react"
 
 const useCanvasCursor = () => {
+  // Ensure we're in a browser environment
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return; // Exit early if not in browser environment
+  }
   function n(e) {
     this.init(e || {})
   }
@@ -107,24 +111,34 @@ const useCanvasCursor = () => {
   }
 
   function render() {
-    if (ctx.running) {
-      ctx.globalCompositeOperation = "source-over"
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      ctx.globalCompositeOperation = "lighter"
-      ctx.strokeStyle = "hsla(" + Math.round(f.update()) + ",50%,50%,0.2)"
-      ctx.lineWidth = 1
-      for (var e, t = 0; t < E.trails; t++) {
-        ;(e = lines[t]).update()
-        e.draw()
+    if (ctx && ctx.running && ctx.canvas) {
+      try {
+        ctx.globalCompositeOperation = "source-over"
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.globalCompositeOperation = "lighter"
+        ctx.strokeStyle = "hsla(" + Math.round(f.update()) + ",50%,50%,0.2)"
+        ctx.lineWidth = 1
+        for (var e, t = 0; t < E.trails; t++) {
+          if (lines[t]) {
+            e = lines[t]
+            e.update()
+            e.draw()
+          }
+        }
+        ctx.frame++
+        window.requestAnimationFrame(render)
+      } catch (error) {
+        console.error("Error in render function:", error)
+        ctx.running = false
       }
-      ctx.frame++
-      window.requestAnimationFrame(render)
     }
   }
 
   function resizeCanvas() {
-    ctx.canvas.width = window.innerWidth - 20
-    ctx.canvas.height = window.innerHeight
+    if (ctx && ctx.canvas) {
+      ctx.canvas.width = window.innerWidth - 20
+      ctx.canvas.height = window.innerHeight
+    }
   }
 
   var ctx,
@@ -148,49 +162,82 @@ const useCanvasCursor = () => {
   }
 
   const renderCanvas = function() {
-    ctx = document.getElementById("canvas").getContext("2d")
-    ctx.running = true
-    ctx.frame = 1
-    f = new n({
-      phase: Math.random() * 2 * Math.PI,
-      amplitude: 85,
-      frequency: 0.0015,
-      offset: 285
-    })
-    document.addEventListener("mousemove", onMousemove)
-    document.addEventListener("touchstart", onMousemove)
-    document.body.addEventListener("orientationchange", resizeCanvas)
-    window.addEventListener("resize", resizeCanvas)
-    window.addEventListener("focus", () => {
-      if (!ctx.running) {
-        ctx.running = true
-        render()
+    const canvasElement = document.getElementById("canvas")
+    // Check if canvas element exists
+    if (!canvasElement) {
+      console.warn("Canvas element not found")
+      return
+    }
+    
+    try {
+      ctx = canvasElement.getContext("2d")
+      if (!ctx) {
+        console.warn("Could not get 2D context from canvas")
+        return
       }
-    })
-    window.addEventListener("blur", () => {
+      
       ctx.running = true
-    })
-    resizeCanvas()
-  }
-
-  useEffect(() => {
-    renderCanvas()
-
-    return () => {
-      ctx.running = false
-      document.removeEventListener("mousemove", onMousemove)
-      document.removeEventListener("touchstart", onMousemove)
-      document.body.removeEventListener("orientationchange", resizeCanvas)
-      window.removeEventListener("resize", resizeCanvas)
-      window.removeEventListener("focus", () => {
-        if (!ctx.running) {
+      ctx.frame = 1
+      f = new n({
+        phase: Math.random() * 2 * Math.PI,
+        amplitude: 85,
+        frequency: 0.0015,
+        offset: 285
+      })
+      document.addEventListener("mousemove", onMousemove)
+      document.addEventListener("touchstart", onMousemove)
+      document.body.addEventListener("orientationchange", resizeCanvas)
+      window.addEventListener("resize", resizeCanvas)
+      window.addEventListener("focus", () => {
+        if (ctx && !ctx.running) {
           ctx.running = true
           render()
         }
       })
-      window.removeEventListener("blur", () => {
-        ctx.running = true
+      window.addEventListener("blur", () => {
+        if (ctx) {
+          ctx.running = true
+        }
       })
+      resizeCanvas()
+    } catch (error) {
+      console.error("Error initializing canvas:", error)
+    }
+  }
+
+  useEffect(() => {
+    // Only run on client-side
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      renderCanvas()
+
+      // Store event handlers for proper cleanup
+      const focusHandler = () => {
+        if (ctx && !ctx.running) {
+          ctx.running = true
+          render()
+        }
+      }
+      
+      const blurHandler = () => {
+        if (ctx) {
+          ctx.running = true
+        }
+      }
+
+      window.addEventListener("focus", focusHandler)
+      window.addEventListener("blur", blurHandler)
+
+      return () => {
+        if (ctx) {
+          ctx.running = false
+        }
+        document.removeEventListener("mousemove", onMousemove)
+        document.removeEventListener("touchstart", onMousemove)
+        document.body.removeEventListener("orientationchange", resizeCanvas)
+        window.removeEventListener("resize", resizeCanvas)
+        window.removeEventListener("focus", focusHandler)
+        window.removeEventListener("blur", blurHandler)
+      }
     }
   }, [])
 }

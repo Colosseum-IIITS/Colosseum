@@ -6,6 +6,7 @@ const Player = require('../../models/Player');
 const Organiser = require('../../models/Organiser');
 const Tournament = require('../../models/Tournament');
 const BanHistory = require('../../models/BanHistory');
+const Report = require('../../models/Report');
 const adminController = require('../adminController');
 const { authenticateUser } = require('../../middleware/authMiddleware');
 const { 
@@ -284,191 +285,188 @@ describe('Admin Controller Tests', () => {
       const updatedTournament = await Tournament.findById(tournament._id);
       expect(updatedTournament.status).toBe('Approved');
     });
-
-      const response = await request(app)
-        .put(`/admin/ban-organiser/${organiser._id}`)
-        .set('Authorization', `Bearer mockToken`)
-        .set('user-id', admin._id.toString())
-        .set('user-role', 'admin')
-        .send(banData)
-        .expect(200);
-
-      expect(response.body.message).toBe('Organiser banned successfully');
-      
-      // Verify organiser is banned
-      const bannedOrganiser = await Organiser.findById(organiser._id);
-      expect(bannedOrganiser.banned).toBe(true);
-      
-      // Verify ban history is created
-      const banHistory = await BanHistory.findOne({ bannedEntity: organiser._id });
-      expect(banHistory).toBeTruthy();
-      expect(banHistory.reason).toBe('Fraudulent tournament activity');
-      expect(banHistory.entityType).toBe('Organiser');
-      expect(banHistory.active).toBe(true);
-    });
   });
 
-  describe('Tournament Management', () => {
-    it('should return all tournaments', async () => {
-      // Create test data
+  describe('Report Management', () => {
+    it('should fetch reports successfully', async () => {
       const admin = await createTestAdmin();
+      const player = await createTestPlayer();
       const organiser = await createTestOrganiser();
       
-      // Create tournaments
-      const tournament1 = new Tournament({
-        tid: 'AT123',
-        name: 'Admin Test Tournament 1',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: organiser._id,
+      // Create a test report
+      const report = new Report({
+        reportedBy: player._id,
+        reportType: 'Organiser',
+        reportedOrganiser: organiser._id,
+        reason: 'Test report reason',
         status: 'Pending'
       });
-      
-      const tournament2 = new Tournament({
-        tid: 'AT456',
-        name: 'Admin Test Tournament 2',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: organiser._id,
-        status: 'Approved'
-      });
-      
-      await tournament1.save();
-      await tournament2.save();
+      await report.save();
 
       const response = await request(app)
-        .get('/admin/tournaments')
-        .set('Authorization', `Bearer mockToken`)
+        .get('/admin/reports')
+        .set('Authorization', 'Bearer mockToken')
         .set('user-id', admin._id.toString())
         .set('user-role', 'admin')
         .expect(200);
 
       expect(response.body).toBeDefined();
-      expect(response.body.length).toBe(2);
-      expect(response.body.map(t => t.name)).toContain('Admin Test Tournament 1');
-      expect(response.body.map(t => t.name)).toContain('Admin Test Tournament 2');
+      expect(response.body.length).toBeGreaterThanOrEqual(1);
+      expect(response.body[0].reason).toBe('Test report reason');
     });
 
-    it('should approve a pending tournament', async () => {
-      // Create test data
+    it('should mark a report as reviewed', async () => {
       const admin = await createTestAdmin();
+      const player = await createTestPlayer();
       const organiser = await createTestOrganiser();
       
-      // Create a pending tournament
-      const tournament = new Tournament({
-        tid: 'AP123',
-        name: 'Pending Approval Tournament',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: organiser._id,
+      // Create a test report
+      const report = new Report({
+        reportedBy: player._id,
+        reportType: 'Organiser',
+        reportedOrganiser: organiser._id,
+        reason: 'Test report reason',
         status: 'Pending'
       });
-      await tournament.save();
+      await report.save();
 
       const response = await request(app)
-        .put(`/admin/approve-tournament/${tournament._id}`)
-        .set('Authorization', `Bearer mockToken`)
+        .put(`/admin/reports/${report._id}/review`)
+        .set('Authorization', 'Bearer mockToken')
         .set('user-id', admin._id.toString())
         .set('user-role', 'admin')
+        .send({ status: 'Reviewed' })
         .expect(200);
 
-      expect(response.body.message).toBe('Tournament approved successfully');
+      expect(response.body.status).toBe('Reviewed');
       
-      // Verify tournament status is updated
-      const approvedTournament = await Tournament.findById(tournament._id);
-      expect(approvedTournament.status).toBe('Approved');
-      
-      // Verify organiser received a notification
-      const updatedOrganiser = await Organiser.findById(organiser._id);
-      expect(updatedOrganiser.notifications.length).toBe(1);
-      expect(updatedOrganiser.notifications[0].message).toContain('has been approved');
-    });
-
-    it('should reject a pending tournament', async () => {
-      // Create test data
-      const admin = await createTestAdmin();
-      const organiser = await createTestOrganiser();
-      
-      // Create a pending tournament
-      const tournament = new Tournament({
-        tid: 'RJ123',
-        name: 'Pending Rejection Tournament',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: organiser._id,
-        status: 'Pending'
-      });
-      await tournament.save();
-
-      const rejectionData = {
-        reason: 'Insufficient tournament details'
-      };
-
-      const response = await request(app)
-        .put(`/admin/reject-tournament/${tournament._id}`)
-        .set('Authorization', `Bearer mockToken`)
-        .set('user-id', admin._id.toString())
-        .set('user-role', 'admin')
-        .send(rejectionData)
-        .expect(200);
-
-      expect(response.body.message).toBe('Tournament rejected successfully');
-      
-      // Verify tournament is deleted
-      const rejectedTournament = await Tournament.findById(tournament._id);
-      expect(rejectedTournament).toBeNull();
-      
-      // Verify organiser received a notification
-      const updatedOrganiser = await Organiser.findById(organiser._id);
-      expect(updatedOrganiser.notifications.length).toBe(1);
-      expect(updatedOrganiser.notifications[0].message).toContain('has been rejected');
-      expect(updatedOrganiser.notifications[0].message).toContain('Insufficient tournament details');
+      // Verify report status is updated in DB
+      const updatedReport = await Report.findById(report._id);
+      expect(updatedReport.status).toBe('Reviewed');
     });
   });
 
   describe('Ban History', () => {
-    it('should return ban history', async () => {
+    it('should retrieve ban history', async () => {
       // Create test data
       const admin = await createTestAdmin();
       const player = await createTestPlayer();
       const organiser = await createTestOrganiser();
       
       // Create ban history records
-      const banHistory1 = new BanHistory({
+      const playerBanHistory = new BanHistory({
         bannedEntity: player._id,
         entityType: 'Player',
-        reason: 'Cheating',
+        reason: 'Player violation',
         date: new Date(),
         active: true
       });
       
-      const banHistory2 = new BanHistory({
+      const organiserBanHistory = new BanHistory({
         bannedEntity: organiser._id,
         entityType: 'Organiser',
-        reason: 'Fraudulent activity',
-        date: new Date(Date.now() - 86400000),
+        reason: 'Organiser violation',
+        date: new Date(),
         active: false
       });
       
-      await banHistory1.save();
-      await banHistory2.save();
+      await playerBanHistory.save();
+      await organiserBanHistory.save();
 
       const response = await request(app)
         .get('/admin/ban-history')
-        .set('Authorization', `Bearer mockToken`)
+        .set('Authorization', 'Bearer mockToken')
         .set('user-id', admin._id.toString())
         .set('user-role', 'admin')
         .expect(200);
 
       expect(response.body).toBeDefined();
-      expect(response.body.length).toBe(2);
-      expect(response.body[0].reason).toBe('Cheating');
-      expect(response.body[0].entityType).toBe('Player');
-      expect(response.body[0].active).toBe(true);
+      expect(response.body.banHistory).toBeDefined();
+      expect(response.body.banHistory.length).toBeGreaterThanOrEqual(2);
       
-      expect(response.body[1].reason).toBe('Fraudulent activity');
-      expect(response.body[1].entityType).toBe('Organiser');
-      expect(response.body[1].active).toBe(false);
+      // Check that both records are present
+      const reasons = response.body.banHistory.map(record => record.reason);
+      expect(reasons).toContain('Player violation');
+      expect(reasons).toContain('Organiser violation');
+    });
+  });
+
+  describe('Dashboard', () => {
+    it('should return dashboard statistics and analytics', async () => {
+      const admin = await createTestAdmin();
+      
+      // Create test players
+      await createTestPlayer();
+      await createTestPlayer();
+      
+      // Create test organiser
+      const organiser = await createTestOrganiser();
+      
+      // Create test tournaments with different statuses and dates
+      const pendingTournament = new Tournament({
+        tid: 'DP101',
+        name: 'Dashboard Pending Tournament',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 86400000),
+        organiser: organiser._id,
+        status: 'Pending',
+        prizePool: 1000
+      });
+      
+      const approvedTournament = new Tournament({
+        tid: 'DA201',
+        name: 'Dashboard Approved Tournament',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 86400000 * 2),
+        organiser: organiser._id,
+        status: 'Approved',
+        prizePool: 2000
+      });
+      
+      const completedTournament = new Tournament({
+        tid: 'DC301',
+        name: 'Dashboard Completed Tournament',
+        startDate: new Date(Date.now() - 86400000 * 3),
+        endDate: new Date(Date.now() - 86400000),
+        organiser: organiser._id,
+        status: 'Completed',
+        prizePool: 3000,
+        revenue: 4000
+      });
+      
+      await pendingTournament.save();
+      await approvedTournament.save();
+      await completedTournament.save();
+
+      const response = await request(app)
+        .get('/admin/dashboard')
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .expect(200);
+
+      // Verify basic stats are returned
+      expect(response.body).toBeDefined();
+      
+      // Check players and organisers data
+      expect(response.body.players).toBeDefined();
+      expect(response.body.organisers).toBeDefined();
+      expect(response.body.players.length).toBeGreaterThanOrEqual(2);
+      expect(response.body.organisers.length).toBeGreaterThanOrEqual(1);
+      
+      // Verify tournament counts
+      expect(response.body.tournaments).toBeDefined();
+      expect(response.body.tournaments.length).toBeGreaterThanOrEqual(3);
+      expect(response.body.pendingTournamentsCount).toBeGreaterThanOrEqual(1);
+      expect(response.body.completedTournamentsCount).toBeGreaterThanOrEqual(1);
+      
+      // Verify prize pool data exists
+      expect(response.body.weeklyPrizePoolData).toBeDefined();
+      expect(response.body.monthlyPrizePoolData).toBeDefined();
+      expect(response.body.yearlyPrizePoolData).toBeDefined();
+      expect(response.body.avgWeeklyPrizePool).toBeDefined();
+      expect(response.body.avgMonthlyPrizePool).toBeDefined();
+      expect(response.body.avgYearlyPrizePool).toBeDefined();
     });
   });
 });

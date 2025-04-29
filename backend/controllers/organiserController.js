@@ -4,6 +4,7 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
+const redis = require("../utils/redisClient");
 
 
 
@@ -46,49 +47,53 @@ exports.getOrganiserByUsername = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-      let totalCount = 0;
-      let organisers = [];
-      let query = { banned: false }; // Default query to exclude banned organisers
-      
-      // Add search condition if searchTerm exists
-      if (searchTerm && searchTerm.trim() !== '') {
-          query.username = { $regex: new RegExp(searchTerm, 'i') };
-      }
-      
-      // Count total results for pagination
-      totalCount = await Organiser.countDocuments(query).lean();
-      
-      // Execute query with pagination, projection and lean
-      organisers = await Organiser.find(query)
-          .select('username email description tournaments followers rating totalRevenue')
-          .populate({ path: 'followers', select: 'username' })
-          .populate({ path: 'tournaments', select: 'name startDate endDate status' })
-          .skip(skip)
-          .limit(parseInt(limit))
-          .lean();
-
-      console.log(`Search term received: ${searchTerm}`);
-      console.log(`Found ${organisers.length} organisers (page ${page} of ${Math.ceil(totalCount/limit)})`);
-
-      // Return empty array with pagination info instead of 404 if no results
+    const cacheValue = await redis.get(searchTerm);
+    if (cacheValue) {
+      console.log(`Cache hit for search term: ${searchTerm}`);
       return res.status(200).json({
-          message: organisers.length > 0 ? `${organisers.length} organisers found` : 'No organisers found',
-          organisationResults: organisers,
-          searchTerm: searchTerm || '',
-          pagination: {
-              total: totalCount,
-              page: parseInt(page),
-              limit: parseInt(limit),
-              pages: Math.ceil(totalCount / limit)
-          }
+        message: 'Organisers fetched from cache',
+        organisationResults: JSON.parse(cacheValue),
+        searchTerm: searchTerm
       });
+    }
+    
+    let organisers;
+
+    if (!searchTerm || searchTerm.trim() === '') {
+      organisers = await Organiser.find()
+        .populate('followers')
+        .populate('tournaments');
+    } else {
+      organisers = await Organiser.find({
+        username: { $regex: new RegExp(searchTerm, 'i') }
+      })
+        .populate('followers')
+        .populate('tournaments');
+    }
+
+    if (organisers.length === 0) {
+      return res.status(404).json({
+        message: 'No organisers found',
+        organisationResults: [],
+        searchTerm: searchTerm
+      });
+    }
+
+    // Cache the result for 30 minutes
+    await redis.setex(searchTerm, 1800, JSON.stringify(organisers));
+
+    return res.status(200).json({
+      message: `${organisers.length} organisers found`,
+      organisationResults: organisers,
+      searchTerm: searchTerm
+    });
 
   } catch (error) {
-      console.error('Error fetching organisers:', error);
-      return res.status(500).json({
-          message: 'Error fetching organisers',
-          error: error.message
-      });
+    console.error('Error fetching organisers:', error);
+    return res.status(500).json({
+      message: 'Error fetching organisers',
+      error: error.message
+    });
   }
 };
 

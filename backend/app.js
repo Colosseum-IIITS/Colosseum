@@ -24,7 +24,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const app = express();
 
 // Allow requests from the frontend
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({origin: 'http://localhost:3000', credentials: true}));
 
 // Create a log stream
 const logStream = rfs.createStream("Colosseum-morgan-logs.txt", {

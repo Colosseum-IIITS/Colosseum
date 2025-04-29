@@ -124,9 +124,9 @@ describe('Payment Controller Tests', () => {
     });
 
     it('should return 500 if stripe throws an error', async () => {
-      // Temporarily make the Stripe API throw an error for this test
+      // Mock the Stripe error more safely - return a rejected promise instead of throwing
       mockStripe.paymentIntents.create.mockImplementationOnce(() => {
-        throw new Error('Stripe API error');
+        return Promise.reject(new Error('Stripe API error'));
       });
       
       const response = await request(app)

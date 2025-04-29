@@ -1,0 +1,47 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # You can test on multiple Node.js versions if needed
+        # node-version: [16.x, 18.x, 20.x]
+        
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm test
+      env:
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'test_secret_key' }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        
+    - name: Generate coverage report
+      run: npm run test:coverage
+      
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage/

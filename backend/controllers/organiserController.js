@@ -4,7 +4,7 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
-const redis = require("../utils/redisClient");
+const { getCache, setCache } = require("../utils/redisClient");
 
 
 
@@ -43,20 +43,19 @@ exports.deleteTournament = async (req, res) => {
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
-  const { searchTerm, page = 1, limit = 10 } = req.query;
-  const skip = (page - 1) * limit;
+  const { searchTerm} = req.query;
 
   try {
-    const cacheValue = await redis.get(searchTerm);
+    const cacheValue = await getCache(searchTerm);
     if (cacheValue) {
       console.log(`Cache hit for search term: ${searchTerm}`);
       return res.status(200).json({
         message: 'Organisers fetched from cache',
-        organisationResults: JSON.parse(cacheValue),
+        organisationResults: cacheValue,
         searchTerm: searchTerm
       });
     }
-    
+      
     let organisers;
 
     if (!searchTerm || searchTerm.trim() === '') {
@@ -80,7 +79,7 @@ exports.getOrganiserByUsername = async (req, res) => {
     }
 
     // Cache the result for 30 minutes
-    await redis.setex(searchTerm, 1800, JSON.stringify(organisers));
+    await setCache(searchTerm, organisers);
 
     return res.status(200).json({
       message: `${organisers.length} organisers found`,
@@ -96,7 +95,6 @@ exports.getOrganiserByUsername = async (req, res) => {
     });
   }
 };
-
 
 // Rename And Change Naming
 exports.updateOrganiserSettings = async (req, res) => {
@@ -129,7 +127,6 @@ exports.updateOrganiserSettings = async (req, res) => {
       res.status(500).json({ error: "Failed to update settings" });
   }
 };
-
 
 exports.updateUsername = async (req, res) => {
   const { newUsername } = req.body;
@@ -344,31 +341,34 @@ exports.renderUpdateVisibilitySettings = async (req, res) => {
 
 
 exports.getOrganiserDashboard = async (req, res) => {
-    const { username } = req.params;
-    const loggedInUserId = req.user._id;
+  const { username } = req.params;
+  const loggedInUserId = req.user._id;
 
-    try {
-        const organiser = await Organiser.findOne({ username })
-            .populate('tournaments')
-            .populate('followers');
+  try {
+      const cacheKey = `organiser_dashboard_${username}`;
+      const cachedData = await getCache(cacheKey);
+
+      if (cachedData) {
+          console.log(`Cache hit for dashboard of ${username}`);
+          return res.status(200).json(cachedData);
+      }
+
+      const organiser = await Organiser.findOne({ username })
+          .populate('tournaments')
+          .populate('followers');
 
       if (!organiser) {
           return res.status(404).json({ message: 'Organiser not found' });
       }
 
-        const isOwner = loggedInUserId.equals(organiser._id);
-        console.log("DEBUG:ISOWNER:"+isOwner+"lOGGEDINID:"+loggedInUserId+"ORGID:"+organiser._id);
-        const totalTournaments = organiser.tournaments.length;
-        console.log("Total Tournaments Count Fetched:"+totalTournaments);
-        const followerCount = organiser.followers.length;
-        console.log("FollowerCount fetched: "+followerCount);
+      const isOwner = loggedInUserId.equals(organiser._id);
+      const totalTournaments = organiser.tournaments.length;
+      const followerCount = organiser.followers.length;
 
-        const tournamentList = await Tournament.find({ organiser: organiser._id });
-
+      const tournamentList = await Tournament.find({ organiser: organiser._id });
       const totalPrizePool = tournamentList.reduce((sum, tournament) => sum + tournament.prizePool, 0);
-      console.log("Total Prize Pool:", totalPrizePool);
 
-        const visibilitySettings = organiser.visibilitySettings || {
+      const visibilitySettings = organiser.visibilitySettings || {
           descriptionVisible: true,
           profilePhotoVisible: true,
           prizePoolVisible: true,
@@ -376,55 +376,71 @@ exports.getOrganiserDashboard = async (req, res) => {
           followersVisible: true,
       };
 
-      console.log("Visibility Settings:", visibilitySettings);
-
       const reports = await Report.find({ reportType: 'Team' }).populate('reportedTeam');
-      res.status(200).json({
-        organiser,
-        isOwner,
-        visibilitySettings,
-        followerCount,
-        totalPrizePool,
-        totalTournaments,
-        tournamentList,
-        reports
-    });
-    
-    } catch (error) {
-        console.error('Error fetching organiser dashboard:', error);
-        res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
-    }
+
+      const responseData = {
+          organiser,
+          isOwner,
+          visibilitySettings,
+          followerCount,
+          totalPrizePool,
+          totalTournaments,
+          tournamentList,
+          reports
+      };
+
+      // Cache the result for 30 minutes
+      await setCache(cacheKey, responseData, 1800);
+
+      return res.status(200).json(responseData);
+
+  } catch (error) {
+      console.error('Error fetching organiser dashboard:', error);
+      return res.status(500).json({ error: 'Error fetching organiser dashboard', details: error.message });
+  }
 };
 
 exports.getMyOrganisers = async (req, res) => {
   const { _id } = req.user; // Player ID
-  console.log("User ID:", _id);
 
   try {
-      const player = await Player.findById(_id).populate({
-          path: 'following',
-          model: 'Organiser',
-          populate: {
-              path: 'tournaments',
-              model: 'Tournament'
-          }
-      });
+    const cacheKey = `player_followed_organisers_${_id}`;
+    const cachedData = await getCache(cacheKey);
 
-      if (!player) {
-          console.log("Player not found");
-          return res.status(404).json({ message: "Player not found" });
-      }
-
-
+    if (cachedData) {
+      console.log(`Cache hit for followed organisers of player ${_id}`);
       return res.status(200).json({
-          followedOrganisers: player.following
+        followedOrganisers: cachedData
       });
+    }
+
+    const player = await Player.findById(_id).populate({
+      path: 'following',
+      model: 'Organiser',
+      populate: {
+        path: 'tournaments',
+        model: 'Tournament'
+      }
+    });
+
+    if (!player) {
+      console.log("Player not found");
+      return res.status(404).json({ message: "Player not found" });
+    }
+
+    // Cache the result for 30 minutes
+    await setCache(cacheKey, player.following, 1800);
+
+    return res.status(200).json({
+      followedOrganisers: player.following
+    });
+
   } catch (error) {
-      console.error("Error retrieving followed organisers:", error);
-      return res.status(500).json({
-          error: "Error retrieving followed organisers",
-          details: error.message,
-      });
+    console.error("Error retrieving followed organisers:", error);
+    return res.status(500).json({
+      error: "Error retrieving followed organisers",
+      details: error.message,
+    });
   }
 };
 
@@ -512,6 +528,13 @@ exports.getOrganiserName = async (req, res) => {
   try {
     const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
 
+    const cacheKey = `organiser_name_${organiserId}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      console.log(`Cache hit for organiser name: ${organiserId}`);
+      return res.status(200).json(cachedData);
+    }
+
     // Fetch organiser from the database
     const organiser = await Organiser.findById(organiserId);
     if (!organiser) {
@@ -523,7 +546,17 @@ exports.getOrganiserName = async (req, res) => {
       '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
     });
 
-    // Send only the necessary fields in the response
+    await setCache(cacheKey, {
+      username: organiser.username,  // Include username in the response
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments: tournaments, // Full tournament documents (if needed)
+      email: organiser.email,
+      description: organiser.description,
+      followers: organiser.followers.length,  // Send the count of followers
+      rating: organiser.rating,
+      banned: organiser.banned  // Include banned status
+    });
+
     return res.json({
       username: organiser.username,  // Include username in the response
       visibilitySettings: organiser.visibilitySettings,
@@ -545,6 +578,13 @@ exports.getOrganiserRevenue = async (req, res) => {
   try {
       // Extract organiser ID from authenticated user in middleware
       const organiserId = req.user._id; 
+
+      const cacheKey = `organiser_revenue_${organiserId}`;
+      const cachedData = await getCache(cacheKey);
+      if (cachedData) {
+          console.log(`Cache hit for organiser revenue: ${organiserId}`);
+          return res.status(200).json(cachedData);
+      }
 
       if (!organiserId) {
           return res.status(401).json({ message: "Unauthorized access" });
@@ -568,6 +608,8 @@ exports.getOrganiserRevenue = async (req, res) => {
           revenue: tournament.revenue || 0,
       }));
 
+      await setCache(cacheKey, { totalRevenue, tournamentRevenueData});
+      
       return res.status(200).json({
           totalRevenue,
           tournamentRevenueData,
@@ -580,20 +622,26 @@ exports.getOrganiserRevenue = async (req, res) => {
 
 exports.getTopOrganisers = async (req, res) => {
   try {
+    const cacheKey = 'top-organisers';
+    const cacheValue = await getCache(cacheKey);
+    
+    if (cacheValue) {
+      console.log('Cache hit for top organisers');
+      return res.status(200).json(JSON.parse(cacheValue));
+    }
+
     const currentDate = new Date();
     const weekStart = new Date(currentDate);
     weekStart.setDate(currentDate.getDate() - 7);
-    
+
     const monthStart = new Date(currentDate);
     monthStart.setMonth(currentDate.getMonth() - 1);
-    
+
     const yearStart = new Date(currentDate);
     yearStart.setFullYear(currentDate.getFullYear() - 1);
 
-    // Get all organisers with their tournaments
     const organisers = await Organiser.find().populate('tournaments');
 
-    // Process data for different time periods
     const processOrganisers = (startDate) => {
       return organisers
         .map(org => ({
@@ -613,6 +661,9 @@ exports.getTopOrganisers = async (req, res) => {
       yearly: processOrganisers(yearStart)
     };
 
+    // Cache the response for 1 hour (3600 seconds)
+    await setCache(cacheKey, JSON.stringify(response), 3600);
+
     res.status(200).json(response);
   } catch (error) {
     console.error("Error getting top organisers:", error);
@@ -625,114 +676,62 @@ exports.getTopOrganisers = async (req, res) => {
 
 exports.getTournamentPrizePoolAverages = async (req, res) => {
   try {
+    const cacheKey = 'tournament-prize-pool-averages';
+    const cacheValue = await getCache(cacheKey);
+
+    if (cacheValue) {
+      console.log('Cache hit for tournament prize pool averages');
+      return res.status(200).json(JSON.parse(cacheValue));
+    }
+
     const currentDate = new Date();
-    
-    // Calculate date ranges
+
     const weekStart = new Date(currentDate);
     weekStart.setDate(currentDate.getDate() - 28); // Last 4 weeks
-    
+
     const monthStart = new Date(currentDate);
     monthStart.setMonth(currentDate.getMonth() - 12); // Last 12 months
-    
+
     const yearStart = new Date(currentDate);
     yearStart.setFullYear(currentDate.getFullYear() - 4); // Last 4 years
 
     // Get weekly averages
     const weeklyAverages = await Tournament.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: weekStart },
-          prizePool: { $exists: true }
-        }
-      },
-      {
-        $group: {
-          _id: { $week: "$createdAt" },
-          average: { $avg: "$prizePool" },
-          period: { $first: { $week: "$createdAt" } }
-        }
-      },
+      { $match: { createdAt: { $gte: weekStart }, prizePool: { $exists: true } } },
+      { $group: { _id: { $week: "$createdAt" }, average: { $avg: "$prizePool" }, period: { $first: { $week: "$createdAt" } } } },
       { $sort: { period: 1 } },
-      {
-        $project: {
-          period: { $concat: ["Week ", { $toString: "$period" }] },
-          average: { $round: ["$average", 2] }
-        }
-      }
+      { $project: { period: { $concat: ["Week ", { $toString: "$period" }] }, average: { $round: ["$average", 2] } } }
     ]);
 
     // Get monthly averages
     const monthlyAverages = await Tournament.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: monthStart },
-          prizePool: { $exists: true }
-        }
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" }
-          },
-          average: { $avg: "$prizePool" }
-        }
-      },
-      {
-        $project: {
-          period: {
-            $let: {
-              vars: {
-                monthsInString: [
-                  "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                ]
-              },
-              in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] }
-            }
-          },
-          average: { $round: ["$average", 2] }
-        }
-      },
+      { $match: { createdAt: { $gte: monthStart }, prizePool: { $exists: true } } },
+      { $group: { _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }, average: { $avg: "$prizePool" } } },
+      { $project: { period: { $let: { vars: { monthsInString: ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] }, in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] } } }, average: { $round: ["$average", 2] } } },
       { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
 
     // Get yearly averages
     const yearlyAverages = await Tournament.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: yearStart },
-          prizePool: { $exists: true }
-        }
-      },
-      {
-        $group: {
-          _id: { $year: "$createdAt" },
-          average: { $avg: "$prizePool" }
-        }
-      },
-      {
-        $project: {
-          period: { $toString: "$_id" },
-          average: { $round: ["$average", 2] }
-        }
-      },
+      { $match: { createdAt: { $gte: yearStart }, prizePool: { $exists: true } } },
+      { $group: { _id: { $year: "$createdAt" }, average: { $avg: "$prizePool" } } },
+      { $project: { period: { $toString: "$_id" }, average: { $round: ["$average", 2] } } },
       { $sort: { period: 1 } }
     ]);
 
-    res.status(200).json({
+    const response = {
       weekly: weeklyAverages,
       monthly: monthlyAverages,
       yearly: yearlyAverages
-    });
+    };
+
+    // Cache the response for 1 hour (3600 seconds)
+    await setCache(cacheKey, JSON.stringify(response), 3600);
+
+    res.status(200).json(response);
 
   } catch (error) {
     console.error("Error getting prize pool averages:", error);
-    res.status(500).json({
-      error: "Error getting prize pool averages",
-      details: error.message
-    });
+    res.status(500).json({ error: "Error getting prize pool averages", details: error.message });
   }
 };
-
-

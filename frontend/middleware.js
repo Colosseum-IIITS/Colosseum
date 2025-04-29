@@ -32,7 +32,6 @@ export async function middleware(req) {
     try {
       // Verify the JWT token using 'jose'
       const { payload } = await jwtVerify(token, secret);
-      console.log('Decoded JWT:', payload);
 
       // Extract the role from decoded token
       const { role } = payload;

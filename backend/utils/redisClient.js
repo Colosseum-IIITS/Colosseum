@@ -1,20 +1,19 @@
+// redisClient.js
 const Redis = require('ioredis');
-const dotenv = require('dotenv');
+const redis = new Redis();
 
-dotenv.config();
+const setCache = (key, value, ttl = 1800) => {
+  return redis.setex(key, ttl, JSON.stringify(value)); // store as string
+};
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
-});
+const getCache = async (key) => {
+  const data = await redis.get(key);
+  try {
+    return data ? JSON.parse(data) : null; // return object
+  } catch (err) {
+    console.error('Redis JSON parse error:', err);
+    return null;
+  }
+};
 
-// Event listeners to handle Redis connection events
-redis.on('connect', () => {
-  console.log('Redis connected');
-});
-
-redis.on('error', (err) => {
-  console.error('Redis error:', err);
-});
-
-module.exports = redis;
+module.exports = { redis, setCache, getCache };

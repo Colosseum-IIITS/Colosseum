@@ -26,7 +26,6 @@ const authenticateOrganiser = async (req, res, next) => {
   try {
     // Verify the JWT and decode it
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Decode the token
-    console.log("Decoded JWT:", decoded);
 
     // Fetch the player by the decoded id
     const organiser = await Organiser.findById(decoded.id); // Ensure `decoded.id` is present in JWT payload
@@ -63,7 +62,6 @@ const authenticateUser = async (req, res, next) => {
   try {
     // Verify the JWT and decode it
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Decode the token
-    console.log("Decoded JWT:", decoded);
 
     // Attempt to find the organiser
     const organiser = await Organiser.findById(decoded.id);

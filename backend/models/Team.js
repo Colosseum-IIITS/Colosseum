@@ -11,5 +11,12 @@ const teamSchema = new mongoose.Schema({
   joinRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }], // New field to track join requests
 }, { timestamps: true });
 
+// Add indexes for frequently queried fields
+teamSchema.index({ name: 1 });
+teamSchema.index({ captain: 1 });
+teamSchema.index({ tournaments: 1 });
+teamSchema.index({ players: 1 });
+teamSchema.index({ joinRequests: 1 });
+
 const Team = mongoose.model('Team', teamSchema);
 module.exports = Team;

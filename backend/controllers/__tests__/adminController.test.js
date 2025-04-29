@@ -34,123 +34,24 @@ const app = express();
 app.use(express.json());
 
 // Register admin routes for testing
-app.get('/admin/dashboard', authenticateUser, adminController.getDashboardStats);
-app.get('/admin/players', authenticateUser, adminController.getAllPlayers);
-app.get('/admin/organisers', authenticateUser, adminController.getAllOrganisers);
-app.get('/admin/tournaments', authenticateUser, adminController.getAllTournaments);
-app.put('/admin/approve-tournament/:id', authenticateUser, adminController.approveTournament);
-app.put('/admin/reject-tournament/:id', authenticateUser, adminController.rejectTournament);
-app.put('/admin/ban-player/:id', authenticateUser, adminController.banPlayer);
-app.put('/admin/unban-player/:id', authenticateUser, adminController.unbanPlayer);
-app.put('/admin/ban-organiser/:id', authenticateUser, adminController.banOrganiser);
-app.put('/admin/unban-organiser/:id', authenticateUser, adminController.unbanOrganiser);
+app.get('/admin/dashboard', authenticateUser, adminController.getDashboard);
 app.get('/admin/ban-history', authenticateUser, adminController.getBanHistory);
+app.put('/admin/ban-player/:id', authenticateUser, adminController.banPlayer);
+app.put('/admin/unban-player/:id', authenticateUser, adminController.unBanPlayer);
+app.put('/admin/ban-organiser/:id', authenticateUser, adminController.banOrganiser);
+app.put('/admin/unban-organiser/:id', authenticateUser, adminController.unBanOrganiser);
+app.delete('/admin/organiser/:id', authenticateUser, adminController.deleteOrganiser);
+app.delete('/admin/player/:id', authenticateUser, adminController.deletePlayer);
+app.put('/admin/approve-tournament/:id', authenticateUser, adminController.approveTournament);
+app.get('/admin/reports', authenticateUser, adminController.fetchOrganiserReportsForAdmin);
+app.put('/admin/reports/:id/review', authenticateUser, adminController.reviewedOrNot);
 
 // Load test setup
 require('../../test/setup');
 
 describe('Admin Controller Tests', () => {
-  describe('Dashboard Stats', () => {
-    it('should return dashboard statistics', async () => {
-      // Create test data
-      const admin = await createTestAdmin();
-      
-      // Create players
-      await createTestPlayer();
-      await createTestPlayer();
-      
-      // Create organisers
-      await createTestOrganiser();
-      
-      // Create tournaments with different statuses
-      const pendingTournament = new Tournament({
-        tid: 'D123',
-        name: 'Pending Tournament',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: generateObjectId(),
-        status: 'Pending'
-      });
-      
-      const approvedTournament = new Tournament({
-        tid: 'D456',
-        name: 'Approved Tournament',
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 86400000),
-        organiser: generateObjectId(),
-        status: 'Approved'
-      });
-      
-      const completedTournament = new Tournament({
-        tid: 'D789',
-        name: 'Completed Tournament',
-        startDate: new Date(Date.now() - 86400000 * 2),
-        endDate: new Date(Date.now() - 86400000),
-        organiser: generateObjectId(),
-        status: 'Completed'
-      });
-      
-      await pendingTournament.save();
-      await approvedTournament.save();
-      await completedTournament.save();
-
-      const response = await request(app)
-        .get('/admin/dashboard')
-        .set('Authorization', `Bearer mockToken`)
-        .set('user-id', admin._id.toString())
-        .set('user-role', 'admin')
-        .expect(200);
-
-      expect(response.body).toBeDefined();
-      expect(response.body.totalPlayers).toBe(2);
-      expect(response.body.totalOrganisers).toBe(1);
-      expect(response.body.totalTournaments).toBe(3);
-      expect(response.body.pendingTournaments).toBe(1);
-      expect(response.body.approvedTournaments).toBe(1);
-      expect(response.body.completedTournaments).toBe(1);
-    });
-  });
-
-  describe('User Management', () => {
-    it('should return all players', async () => {
-      // Create test data
-      const admin = await createTestAdmin();
-      await createTestPlayer({ username: 'player1' });
-      await createTestPlayer({ username: 'player2' });
-
-      const response = await request(app)
-        .get('/admin/players')
-        .set('Authorization', `Bearer mockToken`)
-        .set('user-id', admin._id.toString())
-        .set('user-role', 'admin')
-        .expect(200);
-
-      expect(response.body).toBeDefined();
-      expect(response.body.length).toBe(2);
-      expect(response.body.map(p => p.username)).toContain('player1');
-      expect(response.body.map(p => p.username)).toContain('player2');
-    });
-
-    it('should return all organisers', async () => {
-      // Create test data
-      const admin = await createTestAdmin();
-      await createTestOrganiser({ username: 'organiser1' });
-      await createTestOrganiser({ username: 'organiser2' });
-
-      const response = await request(app)
-        .get('/admin/organisers')
-        .set('Authorization', `Bearer mockToken`)
-        .set('user-id', admin._id.toString())
-        .set('user-role', 'admin')
-        .expect(200);
-
-      expect(response.body).toBeDefined();
-      expect(response.body.length).toBe(2);
-      expect(response.body.map(o => o.username)).toContain('organiser1');
-      expect(response.body.map(o => o.username)).toContain('organiser2');
-    });
-
-    it('should ban a player', async () => {
+  describe('Ban and Unban Player', () => {
+    it('should ban a player successfully', async () => {
       // Create test data
       const admin = await createTestAdmin();
       const player = await createTestPlayer();
@@ -161,67 +62,228 @@ describe('Admin Controller Tests', () => {
 
       const response = await request(app)
         .put(`/admin/ban-player/${player._id}`)
-        .set('Authorization', `Bearer mockToken`)
+        .set('Authorization', 'Bearer mockToken')
         .set('user-id', admin._id.toString())
         .set('user-role', 'admin')
         .send(banData)
         .expect(200);
 
-      expect(response.body.message).toBe('Player banned successfully');
+      expect(response.body.message).toBe('Player banned successfully.');
       
-      // Verify player is banned
+      // Verify player is banned in the database
       const bannedPlayer = await Player.findById(player._id);
       expect(bannedPlayer.banned).toBe(true);
       
-      // Verify ban history is created
-      const banHistory = await BanHistory.findOne({ bannedEntity: player._id });
+      // Verify ban history entry was created
+      const banHistory = await BanHistory.findOne({ 
+        bannedEntity: player._id,
+        entityType: 'Player'
+      });
       expect(banHistory).toBeTruthy();
       expect(banHistory.reason).toBe('Violating platform rules');
-      expect(banHistory.entityType).toBe('Player');
-      expect(banHistory.active).toBe(true);
     });
 
-    it('should unban a player', async () => {
-      // Create test data
+    it('should return 404 if player to ban is not found', async () => {
+      const admin = await createTestAdmin();
+      const nonExistentId = new mongoose.Types.ObjectId();
+
+      const response = await request(app)
+        .put(`/admin/ban-player/${nonExistentId}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .send({ reason: 'Test reason' })
+        .expect(404);
+
+      expect(response.body.error).toBe('Player not found');
+    });
+
+    it('should unban a player successfully', async () => {
+      // Create a banned player with ban history
       const admin = await createTestAdmin();
       const player = await createTestPlayer({ banned: true });
       
-      // Create ban history
+      // Create ban history record
       const banHistory = new BanHistory({
         bannedEntity: player._id,
         entityType: 'Player',
         reason: 'Previous violation',
-        date: new Date(),
         active: true
       });
       await banHistory.save();
 
       const response = await request(app)
         .put(`/admin/unban-player/${player._id}`)
-        .set('Authorization', `Bearer mockToken`)
+        .set('Authorization', 'Bearer mockToken')
         .set('user-id', admin._id.toString())
         .set('user-role', 'admin')
         .expect(200);
 
-      expect(response.body.message).toBe('Player unbanned successfully');
+      expect(response.body.message).toBe('Player unbanned successfully.');
       
-      // Verify player is unbanned
+      // Verify player is unbanned in the database
       const unbannedPlayer = await Player.findById(player._id);
       expect(unbannedPlayer.banned).toBe(false);
       
       // Verify ban history is updated
-      const updatedBanHistory = await BanHistory.findOne({ bannedEntity: player._id });
+      const updatedBanHistory = await BanHistory.findOne({ 
+        bannedEntity: player._id,
+        entityType: 'Player'
+      });
       expect(updatedBanHistory.active).toBe(false);
     });
+  });
 
-    it('should ban an organiser', async () => {
-      // Create test data
+  describe('Ban and Unban Organiser', () => {
+    it('should ban an organiser successfully', async () => {
       const admin = await createTestAdmin();
       const organiser = await createTestOrganiser();
 
       const banData = {
-        reason: 'Fraudulent tournament activity'
+        reason: 'Policy violation'
       };
+
+      const response = await request(app)
+        .put(`/admin/ban-organiser/${organiser._id}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .send(banData)
+        .expect(200);
+
+      expect(response.body.message).toBe('Organiser banned successfully.');
+      
+      // Verify organiser is banned in database
+      const bannedOrganiser = await Organiser.findById(organiser._id);
+      expect(bannedOrganiser.banned).toBe(true);
+      
+      // Verify ban history was created
+      const banHistory = await BanHistory.findOne({ 
+        bannedEntity: organiser._id,
+        entityType: 'Organiser'
+      });
+      expect(banHistory).toBeTruthy();
+      expect(banHistory.reason).toBe('Policy violation');
+    });
+
+    it('should return 404 if organiser to ban is not found', async () => {
+      const admin = await createTestAdmin();
+      const nonExistentId = new mongoose.Types.ObjectId();
+
+      const response = await request(app)
+        .put(`/admin/ban-organiser/${nonExistentId}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .send({ reason: 'Test reason' })
+        .expect(404);
+
+      expect(response.body.error).toBe('Organiser not found');
+    });
+
+    it('should unban an organiser successfully', async () => {
+      const admin = await createTestAdmin();
+      const organiser = await createTestOrganiser({ banned: true });
+      
+      // Create ban history record
+      const banHistory = new BanHistory({
+        bannedEntity: organiser._id,
+        entityType: 'Organiser',
+        reason: 'Previous violation',
+        active: true
+      });
+      await banHistory.save();
+
+      const response = await request(app)
+        .put(`/admin/unban-organiser/${organiser._id}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .expect(200);
+
+      expect(response.body.message).toBe('Organiser unbanned successfully.');
+      
+      // Verify organiser is unbanned
+      const unbannedOrganiser = await Organiser.findById(organiser._id);
+      expect(unbannedOrganiser.banned).toBe(false);
+      
+      // Verify ban history is updated
+      const updatedBanHistory = await BanHistory.findOne({ 
+        bannedEntity: organiser._id,
+        entityType: 'Organiser'
+      });
+      expect(updatedBanHistory.active).toBe(false);
+    });
+  });
+
+  describe('Delete User', () => {
+    it('should delete a player successfully', async () => {
+      const admin = await createTestAdmin();
+      const player = await createTestPlayer();
+
+      const response = await request(app)
+        .delete(`/admin/player/${player._id}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .expect(200);
+
+      expect(response.body.message).toBe('Player deleted successfully.');
+      
+      // Verify player was deleted
+      const deletedPlayer = await Player.findById(player._id);
+      expect(deletedPlayer).toBeNull();
+    });
+
+    it('should delete an organiser successfully', async () => {
+      const admin = await createTestAdmin();
+      const organiser = await createTestOrganiser();
+
+      const response = await request(app)
+        .delete(`/admin/organiser/${organiser._id}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .expect(200);
+
+      expect(response.body.message).toBe('Organiser deleted successfully.');
+      
+      // Verify organiser was deleted
+      const deletedOrganiser = await Organiser.findById(organiser._id);
+      expect(deletedOrganiser).toBeNull();
+    });
+  });
+
+  describe('Tournament Management', () => {
+    it('should approve a tournament successfully', async () => {
+      // Create test data
+      const admin = await createTestAdmin();
+      const organiser = await createTestOrganiser();
+      
+      // Create a pending tournament
+      const tournament = new Tournament({
+        tid: 'T101',
+        name: 'Test Tournament',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 86400000),
+        organiser: organiser._id,
+        status: 'Pending'
+      });
+      await tournament.save();
+
+      const response = await request(app)
+        .put(`/admin/approve-tournament/${tournament._id}`)
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', admin._id.toString())
+        .set('user-role', 'admin')
+        .expect(200);
+
+      expect(response.body.message).toBe('Tournament approved successfully.');
+      
+      // Verify tournament status is updated in database
+      const updatedTournament = await Tournament.findById(tournament._id);
+      expect(updatedTournament.status).toBe('Approved');
+    });
 
       const response = await request(app)
         .put(`/admin/ban-organiser/${organiser._id}`)

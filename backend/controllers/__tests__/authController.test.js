@@ -6,7 +6,7 @@ const Player = require('../../models/Player');
 const Organiser = require('../../models/Organiser');
 const Admin = require('../../models/Admin');
 const authController = require('../authController');
-const { createTestPlayer } = require('../../test/testUtils');
+const { createTestPlayer, createTestAdmin } = require('../../test/testUtils');
 
 // Mock nodemailer
 jest.mock('nodemailer', () => ({
@@ -174,5 +174,58 @@ describe('Auth Controller Tests', () => {
     });
   });
 
-  // Add similar tests for Organiser and Admin authentication
+  describe('Admin Registration', () => {
+    it('should register a new admin successfully', async () => {
+      const adminData = { username: 'testadmin', email: 'testadmin@gmail.com', password: 'password123' };
+      const response = await request(app)
+        .post('/auth/admin/register')
+        .send(adminData)
+        .expect(201);
+      expect(response.body.message).toBe('Admin registered successfully');
+      const admin = await Admin.findOne({ username: adminData.username });
+      expect(admin).toBeTruthy();
+      expect(admin.email).toBe(adminData.email);
+    });
+
+    it('should return 400 if admin username already exists', async () => {
+      await createTestAdmin({ username: 'existingadmin', email: 'existingadmin@gmail.com' });
+      const response = await request(app)
+        .post('/auth/admin/register')
+        .send({ username: 'existingadmin', email: 'different@gmail.com', password: 'password123' })
+        .expect(400);
+      expect(response.body.message).toBe('Admin already exists');
+    });
+  });
+
+  describe('Admin Login', () => {
+    it('should login an admin successfully', async () => {
+      const username = `admin_${Date.now()}`;
+      const admin = await createTestAdmin({ username, email: `${username}@gmail.com` });
+      const response = await request(app)
+        .post('/auth/admin/login')
+        .send({ username: admin.username, password: 'password123' })
+        .expect(200);
+      expect(response.body.message).toBe('Login successful');
+      expect(response.body.token).toBeDefined();
+    });
+
+    it('should return 401 if admin not found', async () => {
+      const response = await request(app)
+        .post('/auth/admin/login')
+        .send({ username: 'nouser', password: 'password123' })
+        .expect(401);
+      expect(response.body.errorMessage).toBe('Invalid username or password');
+    });
+
+    it('should return 401 if password is incorrect', async () => {
+      const admin = await createTestAdmin({ username: 'passadmin', email: 'passadmin@gmail.com' });
+      const response = await request(app)
+        .post('/auth/admin/login')
+        .send({ username: admin.username, password: 'wrongpassword' })
+        .expect(401);
+      expect(response.body.errorMessage).toBe('Invalid username or password');
+    });
+  });
+
+  // Add similar tests for Organiser authentication
 });

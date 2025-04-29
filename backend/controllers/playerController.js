@@ -100,10 +100,12 @@ exports.unfollowOrganiser = async (req, res) => {
 // Func: Search tournaments by tid or name
 exports.searchTournaments = async (req, res) => {
     try {
-        const { searchTerm } = req.query || '';
+        const { searchTerm, page = 1, limit = 10 } = req.query;
+        const skip = (page - 1) * limit;
         console.log('Search Term:', searchTerm); 
         let tournaments = [];
         let joinedTournaments = [];
+        let totalCount = 0;
 
         if (searchTerm) {
             const searchConditions = [];
@@ -116,29 +118,52 @@ exports.searchTournaments = async (req, res) => {
             // Use regex for name field
             searchConditions.push({ name: new RegExp(searchTerm, 'i') });
 
+            // Count total results for pagination info
+            totalCount = await Tournament.countDocuments({
+                $and: [
+                    { $or: searchConditions },
+                    { status: 'Approved' },
+                ],
+            }).lean();
+
+            // Get paginated results with projection
             tournaments = await Tournament.find({
                 $and: [
                     { $or: searchConditions }, // Match either tid or name
                     { status: 'Approved' },   // Filter by status
                 ],
-            });
+            })
+            .select('tid name startDate endDate entryFee prizePool organiser') // Select only needed fields
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean(); // Use lean for better performance
         }
 
         if (req.user && req.user._id) {
-            const player = await Player.findById(req.user._id).populate(
-                'tournaments.tournament'
-            );
+            const player = await Player.findById(req.user._id)
+                .select('tournaments.tournament')
+                .populate({
+                    path: 'tournaments.tournament',
+                    select: '_id' // Only need the IDs to check participation
+                })
+                .lean();
+                
             if (player) {
                 joinedTournaments = player.tournaments.map((t) => t.tournament);
             }
         }
 
-      
         res.status(200).json({
             message: 'Tournaments fetched successfully',
             results: tournaments,
             searchTerm: searchTerm || '',
             joinedTournaments: joinedTournaments || [],
+            pagination: {
+                total: totalCount,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(totalCount / limit)
+            }
         });
     } catch (error) {
         console.error('Error searching tournaments:', error);
@@ -152,26 +177,66 @@ exports.searchTournaments = async (req, res) => {
 
 exports.searchPlayer = async (req, res) => {
     try {
-        const { searchTerm } = req.query; // No fallback to an empty string here
+        const { searchTerm, page = 1, limit = 10 } = req.query;
+        const skip = (page - 1) * limit;
         console.log('Search Term:', searchTerm); 
 
-        if (!searchTerm || searchTerm.trim() === '') {
-            const allPlayers = await Player.find().populate('team').populate('tournaments.tournament');
+        let totalCount = 0;
+        let players = [];
 
+        if (!searchTerm || searchTerm.trim() === '') {
+            // Count total players for pagination
+            totalCount = await Player.countDocuments({ banned: false }).lean();
+            
+            // Get paginated results with needed fields only
+            players = await Player.find({ banned: false })
+                .select('username email team tournaments.tournament profilePhoto')
+                .populate({ path: 'team', select: 'name' })
+                .populate({ path: 'tournaments.tournament', select: 'name startDate' })
+                .skip(skip)
+                .limit(parseInt(limit))
+                .lean();
+        } else {
+            // Count total results for pagination
+            totalCount = await Player.countDocuments({
+                $and: [
+                    { $or: [
+                        { username: new RegExp(searchTerm, 'i') },
+                        { email: new RegExp(searchTerm, 'i') }
+                    ]},
+                    { banned: false }
+                ]
+            }).lean();
+            
+            // Get paginated search results
+            players = await Player.find({
+                $and: [
+                    { $or: [
+                        { username: new RegExp(searchTerm, 'i') },
+                        { email: new RegExp(searchTerm, 'i') }
+                    ]},
+                    { banned: false }
+                ]
+            })
+            .select('username email team tournaments.tournament profilePhoto')
+            .populate({ path: 'team', select: 'name' })
+            .populate({ path: 'tournaments.tournament', select: 'name startDate' })
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean();
         }
 
-        const players = await Player.find({
-            $or: [
-                { username: new RegExp(searchTerm, 'i') },
-                { email: new RegExp(searchTerm, 'i') }
-            ]
-        }).populate('team').populate('tournaments.tournament');
-
-        console.log('Players Found:', players); 
+        console.log('Players Found:', players.length); 
 
         res.status(200).json({
             results: players, 
             searchTerm,
+            pagination: {
+                total: totalCount,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(totalCount / limit)
+            }
         });
         
     } catch (error) {

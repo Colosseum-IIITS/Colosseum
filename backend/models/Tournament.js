@@ -43,5 +43,10 @@ const tournamentSchema = new mongoose.Schema(
   }
 );
 
+// Compound index on status and tid for faster filtering
+tournamentSchema.index({ status: 1, tid: 1 });
+// Text index on name to support text search
+tournamentSchema.index({ name: 'text' });
+
 const Tournament = mongoose.model("Tournament", tournamentSchema);
 module.exports = Tournament;

@@ -37,6 +37,10 @@ playerSchema.methods.canCreateTeam = function() {
   return this.teamPayment.paid === true;
 };
 
+// Add indexes for username and email to speed up lookups
+playerSchema.index({ username: 1 });
+playerSchema.index({ email: 1 });
+
 const Player = mongoose.model('Player', playerSchema);
 
 module.exports = Player;

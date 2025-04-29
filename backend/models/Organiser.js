@@ -25,5 +25,12 @@ const toSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for faster queries
+toSchema.index({ username: 1 });
+toSchema.index({ email: 1 });
+toSchema.index({ tournaments: 1 });
+toSchema.index({ followers: 1 });
+toSchema.index({ banned: 1 });
+
 const Organiser = mongoose.model("Organiser", toSchema);
 module.exports = Organiser;

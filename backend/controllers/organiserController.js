@@ -42,41 +42,45 @@ exports.deleteTournament = async (req, res) => {
 
 // Search Organisation
 exports.getOrganiserByUsername = async (req, res) => {
-  const { searchTerm } = req.query;
+  const { searchTerm, page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
 
   try {
-      let organisers;
-
-      if (!searchTerm || searchTerm.trim() === '') {
-          // Fetch all organisers if searchTerm is empty
-          organisers = await Organiser.find()
-              .populate('followers')
-              .populate('tournaments');
-      } else {
-          // Search organisers by username
-          organisers = await Organiser.find({
-              username: { $regex: new RegExp(searchTerm, 'i') }
-          })
-          .populate('followers')
-          .populate('tournaments');
+      let totalCount = 0;
+      let organisers = [];
+      let query = { banned: false }; // Default query to exclude banned organisers
+      
+      // Add search condition if searchTerm exists
+      if (searchTerm && searchTerm.trim() !== '') {
+          query.username = { $regex: new RegExp(searchTerm, 'i') };
       }
+      
+      // Count total results for pagination
+      totalCount = await Organiser.countDocuments(query).lean();
+      
+      // Execute query with pagination, projection and lean
+      organisers = await Organiser.find(query)
+          .select('username email description tournaments followers rating totalRevenue')
+          .populate({ path: 'followers', select: 'username' })
+          .populate({ path: 'tournaments', select: 'name startDate endDate status' })
+          .skip(skip)
+          .limit(parseInt(limit))
+          .lean();
 
       console.log(`Search term received: ${searchTerm}`);
+      console.log(`Found ${organisers.length} organisers (page ${page} of ${Math.ceil(totalCount/limit)})`);
 
-      if (organisers.length === 0) {
-          console.log(`No organisers found for the username: ${searchTerm}`);
-          return res.status(404).json({
-              message: 'No organisers found',
-              organisationResults: [],
-              searchTerm: searchTerm
-          });
-      }
-
-      console.log(`${organisers.length} organisers found.`);
+      // Return empty array with pagination info instead of 404 if no results
       return res.status(200).json({
-          message: `${organisers.length} organisers found`,
+          message: organisers.length > 0 ? `${organisers.length} organisers found` : 'No organisers found',
           organisationResults: organisers,
-          searchTerm: searchTerm
+          searchTerm: searchTerm || '',
+          pagination: {
+              total: totalCount,
+              page: parseInt(page),
+              limit: parseInt(limit),
+              pages: Math.ceil(totalCount / limit)
+          }
       });
 
   } catch (error) {

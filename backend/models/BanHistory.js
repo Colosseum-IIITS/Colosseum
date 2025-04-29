@@ -29,5 +29,10 @@ const banHistorySchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Add indexes for ban history lookups
+banHistorySchema.index({ bannedEntity: 1, entityType: 1 }); // Compound index for looking up by entity
+banHistorySchema.index({ active: 1 }); // For quickly finding active bans
+banHistorySchema.index({ date: -1 }); // For sorting by most recent
+
 const BanHistory = mongoose.model('BanHistory', banHistorySchema);
 module.exports = BanHistory;

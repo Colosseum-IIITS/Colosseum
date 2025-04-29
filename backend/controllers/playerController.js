@@ -526,78 +526,6 @@ exports.getFollowedOrganisers = async (req, res) => {
     }
 };
 
-// Example route for search results rendering the homepage
-exports.getHomePage = async (req, res) => {
-    try {
-        const tournaments = await Tournament.find().catch(err => {
-            console.error('Error fetching tournaments:', err);
-            return [];
-        });
-
-        const players = await Player.find().catch(err => {
-            console.error('Error fetching players:', err);
-            return [];
-        });
-
-        const organisers = await Organiser.find().catch(err => {
-            console.error('Error fetching organisers:', err);
-            return [];
-        });
-
-        let followedOrganisers = [];
-        let joinedTournaments = [];
-
-        const playerName = req.user?.username || 'Guest';
-        
-        if (req.user && req.user._id) {
-            const { _id } = req.user;
-
-            const player = await Player.findById(_id)
-                .populate({
-                    path: 'following',
-                    model: 'Organiser',
-                    populate: {
-                        path: 'tournaments',
-                        model: 'Tournament'
-                    }
-                })
-                .populate('team')
-                .catch(err => {
-                    console.error('Error fetching player data:', err);
-                    return null;
-                });
-
-            if (player) {
-                followedOrganisers = player.following || [];
-
-                const team = player.team;
-                if (team) {
-                    joinedTournaments = await Tournament.find({ teams: team._id })
-                        .catch(err => {
-                            console.error('Error fetching tournaments for team:', err);
-                            return [];
-                        });
-                }
-            }
-        }
-
-        res.status(200).json({
-            tournaments,
-            players,
-            organisers,
-            followedOrganisers,
-            joinedTournaments,
-            playerName
-        });
-    } catch (error) {
-        console.error('Error in getHomePage:', error);
-        res.status(500).json({
-            statusCode: '500',
-            errorMessage: 'Error fetching data for the homepage'
-        });
-    }
-};
-
 exports.getTournamentPointsTable = async (req, res) => {
     const { tournamentId } = req.params;
 
@@ -709,6 +637,8 @@ exports.getGlobalPlayerRanking = async (req, res) => {
       res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
   };
+
+  
 exports.getUsername = async (req, res) => {
     try {
         const { _id } = req.user;  // Extract the _id from the authenticated user

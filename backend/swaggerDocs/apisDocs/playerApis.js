@@ -496,21 +496,6 @@ router.get('/api/player/teamName', authenticateUser, teamController.getTeamsByNa
 
 /**
  * @swagger
- * /player/homepage:
- *   get:
- *     tags: [Player]
- *     summary: "Get Player Homepage"
- *     description: "This endpoint allows a player to view their homepage with relevant information."
- *     responses:
- *       "200":
- *         description: "Homepage data fetched successfully."
- *       "404":
- *         description: "Player not found."
- */
-router.get('/api/player/homepage', authenticateUser, playerController.getHomePage);
-
-/**
- * @swagger
  * /player/joinTeam:
  *   post:
  *     tags: [Player]

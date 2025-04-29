@@ -14,6 +14,12 @@ const EmailForm = () => {
   
 
     const email = e.target.email.value.trim();
+    // const confirmEmail = e.target.confirmEmail.value.trim();
+    
+    // if (email !== confirmEmail) {
+    //   setError('Emails do not match. Please try again.');
+    //   return;
+    // }
 
     try {
       const response = await fetch('http://localhost:5000/api/player/updateEmail', {
@@ -57,6 +63,20 @@ const EmailForm = () => {
             className="max-w-xs"
           />
         </div>
+        {/* <div className="flex-grow">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700 block mb-1">
+            Email
+          </label>
+          <Input
+            type="email"
+            id="confirmEmail"
+            name="confirmEmail"
+            placeholder="Enter your new email"
+            required
+            className="max-w-xs"
+          />
+        </div> */}
+        {/* onChange={(e) => setConfirmEmail(e.target.value.trim())} */}
         <Button type="submit" className="mt-6" disabled={loading}>
           {loading ? 'Saving...' : 'Save'}
         </Button>

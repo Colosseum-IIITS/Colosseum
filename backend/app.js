@@ -34,11 +34,11 @@ const logStream = rfs.createStream("Colosseum-morgan-logs.txt", {
 });
 
 // Custom Morgan format for more informative logs
-const customFormat = ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms';
+const format = ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] - :response-time ms';
 
 // Middleware setup
-app.use(morgan(customFormat, { stream: logStream }));
-app.use(morgan(customFormat)); // To log to console as well
+app.use(morgan(format, { stream: logStream }));
+// app.use(morgan(format)); // To log to console as well
 
 app.use(express.json());
 app.use(cookieParser());

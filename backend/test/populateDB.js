@@ -66,7 +66,6 @@ const generateTestData = async () => {
       const team = await Team.create({
         name: `Team${i}`,
         leader: players[i-1]._id,
-        captain: players[i-1]._id,  // Add the captain field
         members: [players[i-1]._id, players[i+4]._id],
         description: `Test team ${i} description`
       });

@@ -1,195 +1,173 @@
-
-/**
- * @swagger
- * tags:
- *   - name: Admin Management
- *     description: Endpoints for administrators to manage organizers, players, tournaments, and view dashboard analytics.
- */
-
 /**
  * @swagger
  * /admin/ban/organiser/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Ban an Organiser
- *     description: Ban an organiser by their ID.
+ *     summary: "Ban an Organiser"
+ *     description: "This endpoint allows an admin to ban an organiser by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the organiser to ban.
  *         schema:
  *           type: string
+ *         description: "The ID of the organiser to be banned."
  *     responses:
- *       200:
- *         description: Organiser banned successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Organiser banned successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/ban/organiser/:id', adminController.banOrganiser);
 
 /**
  * @swagger
  * /admin/unban/organiser/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Unban an Organiser
- *     description: Unban an organiser by their ID.
+ *     summary: "Unban an Organiser"
+ *     description: "This endpoint allows an admin to unban an organiser by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the organiser to unban.
  *         schema:
  *           type: string
+ *         description: "The ID of the organiser to be unbanned."
  *     responses:
- *       200:
- *         description: Organiser unbanned successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Organiser unbanned successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/unban/organiser/:id', adminController.unBanOrganiser);
 
 /**
  * @swagger
  * /admin/delete/organiser/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Delete an Organiser
- *     description: Delete an organiser by their ID.
+ *     summary: "Delete an Organiser"
+ *     description: "This endpoint allows an admin to delete an organiser by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the organiser to delete.
  *         schema:
  *           type: string
+ *         description: "The ID of the organiser to be deleted."
  *     responses:
- *       200:
- *         description: Organiser deleted successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Organiser deleted successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/delete/organiser/:id', adminController.deleteOrganiser);
 
 /**
  * @swagger
  * /admin/ban/player/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Ban a Player
- *     description: Ban a player by their ID.
+ *     summary: "Ban a Player"
+ *     description: "This endpoint allows an admin to ban a player by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the player to ban.
  *         schema:
  *           type: string
+ *         description: "The ID of the player to be banned."
  *     responses:
- *       200:
- *         description: Player banned successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Player banned successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/ban/player/:id', adminController.banPlayer);
 
 /**
  * @swagger
  * /admin/unban/player/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Unban a Player
- *     description: Unban a player by their ID.
+ *     summary: "Unban a Player"
+ *     description: "This endpoint allows an admin to unban a player by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the player to unban.
  *         schema:
  *           type: string
+ *         description: "The ID of the player to be unbanned."
  *     responses:
- *       200:
- *         description: Player unbanned successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Player unbanned successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/unban/player/:id', adminController.unBanPlayer);
 
 /**
  * @swagger
  * /admin/approve/tournament/{id}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Approve a Tournament
- *     description: Approve a tournament by its ID.
+ *     summary: "Approve a Tournament"
+ *     description: "This endpoint allows an admin to approve a tournament by ID."
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the tournament to approve.
  *         schema:
  *           type: string
+ *         description: "The ID of the tournament to be approved."
  *     responses:
- *       200:
- *         description: Tournament approved successfully.
- *       400:
- *         description: Invalid ID or error.
+ *       "200":
+ *         description: "Tournament approved successfully."
+ *       "400":
+ *         description: "Invalid ID or other error."
  */
+router.post('/approve/tournament/:id', adminController.approveTournament);
 
 /**
  * @swagger
  * /api/organiser/delete/{tournamentId}:
  *   post:
- *     tags: [Admin Management]
- *     summary: Delete a Tournament
- *     description: Delete a tournament by its ID.
+ *     summary: "Delete a Tournament"
+ *     description: "This endpoint allows an admin to delete a tournament by ID."
  *     parameters:
  *       - in: path
  *         name: tournamentId
  *         required: true
- *         description: The ID of the tournament to delete.
  *         schema:
  *           type: string
+ *         description: "The ID of the tournament to be deleted."
  *     responses:
- *       200:
- *         description: Tournament deleted successfully.
- *       400:
- *         description: Invalid tournament ID or error.
+ *       "200":
+ *         description: "Tournament deleted successfully."
+ *       "400":
+ *         description: "Invalid tournament ID or other error."
  */
+router.post('/api/organiser/delete/:tournamentId', authenticateAdmin,organiserController.deleteTournament);
 
 /**
  * @swagger
  * /admin/dashboard:
  *   get:
- *     tags: [Admin Management]
- *     summary: Get Admin Dashboard
- *     description: Retrieve dashboard metrics and data for the admin.
+ *     summary: "Get Admin Dashboard"
+ *     description: "This endpoint returns the dashboard for the admin, showing key metrics and actions."
  *     responses:
- *       200:
- *         description: Dashboard data retrieved successfully.
- *       400:
- *         description: Unable to retrieve dashboard data.
+ *       "200":
+ *         description: "Dashboard data retrieved successfully."
+ *       "400":
+ *         description: "Error retrieving dashboard data."
  */
-
+router.get('/dashboard', authenticateAdmin, adminController.getDashboard);
 /**
  * @swagger
  * /admin/banhistory:
  *   get:
- *     tags: [Admin Management]
- *     summary: Get Ban History
- *     description: Retrieve the ban history data.
+ *     summary: "Get ban history"
+ *     description: "This endpoint returns the ban history within the last month"
  *     responses:
- *       200:
- *         description: Ban history retrieved successfully.
- *       400:
- *         description: Unable to retrieve ban history.
+ *       "200":
+ *         description: "Ban data retrieved successfully."
+ *       "400":
+ *         description: "Error retrieving Ban data."
  */
-
-// Route handlers
-router.post('/admin/ban/organiser/:id', adminController.banOrganiser);
-router.post('/admin/unban/organiser/:id', adminController.unBanOrganiser);
-router.post('/admin/delete/organiser/:id', adminController.deleteOrganiser);
-router.post('/admin/ban/player/:id', adminController.banPlayer);
-router.post('/admin/unban/player/:id', adminController.unBanPlayer);
-router.post('/admin/approve/tournament/:id', adminController.approveTournament);
-router.post('/api/organiser/delete/:tournamentId', authenticateAdmin, organiserController.deleteTournament);
-router.get('/admin/dashboard', authenticateAdmin, adminController.getDashboard);
-router.get('/admin/banhistory', adminController.getBanHistory);
-
-module.exports = router;
+router.get('/banhistory', adminController.getBanHistory);

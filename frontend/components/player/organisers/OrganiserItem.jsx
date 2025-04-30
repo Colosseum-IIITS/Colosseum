@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '../../../components/ui/button'; // Import ShadCN Button component
+import { Button } from '../../../components/ui/button'; // Adjust path if needed
 
 const OrganiserItem = ({ organiser }) => {
-  const [isFollowing, setIsFollowing] = useState(true); // Assuming user is following initially
+  const [isFollowing, setIsFollowing] = useState(true);
 
-  // Unfollow Organiser API call
   const handleUnfollow = async () => {
     const token = localStorage.getItem('user_jwt');
     
@@ -18,27 +17,25 @@ const OrganiserItem = ({ organiser }) => {
           'Authorization': `Bearer ${token}`,
         },
         credentials: 'include',
-        body: JSON.stringify({ organiserId: organiser._id }), // Pass the organiser ID to unfollow
+        body: JSON.stringify({ organiserId: organiser._id }),
       });
 
       if (response.ok) {
-        setIsFollowing(false); // Change follow state on success
+        setIsFollowing(false);
         window.location.reload();
       } else {
-        console.error('Failed to unfollow organiser');
         alert('Failed to unfollow organiser.');
       }
     } catch (error) {
-      console.error('Error unfollowing organiser:', error);
       alert('Error unfollowing organiser.');
     }
   };
 
   return (
     <div className="tournament-item p-6 border-2 border-gray-200 rounded-xl shadow-lg bg-white hover:shadow-xl transition-shadow duration-300 relative">
-      <h3 className="text-xl font-bold">{organiser.username}</h3>
+      <h3 className="text-xl font-bold">{organiser?.username || 'Unnamed'}</h3>
       <div className="organiser-description mt-2">
-        <p><strong>Email:</strong> {organiser.email}</p>
+        <p><strong>Email:</strong> {organiser?.email || 'N/A'}</p>
         <p><strong>Tournaments Organized:</strong></p>
         <ul className="list-disc ml-5">
           {organiser.tournaments && organiser.tournaments.length > 0 ? (
@@ -51,7 +48,6 @@ const OrganiserItem = ({ organiser }) => {
         </ul>
       </div>
 
-      {/* Unfollow Button */}
       {isFollowing && (
         <Button
           onClick={handleUnfollow}

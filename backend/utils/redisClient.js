@@ -15,5 +15,12 @@ const getCache = async (key) => {
     return null;
   }
 };
-
-module.exports = { redis, setCache, getCache };
+const delCache = async (key) => {
+  try {
+    await redis.del(key);
+    console.log(`Cache with key ${key} deleted successfully`);
+  } catch (err) {
+    console.error('Error deleting cache in Redis:', err);
+  }
+};
+module.exports = { redis, setCache, getCache ,delCache};

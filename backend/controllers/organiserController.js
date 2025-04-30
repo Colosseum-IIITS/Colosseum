@@ -4,7 +4,8 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
-const { getCache, setCache } = require("../utils/redisClient");
+const { getCache, setCache} = require("../utils/redisClient");
+const { delCache } = require("../utils/redisClient");
 
 
 
@@ -400,39 +401,38 @@ exports.getOrganiserDashboard = async (req, res) => {
   }
 };
 
+
 exports.getMyOrganisers = async (req, res) => {
-  const { _id } = req.user; // Player ID
+  const { _id } = req.user;
 
   try {
     const cacheKey = `player_followed_organisers_${_id}`;
-    const cachedData = await getCache(cacheKey);
+    
+    // Delete the cache before fetching fresh data
+    await delCache(cacheKey);
 
-    if (cachedData) {
-      console.log(`Cache hit for followed organisers of player ${_id}`);
-      return res.status(200).json({
-        followedOrganisers: cachedData
-      });
-    }
-
+    // Proceed with fetching fresh data
     const player = await Player.findById(_id).populate({
       path: 'following',
       model: 'Organiser',
       populate: {
         path: 'tournaments',
-        model: 'Tournament'
-      }
+        model: 'Tournament',
+      },
     });
 
     if (!player) {
-      console.log("Player not found");
       return res.status(404).json({ message: "Player not found" });
     }
 
-    // Cache the result for 30 minutes
-    await setCache(cacheKey, player.following, 1800);
+    // Convert to plain JS object
+    const organiserData = player.following.map(o => o.toObject());
+
+    // Cache the fresh data again
+    await setCache(cacheKey, organiserData, 1800); // Cache for 30 mins
 
     return res.status(200).json({
-      followedOrganisers: player.following
+      followedOrganisers: organiserData,
     });
 
   } catch (error) {
@@ -443,6 +443,8 @@ exports.getMyOrganisers = async (req, res) => {
     });
   }
 };
+
+
 
 exports.banTeam = async (req, res) => {
   const { teamId } = req.body;

@@ -268,8 +268,8 @@ exports.getEnrolledTournaments = async (req, res) => {
 
     // Check if the player has a team
     if (!player.team) {
-      console.log("kjhsahf");
-      return res.status(400).json({ message: 'Player is not part of any team' });
+      console.log("Player is not part of any team");
+      return res.status(200).json({ tournaments: [] });  // Return empty tournaments array
     }
 
     // Find the tournaments that the team is enrolled in
@@ -279,13 +279,18 @@ exports.getEnrolledTournaments = async (req, res) => {
       select: 'name email',
     });
 
+    // If no tournaments are found, return an empty array
+    if (tournaments.length === 0) {
+      return res.status(200).json({ tournaments: [] });
+    }
+
     return res.status(200).json({ tournaments }); // Return tournaments to frontend
   } catch (error) {
     console.error('Error fetching enrolled tournaments:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-  
+
 // Fetch tournament by ID
 exports.getTournamentById = async (req, res) => {
     try {

@@ -30,7 +30,10 @@ router.get('/dashboard', authenticateUser, playerController.getDashboard);
 router.get('/teamName', authenticateUser, teamController.getTeamsByName);
 router.get('/followedOrg',authenticateUser,organiserController.getMyOrganisers);
 router.get('/getUserName', authenticateUser, playerController.getUsername);
+<<<<<<< HEAD
+=======
 router.get('/homepage', authenticateUser, playerController.getHomePage);
+>>>>>>> parent of ccd5c65 (playerRoute)
 router.post('/joinTeam', authenticateUser, teamController.joinTeam);
 router.get('/winPercentage',authenticateUser,playerController.getWinPercentage);
 router.get('/ranking', playerController.getGlobalPlayerRanking);

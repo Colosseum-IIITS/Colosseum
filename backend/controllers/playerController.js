@@ -5,51 +5,59 @@ const team = require('../models/Team');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Team = require('../models/Team');
-
-const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Types;
-
+const mongoose = require('mongoose');  
+const { delCache, setCache } = require('../utils/redisClient');  
+const{getCache}=require('../utils/redisClient');
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
-    const { _id } = req.user;
+    const { _id: playerId } = req.user;
 
     try {
+        // Ensure organiserId is a string
         if (typeof organiserId !== 'string') {
             return res.status(400).json({ message: 'organiserId is not a string' });
         }
 
-        if (!ObjectId.isValid(organiserId)) {
+        // Check if organiserId is a valid MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(organiserId)) {
             return res.status(400).json({ message: 'Invalid organiser ID format' });
         }
 
-        const organiser = await Organiser.findById(new ObjectId(organiserId));
+        // Use mongoose.Types.ObjectId() to convert organiserId to a valid ObjectId
+        const organiser = await Organiser.findById(organiserId);
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
 
-        const player = await Player.findById(_id);
+        const player = await Player.findById(playerId);
         if (!player) {
             return res.status(404).json({ message: 'Player not found' });
         }
 
+        // Check if the player is already following the organiser
         if (player.following.includes(organiserId)) {
-            return res.status(202).json({ message: 'Player is already following this organiser', player, organiser });
+            return res.status(400).json({ message: 'Player is already following this organiser' });
         }
 
+        // Follow the organiser
         player.following.push(organiserId);
         await player.save();
 
-        organiser.followers.push(player._id);
+        // Add the player to the organiser's followers
+        organiser.followers.push(playerId);
         await organiser.save();
 
         res.status(200).json({ message: 'Player successfully followed the organiser', player, organiser });
 
     } catch (error) {
-        console.error('Error:', error.message); // Log the error for debugging
-        res.status(500).json({ message: 'Error following organiser', error: error.message });
+        console.error('Error following organiser:', error);
+        res.status(500).json({ error: 'Error following organiser', details: error.message });
     }
 };
 
+
+
+// Import mongoose for ObjectId
 exports.unfollowOrganiser = async (req, res) => {
     const { organiserId } = req.body;
     const { _id: playerId } = req.user; 
@@ -61,12 +69,12 @@ exports.unfollowOrganiser = async (req, res) => {
         }
 
         // Check if organiserId is a valid MongoDB ObjectId
-        if (!ObjectId.isValid(organiserId)) {
+        if (!mongoose.Types.ObjectId.isValid(organiserId)) {
             return res.status(400).json({ message: 'Invalid organiser ID format' });
         }
 
-        // Use new ObjectId() to convert organiserId to a valid ObjectId
-        const organiser = await Organiser.findById(new ObjectId(organiserId));
+        // Use mongoose.Types.ObjectId() to convert organiserId to a valid ObjectId
+        const organiser = await Organiser.findById(organiserId);
         if (!organiser) {
             return res.status(404).json({ message: 'Organiser not found' });
         }
@@ -308,101 +316,128 @@ exports.joinTournament = async (req, res) => {
         return res.status(500).json({ message: 'Server error', error });
     }
 };
-
 exports.updateUsername = async (req, res) => {
-    try {
-        const { username } = req.body;
+  try {
+    const { username } = req.body;
 
-        if (!username || typeof username !== 'string' || !username.trim()) {
-            return res.status(400).json({ error: 'Username is required and cannot be empty' });
-        }
-        
-        const { _id } = req.user;
-
-        const player = await Player.findById(_id);
-        if (!player) {
-            return res.status(404).json({ error: 'Player not found' });
-        }
-
-        const existingPlayer = await Player.findOne({ username });
-        if (existingPlayer) {
-            return res.status(400).json({ error: 'Username already taken' });
-        }
-
-        player.username = username;
-        await player.save();
-
-        res.status(200).json({
-            message: 'Username updated successfully',
-            player,
-        });
-    } catch (error) {
-        console.error('Error updating username:', error);
-        res.status(500).json({
-            error: 'Error updating username',
-            details: error.message,
-        });
+    if (!username || typeof username !== 'string' || !username.trim()) {
+        return res.status(400).json({ error: 'Username is required and cannot be empty' });
     }
+    
+    const { _id } = req.user;
+
+    const player = await Player.findById(_id);
+    if (!player) {
+        return res.status(404).json({ error: 'Player not found' });
+    }
+
+    const existingPlayer = await Player.findOne({ username });
+    if (existingPlayer) {
+        return res.status(400).json({ error: 'Username already taken' });
+    }
+
+    player.username = username;
+    await player.save();
+
+    // Invalidate the cache for both the player dashboard and username
+    const dashboardCacheKey = `dashboard_${_id}`;
+    const usernameCacheKey = `username_${_id}`;
+    
+    await delCache(dashboardCacheKey);  // Remove cached dashboard data
+    await delCache(usernameCacheKey);   // Remove cached username data
+
+    res.status(200).json({
+        message: 'Username updated successfully',
+        player,
+    });
+  } catch (error) {
+      console.error('Error updating username:', error);
+      res.status(500).json({
+          error: 'Error updating username',
+          details: error.message,
+      });
+  }
 };
+
 
 // Update password
 exports.updatePassword = async (req, res) => {
-    const { currentPassword, newPassword } = req.body;
-    const { _id } = req.user;
+  const { currentPassword, newPassword } = req.body;
+  const { _id } = req.user;
 
-    console.log('Updating password for:', _id); 
-    try {
-        const player = await Player.findOne({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
+  console.log('Updating password for:', _id); 
+  try {
+      const player = await Player.findOne({ _id });
+      if (!player) {
+          return res.status(404).json({ message: 'Player not found' });
+      }
 
-        const isMatch = await bcrypt.compare(currentPassword, player.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' });
-        }
+      // Check if the current password matches the stored password
+      const isMatch = await bcrypt.compare(currentPassword, player.password);
+      if (!isMatch) {
+          return res.status(400).json({ message: 'Current password is incorrect' });
+      }
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        player.password = hashedPassword;
-        await player.save();
+      // Hash and update the password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      player.password = hashedPassword;
+      await player.save();
 
-        res.status(200).json({
-            message: 'Password updated successfully',
-            player
-        });
-    } catch (error) {
-        console.error('Error updating password:', error);
-        res.status(500).json({ error: 'Error updating password', details: error.message });
-    }
+      // Invalidate the relevant cache after updating the password
+      const dashboardCacheKey = `dashboard_${_id}`;
+      const usernameCacheKey = `username_${_id}`;
+
+      await delCache(dashboardCacheKey);  // Remove cached dashboard data
+      await delCache(usernameCacheKey);   // Remove cached username data
+
+      res.status(200).json({
+          message: 'Password updated successfully',
+          player
+      });
+  } catch (error) {
+      console.error('Error updating password:', error);
+      res.status(500).json({ error: 'Error updating password', details: error.message });
+  }
 };
+
 // Update email
 exports.updateEmail = async (req, res) => {
-    const { email } = req.body; 
-    const { _id } = req.user;
+  const { email } = req.body; 
+  const { _id } = req.user;
 
-    try {
-        const player = await Player.findOne({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
+  try {
+      const player = await Player.findOne({ _id });
+      if (!player) {
+          return res.status(404).json({ message: 'Player not found' });
+      }
 
-        const existingPlayer = await Player.findOne({ email });
-        if (existingPlayer) {
-            return res.status(400).json({ message: 'Email already taken' });
-        }
+      // Check if the email is already taken by another player
+      const existingPlayer = await Player.findOne({ email });
+      if (existingPlayer) {
+          return res.status(400).json({ message: 'Email already taken' });
+      }
 
-        player.email = email; 
-        await player.save();
+      // Update the player's email
+      player.email = email; 
+      await player.save();
 
-        res.status(200).json({
-            message: 'Email updated successfully',
-            player
-        });
-    } catch (error) {
-        console.error('Error updating email:', error);
-        res.status(500).json({ error: 'Error updating email', details: error.message });
-    }
+      // Invalidate the relevant cache after updating the email
+      const dashboardCacheKey = `dashboard_${_id}`;
+      const usernameCacheKey = `username_${_id}`;
+
+      await delCache(dashboardCacheKey);  // Remove cached dashboard data
+      await delCache(usernameCacheKey);   // Remove cached username data
+
+      res.status(200).json({
+          message: 'Email updated successfully',
+          player
+      });
+  } catch (error) {
+      console.error('Error updating email:', error);
+      res.status(500).json({ error: 'Error updating email', details: error.message });
+  }
 };
+
 
 // Update profile
 exports.updateProfile = async (req, res) => {
@@ -447,224 +482,348 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// Fetch number of tournaments played by the player
 exports.getTournamentsPlayed = async (req, res) => {
-    const { _id } = req.user;
-    try {
-        const player = await Player.findById({ _id });
+  const { _id } = req.user;
 
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        const tournamentsPlayed = player.tournaments.length;
-        res.status(200).json({ tournamentsPlayed });
-    } catch (error) {
-        console.error('Error fetching tournaments played:', error);
-        res.status(500).json({ error: 'Error fetching tournaments played' });
+  try {
+    // Check cache first
+    const cacheKey = `player_tournaments_played_${_id}`;
+    const cacheValue = await getCache(cacheKey);
+    if (cacheValue) {
+      console.log(`Cache hit for player ${_id}`);
+      return res.status(200).json({ tournamentsPlayed: cacheValue });
     }
+
+    // If not in cache, fetch from database
+    const player = await Player.findById({ _id });
+
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const tournamentsPlayed = player.tournaments.length;
+
+    // Store the result in cache for 30 minutes (1800 seconds)
+    await setCache(cacheKey, tournamentsPlayed, 1800);
+
+    res.status(200).json({ tournamentsPlayed });
+  } catch (error) {
+    console.error('Error fetching tournaments played:', error);
+    res.status(500).json({ error: 'Error fetching tournaments played' });
+  }
 };
+
 
 // Fetch number of tournaments won by the player
 exports.getTournamentsWon = async (req, res) => {
-    const { _id } = req.user;
-    console.log('User ID:', _id); // Log user ID to confirm it's correct
+  const { _id } = req.user;
+  console.log('User ID:', _id); // Log user ID to confirm it's correct
   
-    try {
-      const player = await Player.findOne({ _id });
-      if (!player) {
-        return res.status(404).json({ message: 'Player not found' });
-      }
-  
-      const tournamentsWon = player.tournaments.filter(t => t.won).length;
-      console.log('Tournaments Won:', tournamentsWon); // Log the result
-      res.status(200).json({ tournamentsWon });
-    } catch (error) {
-      console.error('Error fetching tournaments won:', error);
-      res.status(500).json({ error: 'Error fetching tournaments won' });
+  try {
+    // Check cache first
+    const cacheKey = `player_tournaments_won_${_id}`;
+    const cacheValue = await getCache(cacheKey);
+    if (cacheValue) {
+      console.log(`Cache hit for player ${_id}`);
+      return res.status(200).json({ tournamentsWon: cacheValue });
     }
-  };
-  
+
+    console.log(`Cache miss for player ${_id}, fetching from DB...`);
+
+    // If not in cache, fetch from database
+    const player = await Player.findOne({ _id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const tournamentsWon = player.tournaments.filter(t => t.won).length;
+    console.log('Tournaments Won:', tournamentsWon); // Log the result
+
+    // Cache the result for 30 minutes (1800 seconds)
+    await setCache(cacheKey, tournamentsWon, 1800);
+
+    res.status(200).json({ tournamentsWon });
+  } catch (error) {
+    console.error('Error fetching tournaments won:', error);
+    res.status(500).json({ error: 'Error fetching tournaments won' });
+  }
+};
+
+
 
 // Fetch player ranking based on the number of tournaments played
 exports.getPlayerRanking = async (req, res) => {
-    const { _id } = req.user;
+  const { _id } = req.user;
 
-    try {
-        const player = await Player.findOne({ _id });
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        const players = await Player.find();
-        const playerRanking = players.sort((a, b) => b.tournaments.length - a.tournaments.length)
-                                     .findIndex(p => p._id.toString() === _id.toString()) + 1;
-
-        res.status(200).json({ playerRanking });
-    } catch (error) {
-        console.error('Error fetching player ranking:', error);
-        res.status(500).json({ error: 'Error fetching player ranking' });
+  try {
+    // Check cache first
+    const cacheKey = `player_ranking_${_id}`;
+    const cacheValue = await getCache(cacheKey);
+    if (cacheValue) {
+      console.log(`Cache hit for player ranking ${_id}`);
+      return res.status(200).json({ playerRanking: cacheValue });
     }
+
+    console.log(`Cache miss for player ranking ${_id}, fetching from DB...`);
+
+    // If not in cache, fetch the player and all players
+    const player = await Player.findOne({ _id });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const players = await Player.find();
+    // Sort players by the number of tournaments and get the rank
+    const playerRanking = players
+      .sort((a, b) => b.tournaments.length - a.tournaments.length)
+      .findIndex(p => p._id.toString() === _id.toString()) + 1;
+
+    console.log('Player Ranking:', playerRanking); // Log the result
+
+    // Cache the result for 30 minutes (1800 seconds)
+    await setCache(cacheKey, playerRanking, 1800);
+
+    res.status(200).json({ playerRanking });
+  } catch (error) {
+    console.error('Error fetching player ranking:', error);
+    res.status(500).json({ error: 'Error fetching player ranking' });
+  }
 };
 
+
+
 exports.getFollowedOrganisers = async (req, res) => {
-    const { _id } = req.user;
-    try {
-        // Find the player by their ID
-        const player = await Player.findById(_id).populate('following');
+  const { _id } = req.user;
 
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        const followingOrganisers = player.following;
-
-        res.status(200).json({ followingOrganisers });
-    } catch (error) {
-        console.error('Error fetching organisers followed:', error);
-        res.status(500).json({ error: 'Error fetching organisers followed' });
+  try {
+    // Check cache first
+    const cacheKey = `player_followed_organisers_${_id}`;
+    const cacheValue = await getCache(cacheKey);
+    if (cacheValue) {
+      console.log(`Cache hit for followed organisers of player ${_id}`);
+      return res.status(200).json({ followingOrganisers: cacheValue });
     }
+
+    // If not in cache, fetch from database
+    const player = await Player.findById(_id).populate('following', 'name _id'); // Optional: specify fields to populate
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    const followingOrganisers = player.following;
+
+    // Cache the result for 30 minutes (1800 seconds)
+    await setCache(cacheKey, followingOrganisers, 1800);
+
+    res.status(200).json({ followingOrganisers });
+  } catch (error) {
+    console.error('Error fetching organisers followed:', error);
+    res.status(500).json({ error: 'Error fetching organisers followed' });
+  }
 };
 
 exports.getTournamentPointsTable = async (req, res) => {
-    const { tournamentId } = req.params;
+  const { tournamentId } = req.params;
 
-    try {
-        const tournament = await Tournament.findById(tournamentId).select('name pointsTable');
-        if (!tournament) {
-            return res.status(404).json({ message: 'Tournament not found' });
-        }   
-        
-        res.status(200).json({
-            pointsTable: tournament.pointsTable,
-            tournamentName: tournament.name
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Internal server error',
-            error
-        });
-    }
-};
-exports.getGlobalPlayerRanking = async (req, res) => {
-    try {
-      const players = await Player.find().lean();
-  
-      const rankedPlayers = players
-        .map(player => ({
-          _id: player._id,
-          username: player.username,
-          tournamentsWon: player.tournaments.filter(t => t.won).length,
-          tournamentsPlayed: player.tournaments.length
-        }))
-        .sort((a, b) =>
-          b.tournamentsWon - a.tournamentsWon || // Primary sorting by tournaments won
-          b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker by tournaments played
-        );
-  
-      res.status(200).json(rankedPlayers);
-    } catch (error) {
-      console.error('Error fetching player rankings:', error);
-      res.status(500).json({ message: 'Error retrieving player rankings', error });
-    }
-};
-
-  exports.getDashboard = async (req, res) => {
-    const playerId = req.user._id;
-    const currentDate = new Date();
-  
-    try {
-      // Populate tournaments with tournament details
-      const player = await Player.findById(playerId).populate('tournaments.tournament');
-      if (!player) {
-        return res.status(404).json({ message: 'Player not found' });
-      }
-  
-      // Calculate tournaments won and played
-      const tournamentsWon = player.tournaments.filter(t => t.won).length;
-      console.log('Tournaments Won:', tournamentsWon);
-      const tournamentsPlayed = player.tournaments.length;
-  
-      let winPercentage = 0;
-      if (tournamentsPlayed !== 0) {
-        winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
-      }
-  
-      // Calculate ongoing tournaments based on current date
-      const ongoingTournaments = player.tournaments.filter(t => {
-        const tournament = t.tournament;
-        return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
-      }).length;
-  
-      // Get team details if exists
-      const teamId = player.team;
-      const team = await Team.findById(teamId);
-  
-      // Compute global rankings for all players
-      const players = await Player.find().lean();
-      const rankings = players
-        .map(p => ({
-          _id: p._id,
-          username: p.username,
-          tournamentsWon: p.tournaments.filter(t => t.won).length,
-          tournamentsPlayed: p.tournaments.length
-        }))
-        .sort((a, b) =>
-          b.tournamentsWon - a.tournamentsWon || // Primary: tournaments won
-          b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker: tournaments played
-        );
-  
-      // Find the current player's rank (1-based index)
-      const globalRank = rankings.findIndex(p => p._id.toString() === playerId.toString()) +1;
-  
-      res.status(200).json({
-        player: {
-          username: player.username,
-          email: player.email,
-          globalRank: globalRank || 'Unranked',
-          tournamentsWon,
-          tournamentsPlayed,
-          noOfOrgsFollowing: player.following.length || 0,
-          team,
-          winPercentage: winPercentage.toFixed(2),
-          ongoingTournaments,
-        },
-        // Return the full global ranking for cross-checking
-        globalRanking: rankings
+  try {
+    // Check cache first
+    const cacheKey = `tournament_points_table_${tournamentId}`;
+    const cacheValue = await getCache(cacheKey);
+    if (cacheValue) {
+      console.log(`Cache hit for tournament points table of tournament ${tournamentId}`);
+      return res.status(200).json({
+        pointsTable: cacheValue.pointsTable,
+        tournamentName: cacheValue.tournamentName
       });
-    } catch (error) {
-      console.error("Error fetching dashboard:", error.message);
-      res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
     }
-  };
+
+    // If not in cache, fetch from database
+    const tournament = await Tournament.findById(tournamentId).select('name pointsTable');
+    if (!tournament) {
+      return res.status(404).json({ message: 'Tournament not found' });
+    }
+
+    const { name, pointsTable } = tournament;
+
+    // Cache the result for 30 minutes (1800 seconds)
+    await setCache(cacheKey, { pointsTable, tournamentName: name }, 1800);
+
+    res.status(200).json({
+      pointsTable,
+      tournamentName: name
+    });
+  } catch (error) {
+    console.error('Error fetching tournament points table:', error);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+};
+
+
+exports.getGlobalPlayerRanking = async (req, res) => {
+  try {
+    const cacheKey = 'global_player_ranking'; // Use a fixed cache key for the global ranking
+
+    // Check if the ranking is cached
+    const cachedRanking = await getCache(cacheKey);
+    if (cachedRanking) {
+      console.log('Cache hit for global player rankings');
+      return res.status(200).json(cachedRanking);
+    }
+
+    // If not cached, calculate the rankings from the database
+    const players = await Player.find().lean();
+
+    const rankedPlayers = players
+      .map(player => ({
+        _id: player._id,
+        username: player.username,
+        tournamentsWon: player.tournaments.filter(t => t.won).length,
+        tournamentsPlayed: player.tournaments.length
+      }))
+      .sort((a, b) =>
+        b.tournamentsWon - a.tournamentsWon || // Primary sorting by tournaments won
+        b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker by tournaments played
+      );
+
+    // Cache the result for 30 minutes (1800 seconds)
+    await setCache(cacheKey, rankedPlayers, 1800);
+
+    res.status(200).json(rankedPlayers);
+  } catch (error) {
+    console.error('Error fetching player rankings:', error);
+    res.status(500).json({ message: 'Error retrieving player rankings', error });
+  }
+};
+
+
+exports.getDashboard = async (req, res) => {
+  const playerId = req.user._id;
+  const currentDate = new Date();
+  const cacheKey = `dashboard_${playerId}`; // Unique cache key for each player
+
+  try {
+    // Check if the dashboard data is cached
+    const cachedDashboard = await getCache(cacheKey);
+    if (cachedDashboard) {
+      console.log('Cache hit for player dashboard');
+      return res.status(200).json(cachedDashboard); // Return cached data
+    }
+
+    // If not cached, proceed with the database query
+    const player = await Player.findById(playerId).populate('tournaments.tournament');
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Calculate tournaments won and played
+    const tournamentsWon = player.tournaments.filter(t => t.won).length;
+    const tournamentsPlayed = player.tournaments.length;
+
+    let winPercentage = 0;
+    if (tournamentsPlayed !== 0) {
+      winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
+    }
+
+    // Calculate ongoing tournaments based on current date
+    const ongoingTournaments = player.tournaments.filter(t => {
+      const tournament = t.tournament;
+      return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
+    }).length;
+
+    // Get team details if exists
+    const teamId = player.team;
+    const team = teamId ? await Team.findById(teamId) : null;
+
+    // Compute global rankings for all players
+    const players = await Player.find().lean();
+    const rankings = players
+      .map(p => ({
+        _id: p._id,
+        username: p.username,
+        tournamentsWon: p.tournaments.filter(t => t.won).length,
+        tournamentsPlayed: p.tournaments.length
+      }))
+      .sort((a, b) =>
+        b.tournamentsWon - a.tournamentsWon || // Primary: tournaments won
+        b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker: tournaments played
+      );
+
+    // Find the current player's rank (1-based index)
+    const globalRank = rankings.findIndex(p => p._id.toString() === playerId.toString()) + 1;
+
+    // Prepare the dashboard response data
+    const dashboardData = {
+      player: {
+        username: player.username,
+        email: player.email,
+        globalRank: globalRank || 'Unranked',
+        tournamentsWon,
+        tournamentsPlayed,
+        noOfOrgsFollowing: player.following.length || 0,
+        team,
+        winPercentage: winPercentage.toFixed(2),
+        ongoingTournaments,
+      },
+      globalRanking: rankings
+    };
+
+    // Cache the dashboard data for 30 minutes (1800 seconds)
+    await setCache(cacheKey, dashboardData, 1800);
+
+    // Return the dashboard data
+    res.status(200).json(dashboardData);
+  } catch (error) {
+    console.error("Error fetching dashboard:", error.message);
+    res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
+  }
+};
 
   
 exports.getUsername = async (req, res) => {
-    try {
-        const { _id } = req.user;  // Extract the _id from the authenticated user
+  const { _id } = req.user;  // Extract the _id from the authenticated user
+  const cacheKey = `username_${_id}`; // Unique cache key for each player
 
-        // Fetch the player from the database
-        const player = await Player.findById(_id);
-        
-        if (!player) {
-            return res.status(404).json({ message: 'Player not found' });
-        }
-
-        // Respond with the player's username
-        res.status(200).json({
-            username: player.username,
-        });
-
-    } catch (error) {
-        // Enhanced error logging for better debugging
-        console.error('Error fetching username:', error);
-
-        res.status(500).json({
-            error: 'Error fetching username',
-            details: error.message,
-        });
+  try {
+    // Check if the username is cached
+    const cachedUsername = await getCache(cacheKey);
+    if (cachedUsername) {
+      console.log('Cache hit for player username');
+      return res.status(200).json(cachedUsername); // Return cached username
     }
+
+    // If not cached, proceed with the database query
+    const player = await Player.findById(_id).select('username');  // Fetch only the username field
+    
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Prepare the response with the player's username
+    const response = {
+      username: player.username,
+    };
+
+    // Cache the username for 30 minutes (1800 seconds)
+    await setCache(cacheKey, response, 1800);
+
+    // Respond with the player's username
+    res.status(200).json(response);
+
+  } catch (error) {
+    // Enhanced error logging for better debugging
+    console.error(`Error fetching username for user ${_id}:`, error);
+
+    res.status(500).json({
+      error: 'Error fetching username',
+      details: error.message,
+    });
+  }
 };
+
+
 
 exports.getPlayerProfile = async (req, res) => {
   try {
@@ -677,6 +836,19 @@ exports.getPlayerProfile = async (req, res) => {
       });
     }
 
+    const cacheKey = `player_profile_${playerId}`; // Unique cache key for each player's profile
+
+    // Check if the player profile is cached
+    const cachedProfile = await getCache(cacheKey);
+    if (cachedProfile) {
+      console.log('Cache hit for player profile');
+      return res.status(200).json({
+        success: true,
+        data: cachedProfile, // Return cached player profile
+      });
+    }
+
+    // If not cached, proceed with the database query
     const player = await Player.findById(playerId)
       .populate('team')
       .populate('teamPayment.payment')
@@ -740,6 +912,9 @@ exports.getPlayerProfile = async (req, res) => {
       updatedAt: player.updatedAt
     };
 
+    // Cache the profile data for 30 minutes (1800 seconds)
+    await setCache(cacheKey, profileData, 1800);
+
     res.status(200).json({
       success: true,
       data: profileData
@@ -754,6 +929,7 @@ exports.getPlayerProfile = async (req, res) => {
     });
   }
 };
+
   
   exports.getWinPercentage = async (req, res) => {
     try {
@@ -787,43 +963,46 @@ exports.getPlayerProfile = async (req, res) => {
   
   exports.updateProfilePicture = async (req, res) => {
     try {
-      console.log('Incoming request to update profile picture'); // Log the incoming request
-  
-      const playerId = req.user.id; // Extract the player ID from the authenticated user
-      console.log(`Player ID: ${playerId}`); // Log the player ID
-  
-      const file = req.file; // File is uploaded via multer middleware
-      console.log('File received:', file); // Log the received file
-  
+      console.log('Incoming request to update profile picture');
+    
+      const playerId = req.user.id;
+      console.log(`Player ID: ${playerId}`);
+    
+      const file = req.file;
+      console.log('File received:', file);
+    
       if (!file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-  
-      // Convert file to Base64 string
+    
       const base64Image = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
-      console.log('Base64 image generated'); // Log when the Base64 string is generated
-  
+      console.log('Base64 image generated');
+    
       // Update the player's profile photo in the database
       const updatedPlayer = await Player.findByIdAndUpdate(
         playerId,
         { profilePhoto: { data: base64Image, contentType: file.mimetype } },
         { new: true }
       );
-      console.log('Updated player:', updatedPlayer); // Log the updated player object
-  
+      console.log('Updated player:', updatedPlayer);
+    
       if (!updatedPlayer) {
         return res.status(404).json({ message: "Player not found" });
       }
   
+      // Invalidate cache for this player's profile picture
+      await delCache(`profile_picture_${playerId}`);
+    
       res.status(200).json({
         message: "Profile photo updated successfully",
         profilePhoto: updatedPlayer.profilePhoto,
       });
     } catch (error) {
-      console.error("Error updating profile picture:", error); // Log the error
+      console.error("Error updating profile picture:", error);
       res.status(500).json({ message: "An error occurred", error: error.message });
     }
   };
+  
   
   
   // Get Player's Profile Picture (GET)
@@ -834,15 +1013,29 @@ exports.getPlayerProfile = async (req, res) => {
       const playerId = req.user.id; // Extract the player ID from the authenticated user
       console.log(`Player ID: ${playerId}`); // Log the player ID
   
+      const cacheKey = `profile_picture_${playerId}`; // Unique cache key for profile picture
+  
+      // Check if the profile picture is cached
+      const cachedProfilePicture = await getCache(cacheKey);
+      if (cachedProfilePicture) {
+        console.log('Cache hit for profile picture');
+        return res.status(200).json({
+          profilePhoto: cachedProfilePicture, // Return cached profile photo
+        });
+      }
+  
       // Find the player in the database
       const player = await Player.findById(playerId);
-      console.log('Player found:', player.profilePhoto); // Log the retrieved player data
+      console.log('Player found:', player?.profilePhoto); // Log the retrieved player data
   
       if (!player || !player.profilePhoto) {
         return res.status(404).json({ message: "Player or profile photo not found" });
       }
   
-      // Send the profile photo as a response (Base64)
+      // Cache the profile picture for 24 hours (86400 seconds)
+      await setCache(cacheKey, player.profilePhoto, 86400);
+  
+      // Send the profile photo as a response (Base64 or URL)
       res.status(200).json({
         profilePhoto: player.profilePhoto,
       });
@@ -851,5 +1044,6 @@ exports.getPlayerProfile = async (req, res) => {
       res.status(500).json({ message: "An error occurred", error: error.message });
     }
   };
+  
   
 

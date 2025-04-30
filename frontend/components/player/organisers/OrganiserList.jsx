@@ -1,55 +1,54 @@
-'use client';
-
 import { useEffect, useState } from 'react';
-import OrganiserItem from './OrganiserItem'; // Assuming OrganiserItem is a separate component
+import OrganiserItem from './OrganiserItem';
 
 const OrganiserList = () => {
   const [followedOrganisers, setFollowedOrganisers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchFollowedOrganisers = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const token = localStorage.getItem('user_jwt');
-        const response = await fetch('http://localhost:5000/api/player/followedOrg', {
-          method: 'GET',
+        const response = await fetch("http://localhost:5000/api/player/followedOrg", {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error fetching followed organisers:', errorData);
-          return;
+          throw new Error("Failed to fetch followed organisers");
         }
 
         const data = await response.json();
-        setFollowedOrganisers(data.followedOrganisers);
-      } catch (error) {
-        console.error('Error fetching followed organisers:', error);
-      } finally {
-        setLoading(false);
+        setFollowedOrganisers(data.followedOrganisers); // ✅ Extract array from response
+        setLoading(false); // ✅ End loading
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Something went wrong");
+        setLoading(false); // ✅ Also stop loading on error
       }
     };
 
     fetchFollowedOrganisers();
   }, []);
 
-  if (loading) {
-    return <div className="text-center text-xl text-gray-700">Loading...</div>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-lg shadow-md space-y-6">
-      {followedOrganisers.length > 0 ? (
-        followedOrganisers.map((organiser) => (
-          <OrganiserItem key={organiser._id} organiser={organiser} />
-        ))
+    <div>
+      <h3 className="text-2xl font-semibold mb-4">Followed Organisers</h3>
+      {followedOrganisers.length === 0 ? (
+        <p>You are not following any organisers yet.</p>
       ) : (
-        <p className="text-center text-lg text-gray-500">You are not following any organisers yet.</p>
+        <ul className="space-y-4">
+          {followedOrganisers.map((organiser) => (
+            <OrganiserItem key={organiser._id} organiser={organiser} />
+          ))}
+        </ul>
       )}
     </div>
   );

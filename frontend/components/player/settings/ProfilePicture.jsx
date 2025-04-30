@@ -79,61 +79,55 @@ const ProfilePicture = () => {
   
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("profilePhoto", file);
+    if (!file) return;
   
-      setLoading(true);
+    const formData = new FormData();
+    formData.append("profilePhoto", file);
+    setLoading(true);
   
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Token is missing or invalid");
-        toast.error("Authentication token is missing or invalid.");
-        setLoading(false);
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Authentication token is missing or invalid.");
+      setLoading(false);
+      return;
+    }
   
-      try {
-        console.log("Attempting to upload profile picture...");
-        const response = await axios.post(
-          "http://localhost:5000/api/player/updateprofilepicture",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        // Log the successful response
-        console.log("Profile picture uploaded successfully:", response.data);
-  
-        if (response.data && response.data.profilePhoto) {
-          const base64Data = response.data.profilePhoto.data;
-          setUser((prevUser) => ({
-            ...prevUser,
-            image: { data: base64Data, contentType: response.data.profilePhoto.contentType },
-          }));
-          toast.success("Profile picture updated successfully!");
-        } else {
-          toast.warn("No profilePhoto found in the response.");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/player/updateprofilepicture",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error(
-          "Error uploading profile picture:",
-          error.response?.data || error.message
-        );
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to upload profile picture."
-        );
-      } finally {
-        setLoading(false);
-        setIsModalOpen(false);
+      );
+  
+      const { profilePhoto } = response.data;
+      if (profilePhoto?.data) {
+        setUser((prevUser) => ({
+          ...prevUser,
+          image: {
+            data: profilePhoto.data,
+            contentType: profilePhoto.contentType,
+          },
+        }));
+        toast.success("Profile picture updated successfully!");
+      } else {
+        toast.warn("No profile picture found in the response.");
       }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to upload profile picture."
+      );
+    } finally {
+      setLoading(false);
+      setIsModalOpen(false);
     }
   };
+  
+  
   
   const handleRemovePicture = async () => {
     const token = localStorage.getItem("token");
@@ -182,12 +176,17 @@ const ProfilePicture = () => {
 
   // Determine image source
   const getImageSrc = () => {
-    if (user && user.image && user.image.data) {
-      // Return the base64 string with the correct content type as the image source
-      return `data:${user.image.data}`;
-    }
-    return "/placeholder.svg"; // Default image if no profile photo
+    const imageData = user?.image?.data;
+  
+    if (!imageData) return "/placeholder.svg";
+  
+    // If it's already a data URL, just return it
+    if (imageData.startsWith("data:image")) return imageData;
+  
+    // Otherwise, construct it manually
+    return `data:${user.image.contentType};base64,${imageData}`;
   };
+  
 
   return (
     <div className="flex flex-col items-center space-y-4">

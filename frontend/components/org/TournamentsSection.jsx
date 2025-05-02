@@ -30,8 +30,8 @@ const TournamentsSection = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setVisibilitySettings(data.visibilitySettings);
-          setTournamentList(data.tournaments);
+          setVisibilitySettings(data.visibilitySettings || {});
+          setTournamentList(data.tournaments || []);
         } else {
           setError('Failed to fetch organiser data');
         }
@@ -53,8 +53,16 @@ const TournamentsSection = () => {
     return <div className="text-center text-red-500">{error}</div>;
   }
 
-  if (!visibilitySettings.tournamentsVisible) {
-    return null;
+  // Optional fallback if tournaments are hidden
+  if (visibilitySettings?.tournamentsVisible === false) {
+    return (
+      <section className="tournaments-section mt-8 px-4">
+        <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-lg shadow-md space-y-6">
+          <h3 className="text-2xl font-semibold text-black mb-4">All Tournaments</h3>
+          <p className="text-center text-gray-500">Tournaments are hidden in visibility settings.</p>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -74,14 +82,15 @@ const TournamentsSection = () => {
                   <li key={tournament._id}>
                     <Card className="bg-white border border-gray-300 shadow-sm rounded-lg p-4 mb-4">
                       <CardHeader className="bg-white p-4 rounded-md">
-                        <CardTitle className="text-xl font-semibold text-black">{tournament.name}</CardTitle>
+                        <CardTitle className="text-xl font-semibold text-black">
+                          {tournament.name}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-black">Start Date: {new Date(tournament.startDate).toLocaleDateString()}</p>
                         <p className="text-black">End Date: {new Date(tournament.endDate).toLocaleDateString()}</p>
                         <p className="text-black">Prize Pool: ${tournament.prizePool}</p>
-                        <div
-                          className={`status-box ${tournament.status?.toLowerCase() || 'unknown'} bg-gray-200 rounded-full py-1 px-4 inline-block mt-2`}>
+                        <div className={`status-box ${tournament.status?.toLowerCase() || 'unknown'} bg-gray-200 rounded-full py-1 px-4 inline-block mt-2`}>
                           {tournament.status || 'Unknown'}
                         </div>
                         {tournament.status === 'Completed' && (
@@ -109,3 +118,4 @@ const TournamentsSection = () => {
 };
 
 export default TournamentsSection;
+  

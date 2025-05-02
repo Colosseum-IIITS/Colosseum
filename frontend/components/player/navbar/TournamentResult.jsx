@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button'; // Assuming you are using the S
 const TournamentResult = ({ tournament }) => {
   const [joining, setJoining] = useState(false);
   const [message, setMessage] = useState('');
-
+  console.log('Tournament data:', tournament);
   const handleJoinTournament = async () => {
-    setJoining(true); // Show loading state
-    const token = localStorage.getItem('user_jwt'); // Get token from localStorage
-
+    setJoining(true); // Set loading state to true
+    console.log('Joining state:', joining); // Add this log
+    const token = localStorage.getItem('user_jwt'); // Get the JWT token from localStorage
+    console.log('Token:', token); // Log the token for debugging
     try {
       const response = await fetch(`http://localhost:5000/api/tournament/join/${tournament._id}`, {
         method: 'POST',
@@ -19,7 +20,7 @@ const TournamentResult = ({ tournament }) => {
         },
         credentials: 'include',
       });
-
+  
       if (response.ok) {
         setMessage('Successfully joined the tournament!');
       } else {
@@ -31,8 +32,10 @@ const TournamentResult = ({ tournament }) => {
       console.error('Error joining tournament:', error);
     } finally {
       setJoining(false); // Hide loading state
+      console.log('Joining state after completion:', joining); // Add this log to verify if state changes
     }
   };
+  
 
   return (
     <div className="tournament-result p-4 border-2 border-gray-200 rounded-lg shadow-sm mb-4">
@@ -46,7 +49,7 @@ const TournamentResult = ({ tournament }) => {
         {message && <p className="text-sm text-gray-600">{message}</p>}
         <Button
           onClick={handleJoinTournament}
-          disabled={joining || tournament.status !== 'Approved'}
+          disabled={joining || tournament.status !== "Approved"}
           className="bg-blue-500 text-white hover:bg-blue-600"
         >
           {joining ? 'Joining...' : 'Join Tournament'}

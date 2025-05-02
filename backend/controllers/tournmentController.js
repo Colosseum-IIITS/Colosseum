@@ -4,7 +4,7 @@ const Team = require("../models/Team");
 const jwt = require('jsonwebtoken');
 const Organiser = require("../models/Organiser");
 const mongoose = require('mongoose');
-
+const {delCache}=require('../utils/redisClient')
 //Create a new tournament
 // exports.createTournamentForm = async (req, res) => {
 //     res.status(200).json({ message: "Render createTournament page", organiser: req.user });
@@ -16,54 +16,62 @@ exports.createTournament = async (req, res) => {
   const organiser = req.user._id;
 
   try {
-      const existingTournament = await Tournament.findOne({ tid });
-      if (existingTournament) {
-          return res.status(400).json({ message: "Tournament ID already exists" });
-      }
+    const existingTournament = await Tournament.findOne({ tid });
+    if (existingTournament) {
+      return res.status(400).json({ message: "Tournament ID already exists" });
+    }
 
-      if (new Date(startDate) >= new Date(endDate)) {
-          return res.status(400).json({ message: "Start date must be earlier than end date" });
-      }
+    if (new Date(startDate) >= new Date(endDate)) {
+      return res.status(400).json({ message: "Start date must be earlier than end date" });
+    }
 
-      const tournament = new Tournament({
-          tid,
-          name,
-          startDate,
-          endDate,
-          entryFee,
-          prizePool,
-          status: "Pending",
-          description,
-          organiser,
+    const tournament = new Tournament({
+      tid,
+      name,
+      startDate,
+      endDate,
+      entryFee,
+      prizePool,
+      status: "Pending",
+      description,
+      organiser,
+    });
+
+    const savedTournament = await tournament.save();
+
+    const organiserUpdate = await Organiser.findByIdAndUpdate(
+      organiser,
+      { $push: { tournaments: savedTournament._id } },
+      { new: true }
+    );
+
+    if (!organiserUpdate) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
+
+    // Notify all players following the organiser
+    const followingPlayers = await Player.find({ following: organiser });
+
+    followingPlayers.forEach(async (player) => {
+      const message = `${organiserUpdate.username} is conducting a new tournament: ${savedTournament.name}`;
+      await Player.findByIdAndUpdate(player._id, {
+        $push: { notifications: { message } },
       });
+    });
 
-      const savedTournament = await tournament.save();
+    // ✅ Clear cached organiser profile so tournaments update in UI
+    await delCache(`organiser_name_${organiser}`);
 
-      const organiserUpdate = await Organiser.findByIdAndUpdate(
-          organiser,
-          { $push: { tournaments: savedTournament._id } },
-          { new: true }
-      );
-
-      if (!organiserUpdate) {
-          return res.status(404).json({ message: "Organiser not found" });
-      }
-
-      // Notify all players following the organiser
-      const followingPlayers = await Player.find({ following: organiser });
-
-      followingPlayers.forEach(async (player) => {
-          const message = `${organiserUpdate.username} is conducting a new tournament: ${savedTournament.name}`;
-          await Player.findByIdAndUpdate(player._id, {
-              $push: { notifications: { message } }
-          });
-      });
-
-      return res.status(200).json({ message: "Tournament created successfully", tournament: savedTournament });
+    return res.status(200).json({
+      message: "Tournament created successfully",
+      tournament: savedTournament,
+    });
   } catch (error) {
-      res.status(500).json({ error: "Error creating tournament" });
+    console.error("Error creating tournament:", error);
+    res.status(500).json({ error: "Error creating tournament" });
   }
 };
+
 
 
 exports.getNotifications = async (req, res) => {
@@ -149,38 +157,44 @@ exports.updateWinner = async (req, res) => {
             return res.status(403).json({ message: "Only the organiser can update the winner" });
         }
 
-        // Find the winning team
+        // Find the winning team and their players
         const winningTeam = await Team.findById(winningTeamId).populate("players");
         if (!winningTeam) {
             return res.status(404).json({ message: "Winning team not found" });
         }
 
-        // Update the tournament winner and status
+        // Update tournament with winner info
         tournament.winner = winningTeamId;
         tournament.status = "Completed";
         tournament.winningDetails = {
-          prizeAmount: tournament.prizePool,
-          winningDate: new Date()
+            prizeAmount: tournament.prizePool,
+            winningDate: new Date()
         };
         await tournament.save();
 
-        // Update all players in the winning team to mark this tournament as won
+        // Update players to reflect tournament victory
         await Promise.all(
             winningTeam.players.map(async (playerId) => {
                 const player = await Player.findById(playerId);
-                if (player) {
-                    const tournamentIndex = player.tournaments.findIndex(t =>
-                        t.tournament.equals(tournamentId)
-                    );
-                    if (tournamentIndex !== -1) {
-                        player.tournaments[tournamentIndex].won = true;
-                    } else {
-                        player.tournaments.push({ tournament: tournamentId, won: true });
-                    }
-                    await player.save();
+                if (!player) return;
+
+                const existing = player.tournaments.find(t => 
+                    t.tournament.toString() === tournamentId
+                );
+
+                if (existing) {
+                    existing.won = true;
+                } else {
+                    player.tournaments.push({ tournament: tournament._id, won: true });
                 }
+
+                await player.save();
             })
         );
+
+        // ❗ Clear global player ranking cache
+        await delCache('global_player_ranking');
+        console.log("Cache cleared for global player ranking");
 
         res.status(200).json({ message: "Winner updated successfully", tournament });
     } catch (error) {
@@ -188,6 +202,7 @@ exports.updateWinner = async (req, res) => {
         res.status(500).json({ error: "Error updating winner" });
     }
 };
+
 
 
 // Update points table

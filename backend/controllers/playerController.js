@@ -141,7 +141,8 @@ exports.searchTournaments = async (req, res) => {
                     { status: 'Approved' },   // Filter by status
                 ],
             })
-            .select('tid name startDate endDate entryFee prizePool organiser') // Select only needed fields
+            .select('tid name startDate endDate entryFee prizePool organiser status description')
+ // Select only needed fields
             .skip(skip)
             .limit(parseInt(limit))
             .lean(); // Use lean for better performance
@@ -318,13 +319,14 @@ exports.joinTournament = async (req, res) => {
 };
 exports.updateUsername = async (req, res) => {
   try {
+    const { _id } = req.user;
     const { username } = req.body;
 
     if (!username || typeof username !== 'string' || !username.trim()) {
         return res.status(400).json({ error: 'Username is required and cannot be empty' });
     }
     
-    const { _id } = req.user;
+   
 
     const player = await Player.findById(_id);
     if (!player) {
@@ -699,85 +701,63 @@ exports.getGlobalPlayerRanking = async (req, res) => {
 };
 
 
+
 exports.getDashboard = async (req, res) => {
   const playerId = req.user._id;
   const currentDate = new Date();
-  const cacheKey = `dashboard_${playerId}`; // Unique cache key for each player
+  const cacheKey = `dashboard_${playerId}`;
 
   try {
     // Check if the dashboard data is cached
-    const cachedDashboard = await getCache(cacheKey);
-    if (cachedDashboard) {
+    let cachedDashboard = await getCache(cacheKey);
+    
+    if (cachedDashboard && cachedDashboard.player.team) {
       console.log('Cache hit for player dashboard');
-      return res.status(200).json(cachedDashboard); // Return cached data
+      return res.status(200).json(cachedDashboard);
     }
 
-    // If not cached, proceed with the database query
-    const player = await Player.findById(playerId).populate('tournaments.tournament');
+    // Fetch player and populate tournaments
+    const player = await Player.findById(playerId).populate('tournaments.tournament').populate('team'); // Ensure team is populated
     if (!player) {
       return res.status(404).json({ message: 'Player not found' });
     }
 
-    // Calculate tournaments won and played
+    // Calculate stats
     const tournamentsWon = player.tournaments.filter(t => t.won).length;
     const tournamentsPlayed = player.tournaments.length;
-
-    let winPercentage = 0;
-    if (tournamentsPlayed !== 0) {
-      winPercentage = (tournamentsWon / tournamentsPlayed) * 100;
-    }
-
-    // Calculate ongoing tournaments based on current date
+    const winPercentage = tournamentsPlayed ? (tournamentsWon / tournamentsPlayed) * 100 : 0;
     const ongoingTournaments = player.tournaments.filter(t => {
       const tournament = t.tournament;
       return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
     }).length;
 
-    // Get team details if exists
-    const teamId = player.team;
-    const team = teamId ? await Team.findById(teamId) : null;
+    // Fetch team details if player has a team
+    let team = null;
+    if (player.team) {
+      team = player.team; // Already populated
+    }
 
-    // Compute global rankings for all players
-    const players = await Player.find().lean();
-    const rankings = players
-      .map(p => ({
-        _id: p._id,
-        username: p.username,
-        tournamentsWon: p.tournaments.filter(t => t.won).length,
-        tournamentsPlayed: p.tournaments.length
-      }))
-      .sort((a, b) =>
-        b.tournamentsWon - a.tournamentsWon || // Primary: tournaments won
-        b.tournamentsPlayed - a.tournamentsPlayed // Tiebreaker: tournaments played
-      );
-
-    // Find the current player's rank (1-based index)
-    const globalRank = rankings.findIndex(p => p._id.toString() === playerId.toString()) + 1;
-
-    // Prepare the dashboard response data
     const dashboardData = {
       player: {
         username: player.username,
         email: player.email,
-        globalRank: globalRank || 'Unranked',
-        tournamentsWon,
+        globalRank: player.globalRank,
         tournamentsPlayed,
-        noOfOrgsFollowing: player.following.length || 0,
-        team,
-        winPercentage: winPercentage.toFixed(2),
+        tournamentsWon,
+        winPercentage,
         ongoingTournaments,
-      },
-      globalRanking: rankings
+        noOfOrgsFollowing: player.orgFollowing?.length || 0,
+        team, // include team object or null
+      }
     };
 
-    // Cache the dashboard data for 30 minutes (1800 seconds)
-    await setCache(cacheKey, dashboardData, 1800);
+    // Cache the result (update cache if new data fetched)
+    await setCache(cacheKey, dashboardData, 3600); // cache for 1 hour
 
-    // Return the dashboard data
-    res.status(200).json(dashboardData);
+    return res.status(200).json(dashboardData);
   } catch (error) {
-    console.error("Error fetching dashboard:", error.message);
-    res.status(500).json({ error: 'Error fetching dashboard', details: error.message });
+    console.error('Dashboard Error:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -836,19 +816,17 @@ exports.getPlayerProfile = async (req, res) => {
       });
     }
 
-    const cacheKey = `player_profile_${playerId}`; // Unique cache key for each player's profile
+    const cacheKey = `player_profile_${playerId}`;
 
-    // Check if the player profile is cached
     const cachedProfile = await getCache(cacheKey);
     if (cachedProfile) {
       console.log('Cache hit for player profile');
       return res.status(200).json({
         success: true,
-        data: cachedProfile, // Return cached player profile
+        data: cachedProfile,
       });
     }
 
-    // If not cached, proceed with the database query
     const player = await Player.findById(playerId)
       .populate('team')
       .populate('teamPayment.payment')
@@ -858,25 +836,17 @@ exports.getPlayerProfile = async (req, res) => {
       .lean();
 
     if (!player) {
-      return res.status(404).json({ 
-        success: false,
-        error: 'Player not found' 
-      });
+      return res.status(404).json({ success: false, error: 'Player not found' });
     }
 
-    // Format the response data
     const profileData = {
       username: player.username,
       email: player.email,
       profilePhoto: player.profilePhoto,
-      
-      // Team details
       team: player.team ? {
         id: player.team._id,
         name: player.team.name
       } : null,
-      
-      // Team payment status
       teamPayment: {
         paid: player.teamPayment?.paid || false,
         paymentDetails: player.teamPayment?.payment ? {
@@ -886,8 +856,6 @@ exports.getPlayerProfile = async (req, res) => {
           date: player.teamPayment.payment.createdAt
         } : null
       },
-
-      // Tournaments with payment info
       tournaments: player.tournaments?.map(t => ({
         id: t.tournament?._id,
         name: t.tournament?.name,
@@ -898,27 +866,18 @@ exports.getPlayerProfile = async (req, res) => {
           amount: t.payment.amount
         } : null
       })) || [],
-
-      // Following list
       following: player.following?.map(org => ({
         id: org._id,
         username: org.username
       })) || [],
-
       banned: player.banned,
-      
-      // Additional user info
       createdAt: player.createdAt,
       updatedAt: player.updatedAt
     };
 
-    // Cache the profile data for 30 minutes (1800 seconds)
-    await setCache(cacheKey, profileData, 1800);
+    await setCache(cacheKey, profileData, 1800); // 30 minutes
 
-    res.status(200).json({
-      success: true,
-      data: profileData
-    });
+    res.status(200).json({ success: true, data: profileData });
 
   } catch (error) {
     console.error('Profile fetch error:', error);
@@ -930,7 +889,6 @@ exports.getPlayerProfile = async (req, res) => {
   }
 };
 
-  
   exports.getWinPercentage = async (req, res) => {
     try {
       const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user

@@ -3,7 +3,8 @@ const Player = require('../models/Player');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Tournament = require('../models/Tournament');
-// Create a new team
+const { delCache } = require('../utils/redisClient'); // Adjust path if needed
+
 exports.createTeam = async (req, res) => {
   const { name } = req.body;
   const { _id: playerId } = req.user;
@@ -18,6 +19,7 @@ exports.createTeam = async (req, res) => {
     if (!player) {
       return res.status(404).json({ message: 'Player not found' });
     }
+
     if (player.team) {
       return res.status(400).json({ message: 'Player is already part of another team' });
     }
@@ -32,6 +34,10 @@ exports.createTeam = async (req, res) => {
 
     player.team = team._id;
     await player.save();
+
+    // ❌ Invalidate cached player profile after team assignment
+    const cacheKey = `player_profile_${playerId}`;
+    await delCache(cacheKey);
 
     res.status(201).json({ message: 'Team created successfully', team });
   } catch (error) {
@@ -115,15 +121,30 @@ exports.updateTeamName = async (req, res) => {
       return res.status(400).json({ message: 'Team name already exists' });
     }
 
+    // Update team name
     team.name = newName;
     await team.save();
 
-    res.status(200).json({ message: 'Team name updated successfully', team });
+    // Optional: Clear cache related to the player or team to force data refresh
+    const cacheKey = `dashboard_${playerId}`;
+    await delCache(cacheKey); // Assuming a function to clear cache by key
+
+    // Refetch player data with the updated team
+    const updatedPlayer = await Player.findById(playerId).populate('team');
+    if (!updatedPlayer) {
+      return res.status(404).json({ message: 'Player not found after update' });
+    }
+
+    res.status(200).json({
+      message: 'Team name updated successfully',
+      team: updatedPlayer.team, // Send updated team data
+    });
   } catch (error) {
     console.error('Error updating team name:', error);
     res.status(500).json({ error: 'Error updating team name', details: error.message });
   }
 };
+
 
 // Get enrolled teams for a player
 exports.getEnrolledTeams = async (req, res) => {
@@ -291,21 +312,27 @@ exports.rejectJoinRequest = async (req, res) => {
   }
 };
 
+// controllers/teamController.js
+
 exports.getTeamDashboard = async (req, res) => {
-  const playerId = req.user._id;  // Get the playerId from the authenticated user
+  const playerId = req.user._id;
   const currentDate = new Date();
 
   try {
     console.log("Received API call from", playerId);
 
     const player = await Player.findById(playerId);
-    if (!player || !player.team) {
-      return res.status(404).json({ message: 'Player or team not found' });
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    if (!player.team) {
+      return res.status(200).json({ message: 'No team found', hasTeamPayment: player.teamPayment?.paid || false });
     }
 
     const teamId = player.team;
     const team = await Team.findById(teamId);
-    const role = team.captain.toString() === playerId.toString() ? 'captain' : 'player'; // Check if the player is captain
+    const role = team.captain.toString() === playerId.toString() ? 'captain' : 'player';
 
     await team.populate('players');
     await team.populate('tournaments');
@@ -313,7 +340,6 @@ exports.getTeamDashboard = async (req, res) => {
     const captain = await Player.findById(team.captain._id);
     const captainName = captain.username;
 
-    // Find ongoing tournaments that the team is participating in
     const ongoingTournamentsCount = await Tournament.countDocuments({
       teams: teamId,
       startDate: { $lte: currentDate },
@@ -321,7 +347,6 @@ exports.getTeamDashboard = async (req, res) => {
       status: "Approved"
     });
 
-    // Count the number of tournaments won by the team
     const tournamentsWonCount = await Tournament.countDocuments({
       winner: teamId
     });
@@ -332,6 +357,7 @@ exports.getTeamDashboard = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 exports.removePlayerFromTeam = async (req, res) => {
   console.log("Handling request to remove player with ID:", req.params.playerId);

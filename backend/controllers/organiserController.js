@@ -138,15 +138,13 @@ exports.updateUsername = async (req, res) => {
   }
 
   try {
-    // Check if username is already taken
     const existingOrganiser = await Organiser.findOne({ username: newUsername });
     if (existingOrganiser) {
       return res.status(400).json({ message: "Username already taken" });
     }
 
-    // Find and update the organiser's username
     const organiser = await Organiser.findByIdAndUpdate(
-      _id, 
+      _id,
       { username: newUsername },
       { new: true, runValidators: true }
     );
@@ -155,12 +153,29 @@ exports.updateUsername = async (req, res) => {
       return res.status(404).json({ message: "Organiser not found" });
     }
 
+    const cacheKey = `organiser_name_${_id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: _id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
+
     res.status(200).json({ message: "Username updated successfully", organiser });
   } catch (error) {
     console.error("Error updating username:", error);
     res.status(500).json({ error: "Error updating username", details: error.message });
   }
 };
+
 
 exports.updateEmail = async (req, res) => {
   const { newEmail } = req.body;
@@ -174,50 +189,73 @@ exports.updateEmail = async (req, res) => {
 
     const existingOrganiser = await Organiser.findOne({ email: newEmail });
     if (existingOrganiser) {
-      return res.status(400).json({ message: "Username already taken" });
+      return res.status(400).json({ message: "Email already taken" });
     }
 
     organiser.email = newEmail;
     await organiser.save();
 
+    const cacheKey = `organiser_name_${_id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: _id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
+
     res.status(200).json({ message: "Email updated successfully", organiser });
   } catch (error) {
     console.error("Error updating Email:", error);
-    res
-      .status(500)
-      .json({ error: "Error updating Email", details: error.message });
+    res.status(500).json({ error: "Error updating Email", details: error.message });
   }
 };
 
+
 exports.updatePassword = async (req, res) => {
-  const { newPassword } = req.body;  // Only take newPassword from the request
+  const { newPassword } = req.body;
   const { _id } = req.user;
 
-  console.log("Request Body:", req.body);
-
-  // Validate if new password is provided
   if (!newPassword) {
     return res.status(400).json({ message: "New password is required" });
   }
 
-  console.log("Updating password for:", _id);
   try {
     const organiser = await Organiser.findOne({ _id });
     if (!organiser) {
       return res.status(404).json({ message: "Organiser not found" });
     }
 
-    // Hash and update the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    organiser.password = hashedPassword;
+    organiser.password = await bcrypt.hash(newPassword, 10);
     await organiser.save();
+
+    const cacheKey = `organiser_name_${_id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: _id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
-    res
-      .status(500)
-      .json({ error: "Error updating password", details: error.message });
+    res.status(500).json({ error: "Error updating password", details: error.message });
   }
 };
 
@@ -225,8 +263,6 @@ exports.updatePassword = async (req, res) => {
 exports.updateDescription = async (req, res) => {
   const { newDescription } = req.body;
   const { _id } = req.user;
-
-  console.log("Incoming newDescription:", newDescription);
 
   try {
     const organiser = await Organiser.findOne({ _id });
@@ -239,8 +275,23 @@ exports.updateDescription = async (req, res) => {
     }
 
     organiser.description = newDescription;
-
     await organiser.save();
+
+    const cacheKey = `organiser_name_${_id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: _id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
 
     res.status(200).json({ message: "Description updated successfully", organiser });
   } catch (error) {
@@ -263,59 +314,88 @@ exports.updateProfilePhoto = async (req, res) => {
     organiser.profilePhoto = newProfilePhoto;
     await organiser.save();
 
-    res
-      .status(200)
-      .json({ message: "Profile Photo updated successfully", organiser });
+    const cacheKey = `organiser_name_${_id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: _id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
+
+    res.status(200).json({ message: "Profile Photo updated successfully", organiser });
   } catch (error) {
     console.error("Error updating Profile Photo:", error);
-    res
-      .status(500)
-      .json({ error: "Error updating Profile Photo", details: error.message });
+    res.status(500).json({ error: "Error updating Profile Photo", details: error.message });
   }
 };
+
 
 exports.updateVisibilitySettings = async (req, res) => {
   const { id } = req.user;
   const {
-      descriptionVisible,
-      profilePhotoVisible,
-      prizePoolVisible,
-      tournamentsVisible,
-      followersVisible,
+    descriptionVisible,
+    profilePhotoVisible,
+    prizePoolVisible,
+    tournamentsVisible,
+    followersVisible,
   } = req.body;
 
-  // Convert the string values to booleans
   const updatedVisibilitySettings = {
-      descriptionVisible: descriptionVisible === 'on', // true if checked
-      profilePhotoVisible: profilePhotoVisible === 'on', // true if checked
-      prizePoolVisible: prizePoolVisible === 'on', // true if checked
-      tournamentsVisible: tournamentsVisible === 'on', // true if checked
-      followersVisible: followersVisible === 'on', // true if checked
+    descriptionVisible: descriptionVisible === 'on',
+    profilePhotoVisible: profilePhotoVisible === 'on',
+    prizePoolVisible: prizePoolVisible === 'on',
+    tournamentsVisible: tournamentsVisible === 'on',
+    followersVisible: followersVisible === 'on',
   };
 
   try {
-      const organiser = await Organiser.findByIdAndUpdate(
-          id,
-          { visibilitySettings: updatedVisibilitySettings },
-          { new: true } // Return the updated document
-      );
+    const organiser = await Organiser.findByIdAndUpdate(
+      id,
+      { visibilitySettings: updatedVisibilitySettings },
+      { new: true }
+    );
 
-      if (!organiser) {
-          return res.status(404).json({ message: "Organiser not found" });
-      }
+    if (!organiser) {
+      return res.status(404).json({ message: "Organiser not found" });
+    }
 
-      res.status(200).json({
-          message: "Visibility settings updated successfully",
-          updatedVisibilitySettings: organiser.visibilitySettings,
-      });
+    const cacheKey = `organiser_name_${id}`;
+    await delCache(cacheKey);
+
+    const tournaments = await Tournament.find({ organiser: id });
+
+    await setCache(cacheKey, {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned
+    });
+
+    res.status(200).json({
+      message: "Visibility settings updated successfully",
+      updatedVisibilitySettings: organiser.visibilitySettings,
+    });
   } catch (error) {
-      console.error("Error updating visibility settings:", error);
-      res.status(500).json({
-          error: "Error updating visibility settings",
-          details: error.message,
-      });
+    console.error("Error updating visibility settings:", error);
+    res.status(500).json({
+      error: "Error updating visibility settings",
+      details: error.message,
+    });
   }
 };
+
 
 
 exports.renderUpdateVisibilitySettings = async (req, res) => {
@@ -526,54 +606,52 @@ exports.banTeam = async (req, res) => {
 
 
 
-exports.getOrganiserName = async (req, res) => {
-  try {
-    const organiserId = req.user.id; // Assuming user ID is attached to the request (e.g., via JWT)
+  exports.getOrganiserName = async (req, res) => {
+    try {
+      const organiserId = req.user.id;
 
-    const cacheKey = `organiser_name_${organiserId}`;
-    const cachedData = await getCache(cacheKey);
-    if (cachedData) {
-      console.log(`Cache hit for organiser name: ${organiserId}`);
-      return res.status(200).json(cachedData);
+      const cacheKey = `organiser_name_${organiserId}`;
+      const cachedData = await getCache(cacheKey);
+      if (cachedData) {
+        console.log(`Cache hit for organiser name: ${organiserId}`);
+        return res.status(200).json(cachedData);
+      }
+
+      // Fetch organiser from DB
+      const organiser = await Organiser.findById(organiserId);
+      if (!organiser) {
+        return res.status(404).json({ message: 'Organiser not found' });
+      }
+
+      // Ensure visibilitySettings and tournamentsVisible field
+      const visibilitySettings = organiser.visibilitySettings || {};
+      if (typeof visibilitySettings.tournamentsVisible === 'undefined') {
+        visibilitySettings.tournamentsVisible = true;
+      }
+
+      // Fetch tournaments created by the organiser (more reliable)
+      const tournaments = await Tournament.find({ organiser: organiserId });
+
+      const responseData = {
+        username: organiser.username,
+        email: organiser.email,
+        description: organiser.description,
+        visibilitySettings,
+        tournaments,
+        followers: organiser.followers.length,
+        rating: organiser.rating,
+        banned: organiser.banned
+      };
+
+      // Cache the result
+      await setCache(cacheKey, responseData);
+
+      return res.status(200).json(responseData);
+    } catch (error) {
+      console.error('Error fetching organiser:', error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
-
-    // Fetch organiser from the database
-    const organiser = await Organiser.findById(organiserId);
-    if (!organiser) {
-      return res.status(404).json({ message: 'Organiser not found' });
-    }
-
-    // Fetch tournaments based on the ObjectIds stored in organiser.tournaments
-    const tournaments = await Tournament.find({
-      '_id': { $in: organiser.tournaments }, // Match any tournament where the _id is in the organiser's tournaments array
-    });
-
-    await setCache(cacheKey, {
-      username: organiser.username,  // Include username in the response
-      visibilitySettings: organiser.visibilitySettings,
-      tournaments: tournaments, // Full tournament documents (if needed)
-      email: organiser.email,
-      description: organiser.description,
-      followers: organiser.followers.length,  // Send the count of followers
-      rating: organiser.rating,
-      banned: organiser.banned  // Include banned status
-    });
-
-    return res.json({
-      username: organiser.username,  // Include username in the response
-      visibilitySettings: organiser.visibilitySettings,
-      tournaments: tournaments, // Full tournament documents (if needed)
-      email: organiser.email,
-      description: organiser.description,
-      followers: organiser.followers.length,  // Send the count of followers
-      rating: organiser.rating,
-      banned: organiser.banned  // Include banned status
-    });
-  } catch (error) {
-    console.error('Error fetching organiser:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
+  };
 
 // Get revenue data for an organiser
 exports.getOrganiserRevenue = async (req, res) => {

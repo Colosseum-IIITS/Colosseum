@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { TiLocationArrow } from "react-icons/ti";
-import { useRouter } from "next/navigation";
 
 export const BentoTilt = ({ children, className = "" }) => {
   const [transformStyle, setTransformStyle] = useState("");
@@ -79,10 +78,15 @@ export const BentoCard = ({ src, title, description, onClick }) => {
 };
 
 const Features = () => {
-  const router = useRouter(); // Initialize the router here
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById("features");
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <section className="bg-black pb-52">
+    <section className="bg-black pb-52" id="features">
       <div className="container mx-auto px-3 md:px-10">
         <div className="px-5 py-32">
           <p className="font-circular-web text-lg text-blue-50">
@@ -110,10 +114,7 @@ const Features = () => {
             <BentoCard
               src="videos/feature-2.mp4"
               title={<>pl<b>ay</b>er</>}
-              onClick={() => {
-                console.log("Navigating to player role...");
-                router.push("/auth?role=player");
-              }}
+              onClick={scrollToFeatures} // Scroll to Features section
               description="No matter who you are, you can climb the ranks at colosseum and claim your spot at the top of the world"
             />
           </BentoTilt>
@@ -122,10 +123,7 @@ const Features = () => {
             <BentoCard
               src="videos/feature-3.mp4"
               title={<>or<b>ga</b>nis<b>er</b></>}
-              onClick={() => {
-                console.log("Navigating to organiser role...");
-                router.push("/auth?role=organiser");
-              }}
+              onClick={scrollToFeatures} // Scroll to Features section
               description="Buddies or professional gamers, team up with your mates and synchronize your plays"
             />
           </BentoTilt>
@@ -134,10 +132,7 @@ const Features = () => {
             <BentoCard
               src="videos/feature-4.mp4"
               title={<>ad<b>m</b>in</>}
-              onClick={() => {
-                console.log("Navigating to admin role...");
-                router.push("/auth?role=admin");
-              }}
+              onClick={scrollToFeatures} // Scroll to Features section
               description="The team of overseers, working to ensure your experience is as smooth as can be."
             />
           </BentoTilt>

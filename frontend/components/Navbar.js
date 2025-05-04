@@ -3,11 +3,8 @@ import clsx from "clsx";
 import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState } from "react";
-import { TiLocationArrow } from "react-icons/ti";
 
-import Button from "./Button";
-
-const navItems = ["Player","Organiser","Admin"];
+const navItems = ["Player", "Organiser", "Admin"];
 
 const NavBar = () => {
   // State for toggling audio and visual indicator
@@ -70,18 +67,18 @@ const NavBar = () => {
     >
       <header className="absolute top-1/2 w-full -translate-y-1/2">
         <nav className="flex size-full items-center justify-between p-4">
-          {/* Logo and Product button */}
+          {/* Logo */}
           <div className="flex items-center gap-7">
             <img src="/img/logo.png" alt="logo" className="w-10" />
           </div>
 
-          {/* Navigation Links and Audio Button */}
+          {/* Navigation Links */}
           <div className="flex h-full items-center">
             <div className="hidden md:block">
               {navItems.map((item, index) => (
                 <a
                   key={index}
-                  href={`#${item.toLowerCase()}`}
+                  href="#features" // Updated to scroll to the Features section
                   className="nav-hover-btn"
                 >
                   {item}
@@ -89,6 +86,7 @@ const NavBar = () => {
               ))}
             </div>
 
+            {/* Audio Button */}
             <button
               onClick={toggleAudioIndicator}
               className="ml-10 flex items-center space-x-0.5"

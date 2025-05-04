@@ -5,8 +5,11 @@ const bcrypt = require('bcrypt');
 const Player = require('../../models/Player');
 const Tournament = require('../../models/Tournament');
 const Team = require('../../models/Team');
-const playerController = require('../playerController');
 const Organiser = require('../../models/Organiser');
+
+// Mock Redis client to prevent connection issues during tests
+jest.mock('../../utils/redisClient', () => require('../../test/mocks/redisMock'));
+const playerController = require('../playerController');
 
 // Mock the Payment model to prevent errors when populating payment references
 const mockPaymentSchema = new mongoose.Schema({
@@ -19,6 +22,9 @@ const mockPaymentSchema = new mongoose.Schema({
 
 // Register the Payment model if it doesn't exist
 mongoose.models.Payment = mongoose.models.Payment || mongoose.model('Payment', mockPaymentSchema);
+
+// Ensure all async test calls complete properly
+jest.setTimeout(30000);
 const { 
   createTestPlayer, 
   createTestOrganiser, 

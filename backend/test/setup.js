@@ -1,6 +1,9 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 
+// Set Node environment to 'test'
+process.env.NODE_ENV = 'test';
+
 let mongoServer;
 
 // Connect to the in-memory database before tests run

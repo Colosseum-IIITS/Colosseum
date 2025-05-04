@@ -22,14 +22,82 @@
 - **Admin Controls**: Admins can ban/unban users and approve tournaments.
 - **Secure Authentication**: Uses JWT-based authentication for players and organizers.
 - **Role-based Access Control**: Provides different levels of access for admins, organizers, and players.
+- **Pub-Sub Notification System**: Automated notifications when organizers create tournaments or other significant events occur.
+- **Redis Caching**: High-performance data caching and strategic cache invalidation for optimized performance.
+- **Email Notifications**: Automated email sending for account confirmations and important updates.
+- **Stripe Payment Integration**: Secure payment processing for tournament entries and team creation.
+- **Social Features**: Follow/unfollow system for players to keep track of preferred organizers.
+- **Global Player Ranking**: Performance-based ranking system for competitive players.
+- **Advanced UI Animations**: GSAP animations with ScrollTrigger for immersive user experiences.
+- **Hybrid Rendering**: Leveraging both server-side and client-side rendering for optimal performance.
+- **Frontend RBAC**: Role-based access control implemented directly in Next.js middleware.
 
 ## Tech Stack
 
-- **Frontend**: HTML, CSS, JavaScript, [EJS](https://ejs.co/) for templating.
-- **Backend**: Node.js, Express.js, MongoDB.
+- **Frontend**: [Next.js](https://nextjs.org/) with React, [Tailwind CSS](https://tailwindcss.com/) for styling, [shadcn UI](https://ui.shadcn.com/) components, GSAP for animations.
+- **Backend**: Node.js, Express.js, MongoDB, Swagger for API documentation.
 - **Authentication**: JWT (JSON Web Token).
 - **Database**: MongoDB for storing player, team, tournament, and report data.
+- **Caching**: Redis for high-performance data caching and reduced database load.
+- **Payment Processing**: Stripe API integration for secure payment handling.
+- **Email Service**: Nodemailer for automated email notifications.
 - **Middleware**: Custom middleware for authentication and role-based access control.
+- **Testing**: Jest with MongoDB Memory Server for isolated unit and integration testing.
+
+## Advanced Technical Implementation
+
+### Frontend Architecture
+
+#### Server and Client Components
+Colosseum utilizes Next.js App Router with a hybrid rendering approach:
+- **Server Components**: Used for data-fetching operations and initial page loads
+- **Client Components**: Used for interactive elements with the 'use client' directive
+- **Dynamic Rendering**: Strategic mix of static and dynamic rendering for optimal performance
+
+#### Role-Based Access Control (RBAC)
+Implemented at the middleware level for secure access control:
+- JWT token verification at the edge using Jose library
+- Route protection based on user roles (admin, organizer, player)
+- Path-specific access rules with granular permissions
+- Automatic redirection for unauthorized access attempts
+
+#### Advanced Animations
+Leverage GSAP (GreenSock Animation Platform) for professional animations:
+- ScrollTrigger for scroll-based animations and effects
+- Complex timeline animations for hero sections
+- Canvas-based cursor effects and interactive elements
+- Performant video transitions and transformations
+
+### Notification System
+Colosseum implements a pub-sub notification system that automatically notifies players of relevant events:
+- Automatically notifies followers when an organizer creates a new tournament
+- Uses MongoDB push operations to efficiently deliver notifications
+- Notification history is stored in player profiles
+
+### Redis Caching Strategy
+The application uses strategic caching to optimize performance:
+- Player profiles, tournament listings, and global rankings are cached
+- Intelligent cache invalidation on data updates (e.g., tournament winners, profile updates)
+- Fallback mechanisms when cache is unavailable
+
+### Payment Processing
+Secure payment handling using Stripe:
+- Two-step payment process with intent creation and confirmation
+- Metadata tracking for payment attribution
+- Database records for payment verification and history
+
+### Testing Infrastructure
+Robust testing setup for reliable code quality:
+- In-memory MongoDB instance for isolated tests
+- Mock Redis implementation for cache testing
+- Controller and route integration testing
+
+### Frontend State Management
+Sophisticated state management architecture:
+- React Context API with custom providers for global state
+- Custom hooks for reusable logic and data fetching
+- Optimistic UI updates for responsive user experience
+- Strategic client-side caching for repeated data
 
 ## Installation
 
@@ -44,56 +112,98 @@
    npm install
    ```
 
-3. Set up the environment variables. Create a `.env` file in the root directory with the following values:
+3. Set up the environment variables. Create a `.env` file in the backend directory with the following values:
    ```bash
-   MONGO_URI=mongodb://localhost:27017/tournamentDB
-   JWT_SECRET=your_jwt_secret_key
+   MONGODB_URI=mongodb://localhost:27017/tournamentDB
+   JWT_SECRET_KEY=your_jwt_secret_key
+   PORT=5000
    ```
 
-4. Start the server:
+4. Start the backend server:
    ```bash
+   cd backend
    npm start
    ```
 
-5. Open the browser and navigate to `http://localhost:3000` to view the application.
+5. In a separate terminal, start the frontend development server:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+6. Open the browser and navigate to `http://localhost:3000` to view the application. The backend API will be running on `http://localhost:5000` with Swagger documentation at the root path.
 
 ## Configuration
 
 To configure the environment variables, update the `.env` file as follows:
 
-- `MONGO_URI`: MongoDB connection string.
-- `JWT_SECRET`: Secret key used for signing JWT tokens.
-- **Port Configuration**: The default port is `3000`. You can change it in the `app.js` file if needed.
+### Backend (.env file in backend directory):
+- `MONGODB_URI`: MongoDB connection string.
+- `JWT_SECRET_KEY`: Secret key used for signing JWT tokens.
+- `PORT`: The backend server port (default: 5000).
+
+### Frontend:
+The frontend uses Next.js and runs on port 3000 by default. Configuration for Next.js can be adjusted in the `next.config.mjs` file.
 
 ## Usage
 
-1. **Player Registration and Login**: Players can sign up and log in from the homepage.
-2. **Organizing a Tournament**: After logging in, organizers can create new tournaments and manage them.
-3. **Team Management**: Organizers can create teams, and players can join teams.
-4. **Admin Controls**: Admins can ban/unban users and approve tournaments through the admin dashboard.
+1. **Player Registration and Login**: Players can sign up and log in through the authentication pages.
+2. **Organizing a Tournament**: Organizers can create, manage, and monitor tournaments through their dedicated dashboard.
+3. **Team Management**: Organizers can create teams, and players can join teams to participate in tournaments.
+4. **Admin Controls**: Admins have a dedicated dashboard to manage users, approve tournaments, and oversee platform activities.
+5. **Payment Processing**: The platform supports payment processing for tournament entries and other features.
 
 ## Project Structure
 
 ```plaintext
 ├── backend
-│   ├── app.js              //Server      
-│   ├── controllers         //Controller Files To Handle Backend Logic
-│   ├── middleware          //Middleware Functions To Handle Authentication
-│   ├── models              //Database Schema
-│   └── routes              //Handles Routing Logic
+│   ├── app.js              // Server initialization
+│   ├── controllers         // Controller files for backend logic
+│   │   └── __tests__       // Controller tests
+│   ├── middleware          // Authentication middleware
+│   ├── models              // MongoDB schema definitions
+│   ├── routes              // API route handlers
+│   ├── swaggerDocs         // API documentation
+│   ├── test                // Test setup and mocks
+│   └── utils               // Utility functions
 ├── frontend
-│   ├── assets              //Contains Front-End Assets         
-│   └── views               //Contains Views to be rendered
-
+│   ├── app                 // Next.js app directory (app router)
+│   │   ├── admin           // Admin dashboard pages
+│   │   ├── auth            // Authentication pages
+│   │   ├── org             // Organizer pages
+│   │   ├── player          // Player pages
+│   │   └── payment         // Payment processing pages
+│   ├── components          // Reusable React components
+│   │   ├── org             // Organizer components
+│   │   ├── player          // Player components
+│   │   ├── payment         // Payment components
+│   │   └── ui              // UI components (shadcn)
+│   ├── context             // React context providers
+│   ├── hooks               // Custom React hooks
+│   ├── lib                 // Utility libraries
+│   ├── public              // Static files
+│   └── utils               // Utility functions
 ```
 
 ### Main Components
 
-- **app.js**: Initializes the server, connects to the database, and sets up routes and middleware.
-- **controllers**: Contains the logic for players, organizers, admins, and tournament handling.
-- **models**: Mongoose models for `Player`, `Organiser`, `Team`, `Tournament`, etc.
-- **routes**: Defines the API routes for different entities (players, organizers, tournaments, etc.).
-- **views**: Contains EJS templates for rendering the frontend.
+#### Backend:
+- **app.js**: Initializes the Express server, connects to MongoDB, and sets up routes and middleware.
+- **controllers**: Contains the business logic for players, organizers, admins, tournaments, and other entities.
+- **middleware**: Authentication and authorization logic for different user roles.
+- **models**: Mongoose models defining the data schema for `Player`, `Organiser`, `Team`, `Tournament`, etc.
+- **routes**: API endpoint definitions for all entities.
+- **swaggerDocs**: API documentation using Swagger UI.
+- **utils**: Helper functions including database utilities.
+
+#### Frontend:
+- **app/**: Next.js app directory using the App Router for page routing.
+- **components/**: Reusable React components organized by feature area.
+- **context/**: React context providers for state management.
+- **hooks/**: Custom React hooks for shared functionality.
+- **lib/**: Utility libraries and configurations.
+- **public/**: Static assets including images and videos.
+- **utils/**: Helper functions for the frontend.
 
 ## ERD(Entity Relationship Diagram):
 ![alt text](image.png)

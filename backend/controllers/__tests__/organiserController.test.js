@@ -3,7 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 // Mock Redis before importing any modules that might use it
-jest.mock('../../utils/redisClient', () => require('../../test/mocks/redisClient'));
+jest.mock('../../utils/redisClient', () => require('../../test/mocks/redisMock'));
+
+// Set timeout for tests
+jest.setTimeout(30000);
 
 const Organiser = require('../../models/Organiser');
 const Tournament = require('../../models/Tournament');

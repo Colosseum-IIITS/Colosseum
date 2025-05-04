@@ -133,7 +133,7 @@ router.post('/auth/org/signup', authController.createOrganiser);
 
 /**
  * @swagger
- * /auth/admin/create:
+ * /auth/admin/signup:
  *   post:
  *     tags: [Authentication]
  *     summary: "Admin SignUp"
@@ -147,10 +147,13 @@ router.post('/auth/org/signup', authController.createOrganiser);
  *             properties:
  *               username:
  *                 type: string
+ *                 example: "admin123"
  *               email:
  *                 type: string
+ *                 example: "admin@example.com"
  *               password:
  *                 type: string
+ *                 example: "adminpass123"
  *             required:
  *               - username
  *               - email
@@ -163,15 +166,15 @@ router.post('/auth/org/signup', authController.createOrganiser);
  *       "500":
  *         description: "Internal Server Error"
  */
-router.post('/auth/admin/create', authController.createAdmin);
+router.post('/auth/admin/signup', authController.createAdmin);
 
 /**
  * @swagger
- * /auth/admin/login:
+ * /auth/admin/signin:
  *   post:
  *     tags: [Authentication]
- *     summary: "Admin Login"
- *     description: "This endpoint allows an admin to log in."
+ *     summary: "Admin SignIn"
+ *     description: "This endpoint allows an admin to sign in"
  *     requestBody:
  *       required: true
  *       content:
@@ -181,15 +184,29 @@ router.post('/auth/admin/create', authController.createAdmin);
  *             properties:
  *               username:
  *                 type: string
+ *                 example: "admin123"
  *               password:
  *                 type: string
+ *                 example: "adminpass123"
  *             required:
  *               - username
  *               - password
  *     responses:
- *       "200":
- *         description: "Admin logged in successfully."
- *       "400":
- *         description: "Invalid credentials."
+ *       200:
+ *         description: Successfully signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Login successful"
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
  */
-router.post('/auth/admin/login', authController.loginAdmin);
+router.post('/auth/admin/signin', authController.loginAdmin);

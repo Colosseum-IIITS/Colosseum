@@ -420,81 +420,84 @@ exports.editTournament = async (req, res) => {
 };
 
 exports.joinTournament = async (req, res) => {
-  const { tournamentId } = req.params;  // Tournament ID from URL
-  const { _id } = req.user;  // Player's ID from authenticated user
-
+  const { tournamentId } = req.params;
+  const { _id } = req.user;
 
   try {
-      // Validate tournamentId format
-      if (!mongoose.isValidObjectId(tournamentId)) {
-          return res.status(400).json({ message: "Invalid tournament ID" });
+    // Validate tournamentId format
+    if (!mongoose.isValidObjectId(tournamentId)) {
+      return res.status(400).json({ message: "Invalid tournament ID" });
+    }
+
+    // Find player and ensure they have a team
+    const player = await Player.findOne({ _id }).populate("team");
+    if (!player) {
+      return res.status(404).json({ message: "Player not found" });
+    }
+    if (!player.team) {
+      return res.status(400).json({ message: "Player must be part of a team" });
+    }
+
+    // Find the tournament
+    const tournament = await Tournament.findOne({ _id: tournamentId }).populate("organiser");
+    if (!tournament) {
+      return res.status(404).json({ message: "Tournament not found" });
+    }
+    
+    // Ensure the team is not already registered
+    if (tournament.teams.some(teamId => teamId.toString() === player.team._id.toString())) {
+      return res.status(400).json({ message: "Team is already registered for this tournament" });
+    }
+
+    // Ensure team has a valid name
+    if (!player.team.name) {
+      return res.status(400).json({ message: "Team name is missing" });
+    }
+    // Add the team to the pointsTable
+    tournament.pointsTable.push({
+      ranking: tournament.pointsTable.length + 1,
+      teamName: player.team.name,
+      totalPoints: 0
+    });
+
+    tournament.teams.push(player.team._id);
+
+    // Update tournament revenue
+    tournament.revenue += tournament.entryFee;
+    await tournament.save();
+
+    // Update organiser revenue and clear related caches
+    if (tournament.organiser) {
+      const organiser = await Organiser.findById(tournament.organiser._id);
+      if (organiser) {
+        organiser.totalRevenue += tournament.entryFee;
+        await organiser.save();
+
+        // Clear all related caches
+        await Promise.all([
+          delCache(`organiser_name_${tournament.organiser._id}`),
+          delCache(`organiser_revenue_${tournament.organiser._id}`),
+          delCache(`organiser_dashboard_${organiser.username}`),
+          delCache(`tournament_${tournamentId}`)
+        ]);
       }
+    }
 
-      // Find player and ensure they have a team
-      const player = await Player.findOne({ _id }).populate("team");
-      if (!player) {
-          return res.status(404).json({ message: "Player not found" });
-      }
-      if (!player.team) {
-          return res.status(400).json({ message: "Player must be part of a team" });
-      }
+    // Update the team's tournament list
+    const team = await Team.findById(player.team._id);
+    if (team) {
+      team.tournaments.push(tournament._id);
+      await team.save();
+    }
 
-      // Find the tournament
-      const tournament = await Tournament.findOne({ _id: tournamentId }).populate("organiser");
-      if (!tournament) {
-          return res.status(404).json({ message: "Tournament not found" });
-      }
-      
-      // Ensure the team is not already registered
-      if (tournament.teams.some(teamId => teamId.toString() === player.team._id.toString())) {
-          return res.status(400).json({ message: "Team is already registered for this tournament" });
-      }
+    // Update player's tournaments
+    player.tournaments.push({ tournament: tournament._id, won: false });
+    await player.save();
 
-      // Ensure team has a valid name
-      if (!player.team.name) {
-          return res.status(400).json({ message: "Team name is missing" });
-      }
-      // Add the team to the pointsTable
-      tournament.pointsTable.push({
-          ranking: tournament.pointsTable.length + 1,
-          teamName: player.team.name,
-          totalPoints: 0
-      });
-
-      tournament.teams.push(player.team._id);
-
-      // Update tournament revenue
-
-      tournament.revenue += tournament.entryFee;
-      await tournament.save();
-
-      // Update organiser revenue if organiser exists
-      if (tournament.organiser) {
-          const organiser = await Organiser.findById(tournament.organiser._id);
-          if (organiser) {
-              organiser.totalRevenue += tournament.entryFee;
-              await organiser.save();
-          }
-      } else {
-          console.warn(`Tournament ${tournamentId} has no organiser.`);
-      }
-
-      // Update the team's tournament list
-      const team = await Team.findById(player.team._id);
-      if (team) {
-          team.tournaments.push(tournament._id);
-          await team.save();
-      }
-
-      // Update player's tournaments
-      player.tournaments.push({ tournament: tournament._id, won: false });
-      await player.save();
-
-      return res.status(200).json({ message: "Successfully joined the tournament" });
-
+    return res.status(200).json({ message: "Successfully joined the tournament" });
   } catch (error) {
-      console.error("Error joining tournament:", error);
-      return res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Error joining tournament:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 

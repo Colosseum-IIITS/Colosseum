@@ -16,7 +16,7 @@ import useFetchAdminDashboard from '@/context/useFetchAdminDashboard';
 export default function ReportedTeams() {
   const dashboardData = useFetchAdminDashboard();
   const [reportedTeams, setReportedTeams] = useState([]);
-  const [isCardView, setIsCardView] = useState(false); // State for toggling view
+  const [isCardView, setIsCardView] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {

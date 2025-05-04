@@ -4,9 +4,7 @@ const Tournament = require("../models/Tournament");
 const Team = require("../models/Team");
 const Report = require("../models/Report");
 const bcrypt = require("bcrypt");
-const { getCache, setCache} = require("../utils/redisClient");
-const { delCache } = require("../utils/redisClient");
-
+const { getCache, setCache, delCache } = require("../utils/redisClient");
 
 
 // Delete a tournament by tid
@@ -606,52 +604,45 @@ exports.banTeam = async (req, res) => {
 
 
 
-  exports.getOrganiserName = async (req, res) => {
-    try {
-      const organiserId = req.user.id;
+exports.getOrganiserName = async (req, res) => {
+  try {
+    // Force fresh data fetch
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
-      const cacheKey = `organiser_name_${organiserId}`;
-      const cachedData = await getCache(cacheKey);
-      if (cachedData) {
-        console.log(`Cache hit for organiser name: ${organiserId}`);
-        return res.status(200).json(cachedData);
-      }
-
-      // Fetch organiser from DB
-      const organiser = await Organiser.findById(organiserId);
-      if (!organiser) {
-        return res.status(404).json({ message: 'Organiser not found' });
-      }
-
-      // Ensure visibilitySettings and tournamentsVisible field
-      const visibilitySettings = organiser.visibilitySettings || {};
-      if (typeof visibilitySettings.tournamentsVisible === 'undefined') {
-        visibilitySettings.tournamentsVisible = true;
-      }
-
-      // Fetch tournaments created by the organiser (more reliable)
-      const tournaments = await Tournament.find({ organiser: organiserId });
-
-      const responseData = {
-        username: organiser.username,
-        email: organiser.email,
-        description: organiser.description,
-        visibilitySettings,
-        tournaments,
-        followers: organiser.followers.length,
-        rating: organiser.rating,
-        banned: organiser.banned
-      };
-
-      // Cache the result
-      await setCache(cacheKey, responseData);
-
-      return res.status(200).json(responseData);
-    } catch (error) {
-      console.error('Error fetching organiser:', error);
-      return res.status(500).json({ message: 'Internal server error' });
+    const organiserId = req.user.id;
+    const cacheKey = `organiser_name_${organiserId}`;
+    
+    // Always fetch fresh data
+    const organiser = await Organiser.findById(organiserId);
+    if (!organiser) {
+      return res.status(404).json({ message: 'Organiser not found' });
     }
-  };
+
+    const tournaments = await Tournament.find({ organiser: organiserId }).lean();
+
+    const responseData = {
+      username: organiser.username,
+      email: organiser.email,
+      description: organiser.description,
+      visibilitySettings: organiser.visibilitySettings,
+      tournaments,
+      followers: organiser.followers.length,
+      rating: organiser.rating,
+      banned: organiser.banned,
+      totalRevenue: organiser.totalRevenue // Include total revenue
+    };
+
+    // Update cache with fresh data
+    await setCache(cacheKey, responseData, 300); // Short TTL of 5 minutes
+
+    return res.status(200).json(responseData);
+  } catch (error) {
+    console.error('Error fetching organiser:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 // Get revenue data for an organiser
 exports.getOrganiserRevenue = async (req, res) => {

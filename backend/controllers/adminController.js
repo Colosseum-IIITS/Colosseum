@@ -4,6 +4,7 @@ const Tournament = require('../models/Tournament');
 const Team = require('../models/Team');
 const Report = require('../models/Report');
 const BanHistory = require('../models/BanHistory');
+const { delCache, setCache, getCache } = require('../utils/redisClient');
 
 // Ban an organiser and create BanHistory entry
 exports.banOrganiser = async (req, res) => {
@@ -92,6 +93,7 @@ exports.unBanPlayer = async (req, res) => {
         res.status(400).json({ error: 'Error unbanning player', details: error.message });
     }
 };
+
 // Delete an organiser
 exports.deleteOrganiser = async (req, res) => {
     try {
@@ -116,7 +118,17 @@ exports.deletePlayer = async (req, res) => {
 // Approve a tournament
 exports.approveTournament = async (req, res) => {
     try {
+        const tournament = await Tournament.findById(req.params.id);
+        if (!tournament) {
+            return res.status(404).json({ error: 'Tournament not found' });
+        }
+
         await Tournament.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+
+        // Invalidate organiser cache when tournament is approved
+        const cacheKey = `organiser_name_${tournament.organiser}`;
+        await delCache(cacheKey);
+
         res.status(200).json({ message: 'Tournament approved successfully.' });
     } catch (error) {
         res.status(400).json({ error: 'Error approving tournament', details: error.message });

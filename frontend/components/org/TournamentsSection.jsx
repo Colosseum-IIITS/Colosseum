@@ -9,41 +9,50 @@ const TournamentsSection = () => {
   const [tournamentList, setTournamentList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refresh, setRefresh] = useState(0); // Add refresh trigger
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No token found');
-        setLoading(false);
-        return;
-      }
+  const fetchData = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:5000/api/organiser/getOrganiserName', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
+        cache: 'no-store'
+      });
 
-      try {
-        const response = await fetch('http://localhost:5000/api/organiser/getOrganiserName', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+      if (response.ok) {
         const data = await response.json();
-
-        if (response.ok) {
-          setVisibilitySettings(data.visibilitySettings || {});
-          setTournamentList(data.tournaments || []);
-        } else {
-          setError('Failed to fetch organiser data');
-        }
-      } catch (error) {
-        setError('Error fetching data');
-      } finally {
-        setLoading(false);
+        setVisibilitySettings(data.visibilitySettings || {});
+        setTournamentList(data.tournaments || []);
       }
-    };
+    } catch (error) {
+      setError('Error fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, []);
+
+    // Poll for updates every 30 seconds
+    const pollInterval = setInterval(() => {
+      setRefresh(prev => prev + 1);
+    }, 30000);
+
+    return () => clearInterval(pollInterval);
+  }, [refresh]); // Add refresh to dependency array
+
+  // Add manual refresh function
+  const handleRefresh = () => {
+    setRefresh(prev => prev + 1);
+    setLoading(true);
+  };
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
@@ -68,7 +77,16 @@ const TournamentsSection = () => {
   return (
     <section className="tournaments-section mt-8 px-4">
       <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-lg shadow-md space-y-6">
-        <h3 className="text-2xl font-semibold text-black mb-4">All Tournaments</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl font-semibold text-black">All Tournaments</h3>
+          <button
+            onClick={handleRefresh}
+            className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            disabled={loading}
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
         {tournamentList.length > 0 ? (
           <div className="overflow-y-auto max-h-[500px]">
             <ul className="space-y-4">
@@ -118,4 +136,3 @@ const TournamentsSection = () => {
 };
 
 export default TournamentsSection;
-  

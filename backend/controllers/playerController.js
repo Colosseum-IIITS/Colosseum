@@ -342,10 +342,8 @@ exports.updateUsername = async (req, res) => {
     await player.save();
 
     // Invalidate the cache for both the player dashboard and username
-    const dashboardCacheKey = `dashboard_${_id}`;
     const usernameCacheKey = `username_${_id}`;
     
-    await delCache(dashboardCacheKey);  // Remove cached dashboard data
     await delCache(usernameCacheKey);   // Remove cached username data
 
     res.status(200).json({
@@ -705,19 +703,13 @@ exports.getGlobalPlayerRanking = async (req, res) => {
 exports.getDashboard = async (req, res) => {
   const playerId = req.user._id;
   const currentDate = new Date();
-  const cacheKey = `dashboard_${playerId}`;
 
   try {
-    // Check if the dashboard data is cached
-    let cachedDashboard = await getCache(cacheKey);
-    
-    if (cachedDashboard && cachedDashboard.player.team) {
-      console.log('Cache hit for player dashboard');
-      return res.status(200).json(cachedDashboard);
-    }
+    // Fetch player and populate tournaments directly without checking cache
+    const player = await Player.findById(playerId)
+      .populate('tournaments.tournament')
+      .populate('team');
 
-    // Fetch player and populate tournaments
-    const player = await Player.findById(playerId).populate('tournaments.tournament').populate('team'); // Ensure team is populated
     if (!player) {
       return res.status(404).json({ message: 'Player not found' });
     }
@@ -731,10 +723,10 @@ exports.getDashboard = async (req, res) => {
       return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
     }).length;
 
-    // Fetch team details if player has a team
+    // Get team details if player has a team
     let team = null;
     if (player.team) {
-      team = player.team; // Already populated
+      team = player.team;
     }
 
     const dashboardData = {
@@ -746,13 +738,10 @@ exports.getDashboard = async (req, res) => {
         tournamentsWon,
         winPercentage,
         ongoingTournaments,
-        noOfOrgsFollowing: player.orgFollowing?.length || 0,
-        team, // include team object or null
+        noOfOrgsFollowing: player.following?.length || 0,
+        team,
       }
     };
-
-    // Cache the result (update cache if new data fetched)
-    await setCache(cacheKey, dashboardData, 3600); // cache for 1 hour
 
     return res.status(200).json(dashboardData);
   } catch (error) {
@@ -1002,6 +991,3 @@ exports.getPlayerProfile = async (req, res) => {
       res.status(500).json({ message: "An error occurred", error: error.message });
     }
   };
-  
-  
-

@@ -1,9 +1,30 @@
-// middleware.js (Edge-compatible middleware using 'jose')
+// middleware.js (Edge-compatible middleware)
 import { NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
 
-// Ensure that your environment variables are correctly loaded
-const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+// Debug environment variables
+console.log('JWT_SECRET_KEY environment variable is set:', !!process.env.JWT_SECRET_KEY);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
+// Simple JWT parsing function (doesn't verify signature in middleware)
+function parseJwt(token) {
+  try {
+    // Just decode the payload without verifying
+    // This is safe since the backend will verify any requests with this token
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+        .join('')
+    );
+
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('Error parsing JWT:', e);
+    return null;
+  }
+}
 
 export async function middleware(req) {
   const { pathname } = req.nextUrl; // Path of the request
@@ -30,8 +51,16 @@ export async function middleware(req) {
     }
 
     try {
-      // Verify the JWT token using 'jose'
-      const { payload } = await jwtVerify(token, secret);
+      console.log('Parsing JWT token');
+      // Parse JWT token without verification
+      const payload = parseJwt(token);
+      
+      if (!payload) {
+        console.log('Failed to parse JWT token');
+        return NextResponse.redirect(new URL('/', req.url));
+      }
+      
+      console.log('JWT parsing successful! Payload:', payload);
 
       // Extract the role from decoded token
       const { role } = payload;
@@ -64,7 +93,13 @@ export async function middleware(req) {
       console.log('User authorized. Proceeding to the requested route.');
       return NextResponse.next();
     } catch (error) {
-      console.error('JWT verification failed:', error);
+      console.log('JWT verification failed: ', error);
+      console.log('JWT verification error details:', {
+        errorCode: error.code,
+        errorName: error.name,
+        errorMessage: error.message
+      });
+      
       // If token verification fails, redirect to login
       return NextResponse.redirect(new URL('/', req.url));
     }

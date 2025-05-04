@@ -154,21 +154,32 @@ Sophisticated state management architecture:
 
 ### Docker Installation
 
-You can also run the entire application stack using Docker Compose:
+You can run the entire application stack using Docker Compose, which will set up all services (frontend, backend, landing page, MongoDB, and Redis) in isolated containers:
+
+#### Prerequisites
+- Docker and Docker Compose installed on your machine
+- Git repository cloned to your local machine
+
+#### Setup and Installation
 
 1. Create a `.env` file at the root of the project by copying the provided `.env.example` file:
    ```bash
    cp .env.example .env
    ```
 
-2. Edit the `.env` file to add your specific configurations for:
-   - Email service (EMAIL_USER, EMAIL_PASS)
-   - Stripe payment integration (STRIPE_SECRET_KEY)
-   - Any other custom settings
+2. Edit the `.env` file to add your specific configurations (see Environment Variables section above)
 
 3. Build and start the Docker containers:
    ```bash
-   docker-compose up -d --build
+   # Clean up any existing containers first (optional but recommended)
+   docker-compose down -v
+   docker system prune -a --volumes --force
+   
+   # Build fresh containers
+   docker-compose build --no-cache
+   
+   # Start the containers
+   docker-compose up
    ```
 
 4. Access the application components:
@@ -178,25 +189,104 @@ You can also run the entire application stack using Docker Compose:
    - MongoDB: `mongodb://localhost:27017`
    - Redis: `redis://localhost:6379`
 
-5. To stop the containers:
-   ```bash
-   docker-compose down
-   ```
+#### Docker Commands Reference
 
-6. To view logs from the containers:
-   ```bash
-   docker-compose logs -f [service_name]
-   ```
-   Where `[service_name]` can be: backend, frontend, landingpage, mongodb, or redis
+- Start the containers in the background:
+  ```bash
+  docker-compose up -d
+  ```
+
+- Stop the containers:
+  ```bash
+  docker-compose down
+  ```
+
+- View logs from all containers:
+  ```bash
+  docker-compose logs -f
+  ```
+
+- View logs from a specific service:
+  ```bash
+  docker-compose logs -f [service_name]
+  ```
+  Where `[service_name]` can be: backend, frontend, landingpage, mongodb, or redis
+
+- Rebuild a specific service:
+  ```bash
+  docker-compose build --no-cache [service_name]
+  ```
+
+#### Troubleshooting Docker Deployment
+
+1. **Native Module Build Issues**
+   If you encounter errors related to bcrypt or other native modules:
+   - The Dockerfile includes necessary build dependencies (python3, make, g++, gcc)
+   - If still encountering issues, you may need to modify the Dockerfile to include additional dependencies
+
+2. **JWT Authentication Issues**
+   - Ensure JWT_SECRET_KEY is the same in both frontend and backend services
+   - For authentication debugging, check the logs using `docker-compose logs -f frontend`
+
+3. **Database Connection Issues**
+   - Check MongoDB connection with `docker-compose exec mongodb mongo -u admin -p password`
+   - Ensure the MONGODB_URI in .env uses the correct service name: `mongodb://admin:password@mongodb:27017/tournamentDB?authSource=admin`
+
+4. **Network/API Connection Issues**
+   - Frontend to backend communication uses the environment variable NEXT_PUBLIC_API_URL
+   - In the container environment, ensure this is set correctly in docker-compose.yml
+
+5. **Redis Connection Issues**
+   - Test Redis connection with `docker-compose exec redis redis-cli -a redispassword ping`
+   - Ensure REDIS_URL uses the correct service name: `redis://:redispassword@redis:6379`
 
 ## Configuration
 
 To configure the environment variables, update the `.env` file as follows:
 
-### Backend (.env file in backend directory):
-- `MONGODB_URI`: MongoDB connection string.
-- `JWT_SECRET_KEY`: Secret key used for signing JWT tokens.
-- `PORT`: The backend server port (default: 5000).
+### Environment Variables
+
+The application requires several environment variables to function properly. For Docker deployment, these should be set in the root `.env` file, which will be read by docker-compose:
+
+```
+# JWT Authentication
+JWT_SECRET_KEY=projectK         # Used by both frontend and backend for RBAC
+
+# MongoDB
+MONGODB_URI=mongodb://admin:password@mongodb:27017/tournamentDB?authSource=admin
+
+# API Configuration
+PORT=5000
+
+# Redis Cache
+REDIS_URL=redis://:redispassword@redis:6379
+
+# Email Configuration (required for verification emails)
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_email_app_password
+
+# Payment Processing
+STRIPE_SECRET_KEY=your_stripe_secret_key
+```
+
+#### Important Notes for Docker Deployment:
+
+- The `JWT_SECRET_KEY` must be the same for both frontend and backend services
+- The MongoDB URI format in Docker should use the service name `mongodb` (not localhost)
+- Similarly, Redis URL should use the service name `redis` (not localhost)
+- Email and Stripe credentials are required for full functionality
+
+### Development Environment Variables
+
+For local development, you'll need separate `.env` files:
+
+#### Backend (.env file in backend directory):
+- `MONGODB_URI`: MongoDB connection string (typically to localhost or Atlas)
+- `JWT_SECRET_KEY`: Secret key used for signing JWT tokens
+- `PORT`: The backend server port (default: 5000)
+- `REDIS_URL`: Connection string for Redis cache
+- `EMAIL_USER` and `EMAIL_PASS`: For sending notifications
+- `STRIPE_SECRET_KEY`: For payment processing
 
 ### Frontend:
 The frontend uses Next.js and runs on port 3000 by default. Configuration for Next.js can be adjusted in the `next.config.mjs` file.

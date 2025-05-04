@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: API endpoints for user authentication
+ */
+
+/**
+ * @swagger
  * /auth/player/signin:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Player SignIn"
  *     description: "This endpoint allows a player to sign in."
  *     requestBody:
@@ -30,6 +38,7 @@ router.post('/auth/player/signin', authController.loginPlayer);
  * @swagger
  * /auth/player/signup:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Player SignUp"
  *     description: "This endpoint allows a player to sign up."
  *     requestBody:
@@ -63,6 +72,7 @@ router.post('/auth/player/signup', authController.createPlayer);
  * @swagger
  * /auth/org/signin:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Organiser SignIn"
  *     description: "This endpoint allows an organiser to sign in."
  *     requestBody:
@@ -91,6 +101,7 @@ router.post('/auth/org/signin', authController.loginOrganiser);
  * @swagger
  * /auth/org/signup:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Organiser SignUp"
  *     description: "This endpoint allows an organiser to sign up."
  *     requestBody:
@@ -124,6 +135,7 @@ router.post('/auth/org/signup', authController.createOrganiser);
  * @swagger
  * /auth/admin/create:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Admin SignUp"
  *     description: "This endpoint allows an admin to sign up."
  *     requestBody:
@@ -157,6 +169,7 @@ router.post('/auth/admin/create', authController.createAdmin);
  * @swagger
  * /auth/admin/login:
  *   post:
+ *     tags: [Authentication]
  *     summary: "Admin Login"
  *     description: "This endpoint allows an admin to log in."
  *     requestBody:

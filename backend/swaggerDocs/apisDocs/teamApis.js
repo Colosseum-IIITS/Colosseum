@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   name: Teams
+ *   description: API endpoints for team operations
+ */
+
+/**
+ * @swagger
  * /api/team/create:
  *   post:
+ *     tags: [Teams]
  *     summary: "Create a Team"
  *     description: "This endpoint allows a player to create a new team."
  *     requestBody:
@@ -33,6 +41,7 @@ router.post('/api/team/create', authenticateUser, teamController.createTeam);
  * @swagger
  * /api/player/joinTeam:
  *   post:
+ *     tags: [Teams]
  *     summary: "Join a Team"
  *     description: "This endpoint allows a player to join an existing team."
  *     requestBody:
@@ -65,6 +74,7 @@ router.post('/player/joinTeam', authenticateUser, teamController.joinTeam);
  * @swagger
  * /api/team/request:
  *   post:
+ *     tags: [Teams]
  *     summary: "Request to Join a Team"
  *     description: "This endpoint allows a player to request to join an existing team."
  *     requestBody:
@@ -96,6 +106,7 @@ router.post('/api/team/request', authenticateUser, teamController.requestToJoinT
  * @swagger
  * /api/team/leave:
  *   post:
+ *     tags: [Teams]
  *     summary: "Leave a Team"
  *     description: "This endpoint allows a player to leave a team they are currently part of. The player must already be part of a team."
  *     responses:
@@ -116,6 +127,7 @@ router.post('/api/team/leave', authenticateUser, teamController.leaveTeam);
  * @swagger
  * /api/team/search:
  *   get:
+ *     tags: [Teams]
  *     summary: "Search for Teams"
  *     description: "This endpoint allows a player to search for teams by name."
  *     parameters:
@@ -140,6 +152,7 @@ router.get('/api/team/search', teamController.getTeamsByName);
  * @swagger
  * /api/team/updateTeamName:
  *   post:
+ *     tags: [Teams]
  *     summary: "Update Team Name"
  *     description: "This endpoint allows the team captain to update the team name."
  *     requestBody:
@@ -171,6 +184,7 @@ router.post('/api/team/updateTeamName', authenticateUser, teamController.updateT
  * @swagger
  * /api/team/{teamId}/requests:
  *   get:
+ *     tags: [Teams]
  *     summary: "Get Join Requests for the Player's Team"
  *     description: "This endpoint allows the team captain to view join requests for their team (the player is automatically considered as part of the team)."
  *     parameters:
@@ -210,6 +224,7 @@ router.get('/api/team/:teamId/requests', authenticateUser, teamController.getJoi
  * @swagger
  * /api/team/accept:
  *   post:
+ *     tags: [Teams]
  *     summary: "Accept a Join Request"
  *     description: "This endpoint allows the captain to accept a join request for their team."
  *     requestBody:
@@ -241,6 +256,7 @@ router.post('/api/team/accept', authenticateUser, teamController.acceptJoinReque
  * @swagger
  * /api/team/reject:
  *   post:
+ *     tags: [Teams]
  *     summary: "Reject a Join Request"
  *     description: "This endpoint allows the captain to reject a join request for their team."
  *     requestBody:

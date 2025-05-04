@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   name: Organisers
+ *   description: API endpoints for organiser operations
+ */
+
+/**
+ * @swagger
  * /api/organiser/search:
  *   get:
+ *     tags: [Organisers]
  *     summary: "Search an Organiser"
  *     description: "This endpoint allows searching an organiser by their username."
  *     parameters:
@@ -23,6 +31,7 @@ router.get("/api/organiser/search", organiserController.getOrganiserByUsername);
  * @swagger
  * /api/organiser/updateUsername:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Username"
  *     description: "This endpoint allows an organiser to update their username."
  *     requestBody:
@@ -44,10 +53,10 @@ router.post("/api/organiser/updateUsername", authenticateOrganiser, organiserCon
 
 
 /**
- * /**
  * @swagger
  * /api/organiser/updateEmail:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Email"
  *     description: "This endpoint allows an organiser to update their email."
  *     requestBody:
@@ -72,6 +81,7 @@ router.post("/api/organiser/updateEmail", authenticateOrganiser, organiserContro
  * @swagger
  * /api/organiser/updatePassword:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Password"
  *     description: "This endpoint allows an organiser to update their password by providing the current password and the new password."
  *     requestBody:
@@ -102,6 +112,7 @@ router.post("/api/organiser/updatePassword", authenticateOrganiser, organiserCon
  * @swagger
  * /api/organiser/updateDescription:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Description"
  *     description: "This endpoint allows an organiser to update their profile description."
  *     requestBody:
@@ -128,6 +139,7 @@ router.post("/api/organiser/updateDescription", authenticateOrganiser, organiser
  * @swagger
  * /api/organiser/updateProfilePhoto:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Profile Photo"
  *     description: "This endpoint allows an organiser to update their profile photo."
  *     parameters:
@@ -152,6 +164,7 @@ router.post("/updateProfilePhoto", authenticateOrganiser, organiserController.up
  * @swagger
  * /api/organiser/update-visibility:
  *   get:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Visibility Settings"
  *     description: "This endpoint allows an organiser to manage their visibility settings."
  *     responses:
@@ -166,6 +179,7 @@ router.get('/update-visibility', authenticateOrganiser, organiserController.rend
  * @swagger
  * /api/organiser/{username}/dashboard:
  *   get:
+ *     tags: [Organisers]
  *     summary: "Get Organiser Dashboard"
  *     description: "This endpoint allows an organiser to view their dashboard."
  *     parameters:
@@ -187,6 +201,7 @@ router.get('/api/organiser/:username/dashboard', authenticateUser, organiserCont
  * @swagger
  * /api/organiser/dashboardVisibility:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Update Organiser Dashboard Visibility"
  *     description: "This endpoint allows an organiser to update their dashboard visibility settings."
  *     parameters:
@@ -218,6 +233,7 @@ router.post("/dashboardVisibility", authenticateOrganiser, organiserController.u
  * @swagger
  * /api/organiser/banTeam:
  *   post:
+ *     tags: [Organisers]
  *     summary: "Ban a Team"
  *     description: "This endpoint allows an organiser to ban a team from participating in their tournaments."
  *     parameters:

@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   name: Admin
+ *   description: API endpoints for admin operations
+ */
+
+/**
+ * @swagger
  * /admin/ban/organiser/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Ban an Organiser"
  *     description: "This endpoint allows an admin to ban an organiser by ID."
  *     parameters:
@@ -23,6 +31,7 @@ router.post('/ban/organiser/:id', adminController.banOrganiser);
  * @swagger
  * /admin/unban/organiser/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Unban an Organiser"
  *     description: "This endpoint allows an admin to unban an organiser by ID."
  *     parameters:
@@ -44,6 +53,7 @@ router.post('/unban/organiser/:id', adminController.unBanOrganiser);
  * @swagger
  * /admin/delete/organiser/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Delete an Organiser"
  *     description: "This endpoint allows an admin to delete an organiser by ID."
  *     parameters:
@@ -65,6 +75,7 @@ router.post('/delete/organiser/:id', adminController.deleteOrganiser);
  * @swagger
  * /admin/ban/player/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Ban a Player"
  *     description: "This endpoint allows an admin to ban a player by ID."
  *     parameters:
@@ -86,6 +97,7 @@ router.post('/ban/player/:id', adminController.banPlayer);
  * @swagger
  * /admin/unban/player/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Unban a Player"
  *     description: "This endpoint allows an admin to unban a player by ID."
  *     parameters:
@@ -107,6 +119,7 @@ router.post('/unban/player/:id', adminController.unBanPlayer);
  * @swagger
  * /admin/approve/tournament/{id}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Approve a Tournament"
  *     description: "This endpoint allows an admin to approve a tournament by ID."
  *     parameters:
@@ -128,6 +141,7 @@ router.post('/approve/tournament/:id', adminController.approveTournament);
  * @swagger
  * /api/organiser/delete/{tournamentId}:
  *   post:
+ *     tags: [Admin]
  *     summary: "Delete a Tournament"
  *     description: "This endpoint allows an admin to delete a tournament by ID."
  *     parameters:
@@ -143,12 +157,13 @@ router.post('/approve/tournament/:id', adminController.approveTournament);
  *       "400":
  *         description: "Invalid tournament ID or other error."
  */
-router.post('/api/organiser/delete/:tournamentId', authenticateAdmin,organiserController.deleteTournament);
+router.post('/api/organiser/delete/:tournamentId', authenticateAdmin, organiserController.deleteTournament);
 
 /**
  * @swagger
  * /admin/dashboard:
  *   get:
+ *     tags: [Admin]
  *     summary: "Get Admin Dashboard"
  *     description: "This endpoint returns the dashboard for the admin, showing key metrics and actions."
  *     responses:
@@ -158,10 +173,12 @@ router.post('/api/organiser/delete/:tournamentId', authenticateAdmin,organiserCo
  *         description: "Error retrieving dashboard data."
  */
 router.get('/dashboard', authenticateAdmin, adminController.getDashboard);
+
 /**
  * @swagger
  * /admin/banhistory:
  *   get:
+ *     tags: [Admin]
  *     summary: "Get ban history"
  *     description: "This endpoint returns the ban history within the last month"
  *     responses:

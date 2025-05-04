@@ -1,7 +1,15 @@
 /**
  * @swagger
+ * tags:
+ *   name: Reports
+ *   description: API endpoints for report operations
+ */
+ 
+/**
+ * @swagger
  * /api/report/PreportT2O:
  *   post:
+ *     tags: [Reports]
  *     summary: "Report a Team"
  *     description: "This endpoint allows a player to report a team to an organiser."
  *     requestBody:
@@ -28,6 +36,7 @@ router.post('/api/report/PreportT2O', authenticateUser, reportController.reportT
  * @swagger
  * /api/report/PreportO2A:
  *   post:
+ *     tags: [Reports]
  *     summary: "Report an Organiser"
  *     description: "This endpoint allows a player to report an organiser to an admin."
  *     requestBody:
@@ -59,6 +68,7 @@ router.post('/api/report/PreportO2A', authenticateUser, reportController.reportO
  * @swagger
  * /api/report/OreportO2A:
  *   post:
+ *     tags: [Reports]
  *     summary: "Organiser Reports Another Organiser"
  *     description: "This endpoint allows an organiser to report another organiser to an admin."
  *     requestBody:
@@ -91,6 +101,7 @@ router.post('/api/report/OreportO2A', authenticateOrganiser, reportController.re
  * @swagger
  * /api/report/getTeamReports:
  *   get:
+ *     tags: [Reports]
  *     summary: "Get Reported Teams"
  *     description: "This endpoint allows an organiser to get a list of reported teams."
  *     responses:
@@ -105,6 +116,7 @@ router.get('/api/report/getTeamReports', authenticateOrganiser, reportController
  * @swagger
  * /api/report/getOrganiserReports:
  *   get:
+ *     tags: [Reports]
  *     summary: "Get Reported Organisers"
  *     description: "This endpoint allows a player to get a list of reported organisers."
  *     responses:

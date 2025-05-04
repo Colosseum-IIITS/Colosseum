@@ -2227,3 +2227,25 @@
 ::1 - - [30/Apr/2025:10:28:32 +0000] "GET /favicon-32x32.png HTTP/1.1" 304 - - 0.589 ms
 =======
 >>>>>>> parent of ccd5c65 (playerRoute)
+::1 - - [04/May/2025:09:46:38 +0000] "GET / HTTP/1.1" 200 3106 - 7.303 ms
+::1 - - [04/May/2025:09:46:38 +0000] "GET /swagger-ui.css HTTP/1.1" 200 152072 - 10.229 ms
+::1 - - [04/May/2025:09:46:38 +0000] "GET /swagger-ui-standalone-preset.js HTTP/1.1" 200 230007 - 6.070 ms
+::1 - - [04/May/2025:09:46:38 +0000] "GET /swagger-ui-bundle.js HTTP/1.1" 200 1426050 - 6.664 ms
+::1 - - [04/May/2025:09:46:38 +0000] "GET /swagger-ui-init.js HTTP/1.1" 200 86501 - 0.675 ms
+::1 - - [04/May/2025:09:57:05 +0000] "GET / HTTP/1.1" 304 - - 6.188 ms
+::1 - - [04/May/2025:09:57:05 +0000] "GET /swagger-ui.css HTTP/1.1" 304 - - 5.404 ms
+::1 - - [04/May/2025:09:57:05 +0000] "GET /swagger-ui-bundle.js HTTP/1.1" 304 - - 2.614 ms
+::1 - - [04/May/2025:09:57:05 +0000] "GET /swagger-ui-init.js HTTP/1.1" 200 90246 - 1.178 ms
+::1 - - [04/May/2025:09:57:05 +0000] "GET /swagger-ui-standalone-preset.js HTTP/1.1" 304 - - 3.828 ms
+::1 - - [04/May/2025:09:57:06 +0000] "GET /favicon-32x32.png HTTP/1.1" 200 628 - 4.852 ms
+::1 - - [04/May/2025:09:58:10 +0000] "GET / HTTP/1.1" 304 - - 7.134 ms
+::1 - - [04/May/2025:09:58:10 +0000] "GET /swagger-ui-init.js HTTP/1.1" 200 91072 - 1.055 ms
+::1 - - [04/May/2025:09:58:10 +0000] "GET /swagger-ui.css HTTP/1.1" 304 - - 12.138 ms
+::1 - - [04/May/2025:09:58:10 +0000] "GET /swagger-ui-bundle.js HTTP/1.1" 304 - - 11.576 ms
+::1 - - [04/May/2025:09:58:10 +0000] "GET /swagger-ui-standalone-preset.js HTTP/1.1" 304 - - 12.837 ms
+::1 - - [04/May/2025:09:58:47 +0000] "GET / HTTP/1.1" 304 - - 5.920 ms
+::1 - - [04/May/2025:09:58:47 +0000] "GET /swagger-ui-init.js HTTP/1.1" 200 90632 - 0.864 ms
+::1 - - [04/May/2025:09:58:47 +0000] "GET /swagger-ui.css HTTP/1.1" 304 - - 7.099 ms
+::1 - - [04/May/2025:09:58:47 +0000] "GET /swagger-ui-bundle.js HTTP/1.1" 304 - - 6.406 ms
+::1 - - [04/May/2025:09:58:47 +0000] "GET /swagger-ui-standalone-preset.js HTTP/1.1" 304 - - 5.412 ms
+::1 - - [04/May/2025:09:58:48 +0000] "GET /favicon-32x32.png HTTP/1.1" 304 - - 6.458 ms

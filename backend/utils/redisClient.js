@@ -1,11 +1,14 @@
-require('dotenv').config(); // ensure environment variables are loaded
 const Redis = require('ioredis');
 
-if (!process.env.REDIS_URL) {
-  throw new Error('REDIS_URL is not defined in environment variables.');
-}
-
-const redis = new Redis(process.env.REDIS_URL);
+// Only create a Redis client if not in a test environment
+// This prevents open handles during testing
+const redis = process.env.NODE_ENV === 'test'
+  ? { 
+      setex: () => Promise.resolve(), 
+      get: () => Promise.resolve(null), 
+      del: () => Promise.resolve() 
+    }
+  : new Redis(process.env.REDIS_URL);
 
 // Set data in cache with TTL
 const setCache = async (key, data, ttl = 3600) => {

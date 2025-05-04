@@ -18,7 +18,7 @@ const DropdownWithComponents = () => {
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem('user_jwt');
+    localStorage.removeItem('token');
     router.push('/auth?role=player');
   };
 

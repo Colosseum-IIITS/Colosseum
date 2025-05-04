@@ -16,8 +16,9 @@ export default function HomePage() {
         autoPlay
         loop
         muted
-      ></video>
-
+      >
+      </video>
+      
       {/* Colloseum Logo */}
       <div className="absolute top-8 left-8 z-20">
         <Image 

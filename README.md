@@ -101,15 +101,30 @@ Sophisticated state management architecture:
 
 ## Installation
 
+### Standard Installation
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/colosseum.git
    cd colosseum
    ```
 
-2. Install the dependencies:
+2. Install the dependencies for backend and frontend:
    ```bash
+   # Install backend dependencies
+   cd backend
    npm install
+   cd ..
+   
+   # Install frontend dependencies
+   cd frontend
+   npm install
+   cd ..
+   
+   # Install landing page dependencies
+   cd LandingPage
+   npm install
+   cd ..
    ```
 
 3. Set up the environment variables. Create a `.env` file in the backend directory with the following values:
@@ -117,6 +132,10 @@ Sophisticated state management architecture:
    MONGODB_URI=mongodb://localhost:27017/tournamentDB
    JWT_SECRET_KEY=your_jwt_secret_key
    PORT=5000
+   REDIS_URL=redis://localhost:6379
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_email_app_password
+   STRIPE_SECRET_KEY=your_stripe_secret_key
    ```
 
 4. Start the backend server:
@@ -132,6 +151,43 @@ Sophisticated state management architecture:
    ```
 
 6. Open the browser and navigate to `http://localhost:3000` to view the application. The backend API will be running on `http://localhost:5000` with Swagger documentation at the root path.
+
+### Docker Installation
+
+You can also run the entire application stack using Docker Compose:
+
+1. Create a `.env` file at the root of the project by copying the provided `.env.example` file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file to add your specific configurations for:
+   - Email service (EMAIL_USER, EMAIL_PASS)
+   - Stripe payment integration (STRIPE_SECRET_KEY)
+   - Any other custom settings
+
+3. Build and start the Docker containers:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. Access the application components:
+   - Landing Page: `http://localhost:4000`
+   - Main Application: `http://localhost:3000`
+   - Backend API: `http://localhost:5000`
+   - MongoDB: `mongodb://localhost:27017`
+   - Redis: `redis://localhost:6379`
+
+5. To stop the containers:
+   ```bash
+   docker-compose down
+   ```
+
+6. To view logs from the containers:
+   ```bash
+   docker-compose logs -f [service_name]
+   ```
+   Where `[service_name]` can be: backend, frontend, landingpage, mongodb, or redis
 
 ## Configuration
 

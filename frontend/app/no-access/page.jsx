@@ -2,9 +2,9 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
-import { Card,CardContent,CardHeader,CardTitle } from "@/components/ui/card";
-import { Alert,AlertTitle,AlertDescription } from "@/components/ui/alert";
+import { useRouter } from "next/navigation"; // Updated import for App Router
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function NoAccessPage() {
   const router = useRouter();

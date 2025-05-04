@@ -26,11 +26,14 @@ const toSchema = new mongoose.Schema(
 );
 
 // Add indexes for faster queries
-toSchema.index({ username: 1 });
-toSchema.index({ email: 1 });
-toSchema.index({ tournaments: 1 });
-toSchema.index({ followers: 1 });
-toSchema.index({ banned: 1 });
+toSchema.index({ username: 1 }); // For username lookups
+toSchema.index({ email: 1 }); // For email lookups
+toSchema.index({ tournaments: 1 }); // For tournament queries
+toSchema.index({ followers: 1 }); // For follower queries
+toSchema.index({ banned: 1 }); // For ban status checks
+toSchema.index({ username: 'text' }); // Text index for search functionality
+toSchema.index({ username: 1, banned: 1 }); // Compound index for organiser status checks
+toSchema.index({ tournaments: 1, banned: 1 }); // Compound index for active organisers
 
 const Organiser = mongoose.model("Organiser", toSchema);
 module.exports = Organiser;

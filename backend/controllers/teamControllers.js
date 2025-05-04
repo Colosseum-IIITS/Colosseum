@@ -69,6 +69,35 @@ exports.leaveTeam = async (req, res) => {
   }
 };
 
+exports.searchTeams = async (req, res) => {
+  try {
+    const { searchTerm } = req.query;
+    const teams = await Team.find({
+      name: { $regex: searchTerm, $options: 'i' }
+    })
+    .populate('captain', 'username')
+    .populate('players')
+    .populate('tournaments');
+
+    const enhancedTeams = teams.map(team => ({
+      _id: team._id,
+      name: team.name,
+      captain: team.captain,
+      players: team.players,
+      tournaments: team.tournaments,
+      wins: team.tournaments.filter(t => t.winner === team._id).length,
+      totalMatches: team.tournaments.length
+    }));
+
+    res.status(200).json({
+      teams: enhancedTeams
+    });
+  } catch (error) {
+    console.error('Team search error:', error);
+    res.status(500).json({ message: 'Error searching teams' });
+  }
+};
+
 // Controller to fetch teams based on search term
 exports.getTeamsByName = async (req, res) => {
   const { searchTerm } = req.query;
@@ -392,7 +421,6 @@ exports.removePlayerFromTeam = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 exports.getTournamentsWon = async (req, res) => {
   const { teamId } = req.params;

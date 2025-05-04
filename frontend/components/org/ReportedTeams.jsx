@@ -16,7 +16,7 @@ import useFetchAdminDashboard from '@/context/useFetchAdminDashboard';
 export default function ReportedTeams() {
   const dashboardData = useFetchAdminDashboard();
   const [reportedTeams, setReportedTeams] = useState([]);
-  const [isCardView, setIsCardView] = useState(false);
+  const [isCardView, setIsCardView] = useState(false); // State for toggling view
   const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {
@@ -36,13 +36,37 @@ export default function ReportedTeams() {
     }
   }, [dashboardData]);
 
-  const handleReviewReport = (reportId, status) => {
-    setReportedTeams((prevReports) =>
-      prevReports.map((report) =>
-        report._id === reportId ? { ...report, status: status } : report
-      )
-    );
-    setSelectedReport(null);
+  const handleReviewReport = async (reportId, status) => {
+    try {
+      const token = localStorage.getItem('user_jwt');
+      const response = await fetch(`http://localhost:5000/api/report/update-status/${reportId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: 'Reviewed' })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update report status');
+      }
+
+      const updatedReport = await response.json();
+
+      // Update local state only after successful API call
+      setReportedTeams((prevReports) =>
+        prevReports.map((report) =>
+          report._id === reportId ? { ...report, status: updatedReport.status } : report
+        )
+      );
+
+      // Optional: Show success message
+      console.log('Report status updated successfully');
+    } catch (error) {
+      console.error('Error updating report status:', error);
+      // Optional: Show error message to user
+    }
   };
 
   const toggleView = () => {
@@ -75,15 +99,17 @@ export default function ReportedTeams() {
                   <p><strong>Reason:</strong> {report.reason}</p>
                   <p><strong>Status:</strong> {report.status}</p>
                   <p><strong>Reported At:</strong> {new Date(report.createdAt).toLocaleString()}</p>
-                  {/* Add actions for handling the report (e.g., approve, reject) */}
-                  <div className="mt-4">
-                    <Button
-                      onClick={() => handleReviewReport(report._id, 'Reviewed')}
-                      className="bg-green-500 text-white"
-                    >
-                      Mark as Reviewed
-                    </Button>
-                  </div>
+                  {/* Only show button if status is not 'Reviewed' */}
+                  {report.status !== 'Reviewed' && (
+                    <div className="mt-4">
+                      <Button
+                        onClick={() => handleReviewReport(report._id, 'Reviewed')}
+                        className="bg-green-500 text-white"
+                      >
+                        Mark as Reviewed
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))

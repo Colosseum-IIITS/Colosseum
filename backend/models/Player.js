@@ -37,9 +37,16 @@ playerSchema.methods.canCreateTeam = function() {
   return this.teamPayment.paid === true;
 };
 
-// Add indexes for username and email to speed up lookups
-playerSchema.index({ username: 1 });
-playerSchema.index({ email: 1 });
+// Add indexes for frequently queried fields
+playerSchema.index({ username: 1 }); // For player search
+playerSchema.index({ email: 1 }); // For email lookups
+playerSchema.index({ team: 1 }); // For team lookups
+playerSchema.index({ banned: 1 }); // For ban status checks
+playerSchema.index({ 'tournaments.tournament': 1 }); // For tournament queries
+playerSchema.index({ following: 1 }); // For following organiser queries
+playerSchema.index({ username: 'text' }); // Text index for search functionality
+playerSchema.index({ 'tournaments.won': 1 }); // For win statistics
+playerSchema.index({ username: 1, banned: 1 }); // Compound index for player status checks
 
 const Player = mongoose.model('Player', playerSchema);
 

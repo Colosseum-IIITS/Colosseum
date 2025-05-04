@@ -185,76 +185,119 @@ exports.searchTournaments = async (req, res) => {
 
 
 exports.searchPlayer = async (req, res) => {
-    try {
-        const { searchTerm, page = 1, limit = 10 } = req.query;
-        const skip = (page - 1) * limit;
-        console.log('Search Term:', searchTerm); 
-
-        let totalCount = 0;
-        let players = [];
-
-        if (!searchTerm || searchTerm.trim() === '') {
-            // Count total players for pagination
-            totalCount = await Player.countDocuments({ banned: false }).lean();
-            
-            // Get paginated results with needed fields only
-            players = await Player.find({ banned: false })
-                .select('username email team tournaments.tournament profilePhoto')
-                .populate({ path: 'team', select: 'name' })
-                .populate({ path: 'tournaments.tournament', select: 'name startDate' })
-                .skip(skip)
-                .limit(parseInt(limit))
-                .lean();
-        } else {
-            // Count total results for pagination
-            totalCount = await Player.countDocuments({
-                $and: [
-                    { $or: [
-                        { username: new RegExp(searchTerm, 'i') },
-                        { email: new RegExp(searchTerm, 'i') }
-                    ]},
-                    { banned: false }
-                ]
-            }).lean();
-            
-            // Get paginated search results
-            players = await Player.find({
-                $and: [
-                    { $or: [
-                        { username: new RegExp(searchTerm, 'i') },
-                        { email: new RegExp(searchTerm, 'i') }
-                    ]},
-                    { banned: false }
-                ]
-            })
-            .select('username email team tournaments.tournament profilePhoto')
-            .populate({ path: 'team', select: 'name' })
-            .populate({ path: 'tournaments.tournament', select: 'name startDate' })
-            .skip(skip)
-            .limit(parseInt(limit))
-            .lean();
-        }
-
-        console.log('Players Found:', players.length); 
-
-        res.status(200).json({
-            results: players, 
-            searchTerm,
-            pagination: {
-                total: totalCount,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                pages: Math.ceil(totalCount / limit)
-            }
-        });
-        
-    } catch (error) {
-        console.error('Error searching players:', error); 
-        res.status(500).json({
-            error: 'Error searching players',
-            details: error.message,
-        });
+  try {
+    const { searchTerm } = req.query;
+    
+    if (!searchTerm) {
+      return res.status(400).json({ message: 'Search term is required' });
     }
+
+    // Find players with username matching the search term
+    const players = await Player.find({
+      username: { $regex: searchTerm, $options: 'i' }
+    })
+    .populate('team')
+    .lean();
+
+    // Calculate stats for each player
+    const enhancedPlayers = await Promise.all(players.map(async (player) => {
+      // Calculate tournaments stats
+      const tournaments = player.tournaments || [];
+      const tournamentsPlayed = tournaments.length;
+      const tournamentsWon = tournaments.filter(t => t.won).length;
+      const winPercentage = tournamentsPlayed ? (tournamentsWon / tournamentsPlayed) * 100 : 0;
+      const currentDate = new Date();
+      const ongoingTournaments = tournaments.filter(t => {
+        const tournament = t.tournament;
+        return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
+      }).length;
+
+      // Calculate global rank
+      const globalRank = await Player.countDocuments({
+        $or: [
+          { 'tournaments': { $gt: { $size: player.tournaments || [] } } },
+          {
+            'tournaments': { $size: player.tournaments?.length || 0 },
+            '_id': { $lt: player._id }
+          }
+        ]
+      }) + 1;
+
+      return {
+        _id: player._id,
+        username: player.username,
+        email: player.email,
+        team: player.team,
+        globalRank,
+        tournamentsPlayed,
+        tournamentsWon,
+        winPercentage,
+        ongoingTournaments,
+        noOfOrgsFollowing: player.following?.length || 0
+      };
+    }));
+
+    res.status(200).json({
+      results: enhancedPlayers
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ message: 'Error searching players' });
+  }
+};
+
+exports.getPlayerDetails = async (req, res) => {
+  try {
+    const { playerId } = req.params;
+
+    const player = await Player.findById(playerId)
+      .populate('team')
+      .lean();
+
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+
+    // Calculate player stats
+    const tournaments = player.tournaments || [];
+    const tournamentsPlayed = tournaments.length;
+    const tournamentsWon = tournaments.filter(t => t.won).length;
+    const winPercentage = tournamentsPlayed ? (tournamentsWon / tournamentsPlayed) * 100 : 0;
+    const currentDate = new Date();
+    const ongoingTournaments = tournaments.filter(t => {
+      const tournament = t.tournament;
+      return tournament && currentDate >= tournament.startDate && currentDate <= tournament.endDate;
+    }).length;
+
+    // Calculate global rank
+    const globalRank = await Player.countDocuments({
+      $or: [
+        { 'tournaments': { $gt: { $size: player.tournaments || [] } } },
+        {
+          'tournaments': { $size: player.tournaments?.length || 0 },
+          '_id': { $lt: player._id }
+        }
+      ]
+    }) + 1;
+
+    const playerDetails = {
+      _id: player._id,
+      username: player.username,
+      email: player.email,
+      team: player.team,
+      globalRank,
+      tournamentsPlayed,
+      tournamentsWon,
+      winPercentage,
+      ongoingTournaments,
+      noOfOrgsFollowing: player.following?.length || 0
+    };
+
+    res.status(200).json(playerDetails);
+  } catch (error) {
+    console.error('Error fetching player details:', error);
+    res.status(500).json({ message: 'Error fetching player details' });
+  }
 };
 
 // Func: Join Tournament

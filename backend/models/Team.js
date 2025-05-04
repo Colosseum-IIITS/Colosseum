@@ -12,11 +12,12 @@ const teamSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Add indexes for frequently queried fields
-teamSchema.index({ name: 1 });
-teamSchema.index({ captain: 1 });
-teamSchema.index({ tournaments: 1 });
-teamSchema.index({ players: 1 });
-teamSchema.index({ joinRequests: 1 });
+teamSchema.index({ name: 1 }); // For team name searches
+teamSchema.index({ captain: 1 }); // For captain lookups
+teamSchema.index({ players: 1 }); // For player membership queries
+teamSchema.index({ tournaments: 1 }); // For tournament participation queries
+teamSchema.index({ name: 'text' }); // Text index for search functionality
+teamSchema.index({ captain: 1, players: 1 }); // Compound index for team membership checks
 
 const Team = mongoose.model('Team', teamSchema);
 module.exports = Team;

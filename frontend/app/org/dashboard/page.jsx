@@ -49,16 +49,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto mt-6 space-y-8">
-        {/* Tournaments Section */}
-        <Card className="shadow-lg border border-gray-200 rounded-xl p-4">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">Ongoing Tournaments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TournamentsSection />
-          </CardContent>
-        </Card>
-
         {/* Stats & Reports Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Reports */}
@@ -82,6 +72,16 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Tournaments Section */}
+        <Card className="shadow-lg border border-gray-200 rounded-xl p-4">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Ongoing Tournaments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TournamentsSection />
+          </CardContent>
+        </Card>
 
         {/* Reported Teams Section */}
         <Card className="shadow-lg border border-gray-200 rounded-xl p-4">

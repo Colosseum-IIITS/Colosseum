@@ -21,7 +21,4 @@ router.get('/getTournamentsPlayed',authenticateUser,teamController.getTournament
 router.get('/dashboard', authenticateUser, teamController.getTeamDashboard);
 router.post('/remove/:playerId', authenticateUser, teamController.removePlayerFromTeam);
 
-
-
-
 module.exports = router;

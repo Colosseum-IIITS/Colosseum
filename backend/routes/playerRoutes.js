@@ -13,6 +13,7 @@ const upload = require("../middleware/multerConfig");
 router.get('/profile',authenticateUser,playerController.getPlayerProfile);
 router.get('/searchTournaments', authenticateUser, playerController.searchTournaments);
 router.get('/searchPlayer', playerController.searchPlayer);
+router.get('/details/:playerId', authenticateUser, playerController.getPlayerDetails);
 router.post('/followOrganiser', authenticateUser, playerController.followOrganiser);
 router.post('/unFollowOrganiser', authenticateUser, playerController.unfollowOrganiser);
 router.post('/joinTournament', authenticateUser, playerController.joinTournament);

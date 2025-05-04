@@ -11,6 +11,20 @@ module.exports = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			  blue:{
+				50: '#DFDFF0',
+				75: '#DFDFF2',
+				100:'#F0F2FA',
+				200:'#4FB7DD',
+				300:'#4FB7DD',
+			  },
+			  violet:{
+				300:'#5724FF',
+			  },
+			  yellow:{
+				100:'#8E983F',
+				300:'#EDFF66',
+			  },
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -50,6 +64,13 @@ module.exports = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+		  fontFamily:{
+			zentry: ['zentry','sans-serif'],
+			general:['general','sans-serif'],
+			'circular-web':['circular-web','sans-serif'],
+			'robert-medium':['robert-medium','sans-serif'],
+			'robert-regular':['robert-regular','sans-serif'],
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -87,7 +108,10 @@ module.exports = {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
         'gradient': 'gradient 8s linear infinite',
-  		}
+  		},
+		  transitionTimingFunction: {
+			"custom-ease": "cubic-bezier(0.65, 0.05, 0.36, 1)", // Define the custom easing function
+		  },
   	}
   },
   plugins: [require("tailwindcss-animate")],

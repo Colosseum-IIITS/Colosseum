@@ -1,13 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 
-export default function AuthPage() {
+// Loading component to use during Suspense
+function AuthLoading() {
+  return (
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-4">Loading...</h2>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+      </div>
+    </div>
+  );
+}
+
+// Component that uses useSearchParams
+function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get("role");
@@ -143,12 +156,21 @@ export default function AuthPage() {
           </div>
 
           <div className="mt-4 text-center">
-            <Button variant="link" onClick={() => router.push("http://localhost:3010/")}>
+            <Button variant="link" onClick={() => router.push("http://localhost:3000/")}>
               Back to Role Selection
             </Button>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthLoading />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

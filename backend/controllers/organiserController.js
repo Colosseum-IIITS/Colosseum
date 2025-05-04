@@ -614,28 +614,34 @@ exports.getOrganiserName = async (req, res) => {
     const organiserId = req.user.id;
     const cacheKey = `organiser_name_${organiserId}`;
     
-    // Always fetch fresh data
+    // Always fetch fresh data with populated winner
     const organiser = await Organiser.findById(organiserId);
     if (!organiser) {
       return res.status(404).json({ message: 'Organiser not found' });
     }
 
-    const tournaments = await Tournament.find({ organiser: organiserId }).lean();
+    // Fetch tournaments with populated winner field
+    const tournaments = await Tournament.find({ organiser: organiserId })
+      .populate('winner', 'name') // Only populate name field from winner
+      .lean();
 
     const responseData = {
       username: organiser.username,
       email: organiser.email,
       description: organiser.description,
       visibilitySettings: organiser.visibilitySettings,
-      tournaments,
+      tournaments: tournaments.map(t => ({
+        ...t,
+        winner: t.winner?.name || null // Use winner's name if exists, null if not
+      })),
       followers: organiser.followers.length,
       rating: organiser.rating,
       banned: organiser.banned,
-      totalRevenue: organiser.totalRevenue // Include total revenue
+      totalRevenue: organiser.totalRevenue
     };
 
     // Update cache with fresh data
-    await setCache(cacheKey, responseData, 300); // Short TTL of 5 minutes
+    await setCache(cacheKey, responseData, 300);
 
     return res.status(200).json(responseData);
   } catch (error) {

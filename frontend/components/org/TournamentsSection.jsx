@@ -112,7 +112,9 @@ const TournamentsSection = () => {
                           {tournament.status || 'Unknown'}
                         </div>
                         {tournament.status === 'Completed' && (
-                          <p className="text-black mt-2">Winner: {tournament.winner || 'TBD'}</p>
+                          <p className="text-black mt-2">
+                            Winner: {tournament.winner || 'TBD'}
+                          </p>
                         )}
                         <button
                           className="mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"

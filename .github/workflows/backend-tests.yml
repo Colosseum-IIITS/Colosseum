@@ -19,6 +19,7 @@ jobs:
         
     steps:
     - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -28,6 +29,7 @@ jobs:
         
     - name: Install dependencies
       run: npm install
+      # Using 'npm install' instead of 'npm ci' to handle package.json/lock file sync issues
       
     - name: Run tests
       run: npm test
@@ -41,6 +43,7 @@ jobs:
       run: npm run test:coverage
       
     - name: Upload coverage report
+      uses: actions/upload-artifact@v4
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report

@@ -20,6 +20,9 @@ const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const b2cRoutes = require('./externalApis/b2c/routes');
+const b2bRoutes = require('./externalApis/b2b/routes');
+
 
 const app = express();
 
@@ -53,6 +56,8 @@ app.use('/api/report', reportRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/b2c', b2cRoutes);
+app.use('/b2b', b2bRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {

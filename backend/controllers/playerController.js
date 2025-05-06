@@ -8,11 +8,17 @@ const Team = require('../models/Team');
 const mongoose = require('mongoose');  
 const { delCache, setCache } = require('../utils/redisClient');  
 const{getCache}=require('../utils/redisClient');
+
+
 exports.followOrganiser = async (req, res) => {
     const { organiserId } = req.body;
     const { _id: playerId } = req.user;
 
     try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         // Ensure organiserId is a string
         if (typeof organiserId !== 'string') {
             return res.status(400).json({ message: 'organiserId is not a string' });
@@ -63,6 +69,10 @@ exports.unfollowOrganiser = async (req, res) => {
     const { _id: playerId } = req.user; 
 
     try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         // Ensure organiserId is a string
         if (typeof organiserId !== 'string') {
             return res.status(400).json({ message: 'organiserId is not a string' });
@@ -108,6 +118,10 @@ exports.unfollowOrganiser = async (req, res) => {
 // Func: Search tournaments by tid or name
 exports.searchTournaments = async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         const { searchTerm, page = 1, limit = 10 } = req.query;
         const skip = (page - 1) * limit;
         console.log('Search Term:', searchTerm); 
@@ -186,6 +200,10 @@ exports.searchTournaments = async (req, res) => {
 
 exports.searchPlayer = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     const { searchTerm } = req.query;
     
     if (!searchTerm) {
@@ -248,6 +266,10 @@ exports.searchPlayer = async (req, res) => {
 
 exports.getPlayerDetails = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     const { playerId } = req.params;
 
     const player = await Player.findById(playerId)
@@ -302,6 +324,10 @@ exports.getPlayerDetails = async (req, res) => {
 
 // Func: Join Tournament
 exports.joinTournament = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     if (!mongoose.isValidObjectId(tournamentId)) {
         return res.status(400).json({ message: "Invalid tournament ID" });
     }
@@ -362,6 +388,10 @@ exports.joinTournament = async (req, res) => {
 };
 exports.updateUsername = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     const { _id } = req.user;
     const { username } = req.body;
 
@@ -405,6 +435,10 @@ exports.updateUsername = async (req, res) => {
 
 // Update password
 exports.updatePassword = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { currentPassword, newPassword } = req.body;
   const { _id } = req.user;
 
@@ -445,6 +479,10 @@ exports.updatePassword = async (req, res) => {
 
 // Update email
 exports.updateEmail = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { email } = req.body; 
   const { _id } = req.user;
 
@@ -484,6 +522,10 @@ exports.updateEmail = async (req, res) => {
 
 // Update profile
 exports.updateProfile = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     const { username, email, currentPassword, newPassword } = req.body;
     const userId = req.user._id; // Ensure you have the user's ID from the JWT
 
@@ -526,6 +568,10 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.getTournamentsPlayed = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { _id } = req.user;
 
   try {
@@ -559,6 +605,10 @@ exports.getTournamentsPlayed = async (req, res) => {
 
 // Fetch number of tournaments won by the player
 exports.getTournamentsWon = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { _id } = req.user;
   console.log('User ID:', _id); // Log user ID to confirm it's correct
   
@@ -596,6 +646,10 @@ exports.getTournamentsWon = async (req, res) => {
 
 // Fetch player ranking based on the number of tournaments played
 exports.getPlayerRanking = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { _id } = req.user;
 
   try {
@@ -636,6 +690,10 @@ exports.getPlayerRanking = async (req, res) => {
 
 
 exports.getFollowedOrganisers = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { _id } = req.user;
 
   try {
@@ -666,6 +724,10 @@ exports.getFollowedOrganisers = async (req, res) => {
 };
 
 exports.getTournamentPointsTable = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { tournamentId } = req.params;
 
   try {
@@ -706,6 +768,10 @@ exports.getTournamentPointsTable = async (req, res) => {
 
 
 exports.getGlobalPlayerRanking = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   try {
     const cacheKey = 'global_player_ranking'; // Use a fixed cache key for the global ranking
 
@@ -744,6 +810,10 @@ exports.getGlobalPlayerRanking = async (req, res) => {
 
 
 exports.getDashboard = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const playerId = req.user._id;
   const currentDate = new Date();
 
@@ -795,6 +865,10 @@ exports.getDashboard = async (req, res) => {
 
   
 exports.getUsername = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { _id } = req.user;  // Extract the _id from the authenticated user
   const cacheKey = `username_${_id}`; // Unique cache key for each player
 
@@ -838,6 +912,10 @@ exports.getUsername = async (req, res) => {
 
 
 exports.getPlayerProfile = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   try {
     const playerId = req.user?._id;
 
@@ -922,6 +1000,10 @@ exports.getPlayerProfile = async (req, res) => {
 };
 
   exports.getWinPercentage = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     try {
       const playerId = req.user.id; // Assuming you have user authentication and user ID is stored in req.user
   
@@ -952,6 +1034,10 @@ exports.getPlayerProfile = async (req, res) => {
   };
   
   exports.updateProfilePicture = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     try {
       console.log('Incoming request to update profile picture');
     
@@ -997,6 +1083,10 @@ exports.getPlayerProfile = async (req, res) => {
   
   // Get Player's Profile Picture (GET)
   exports.getProfilePicture = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     try {
       console.log('Incoming request to get profile picture'); // Log the incoming request
   

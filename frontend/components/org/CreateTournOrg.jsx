@@ -41,7 +41,7 @@ const OrgTourn = () => {
 
     try {
       // Re-fetch CSRF token immediately before submitting
-      const csrfResponse = await fetch('http://localhost:5000/auth/csrfToken', {
+      const csrfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/csrfToken`, {
         credentials: 'include',
         cache: 'no-store'
       });
@@ -65,7 +65,7 @@ const OrgTourn = () => {
         _csrf: freshCsrfToken // send token in raw JSON body
       };
 
-      const response = await fetch('http://localhost:5000/api/tournament/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/create`, {
         method: 'POST',
         credentials: 'include', // ensure cookies are sent along
         headers: {

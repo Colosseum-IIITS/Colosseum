@@ -36,7 +36,7 @@ const ProfilePicture = () => {
       try {
         console.log("Attempting to fetch profile picture...");
         const response = await axios.get(
-          "http://localhost:5000/api/player/profilepicture",
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/profilepicture`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -94,7 +94,7 @@ const ProfilePicture = () => {
   
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/player/updateprofilepicture",
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/updateprofilepicture`,
         formData,
         {
           headers: {
@@ -141,7 +141,7 @@ const ProfilePicture = () => {
   
     try {
       console.log("Attempting to remove profile picture...");
-      await axios.delete("http://localhost:5000/api/player/removeprofilepicture", {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/removeprofilepicture`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

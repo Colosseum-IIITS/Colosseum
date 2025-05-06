@@ -24,7 +24,7 @@ const TournamentDetails = ({ tournament, organiser, userRole, isCaptain }) => {
 
   const handleLeaveTournament = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tournament/leave/${tournament._id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/leave/${tournament._id}`, {
         method: 'POST',
         credentials: 'include',
       });

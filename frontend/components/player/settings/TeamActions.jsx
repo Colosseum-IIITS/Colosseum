@@ -15,7 +15,7 @@ const TeamActions = () => {
   const [csrfToken,setCsrfToken]=useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/auth/csrfToken', { credentials: 'include' })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/csrfToken`, { credentials: 'include' })
         .then(response => response.json())
         .then(data => setCsrfToken(data.csrfToken))
         .catch(error => console.error('Error fetching CSRF token:', error));
@@ -55,7 +55,7 @@ const TeamActions = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/team/leave', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/leave`, {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({ _csrf: csrfToken }),
@@ -90,7 +90,7 @@ const TeamActions = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/team/updateTeamName', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/updateTeamName`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ const WinPercentage = () => {
   useEffect(() => {
     const fetchWinPercentage = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/player/winPercentage', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/winPercentage`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`, // Authorization header with token
           },

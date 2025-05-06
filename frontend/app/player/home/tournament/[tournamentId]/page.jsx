@@ -24,7 +24,7 @@ const TournamentPage = () => {
     const fetchTournamentDetails = async () => {
       try {
         const token = localStorage.getItem('user_jwt');
-        const response = await fetch(`http://localhost:5000/api/tournament/${tournamentId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/${tournamentId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

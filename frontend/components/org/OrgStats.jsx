@@ -23,7 +23,7 @@ const OrganiserStats = () => {
           return;
         }
     
-        const response = await axios.get('http://localhost:5000/api/organiser/getOrganiserName', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/getOrganiserName`, {
           headers: {
             Authorization: `Bearer ${token}`, // Ensure the token is attached
           },

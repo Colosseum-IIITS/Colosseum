@@ -20,7 +20,7 @@ const ProfilePicture = () => {
       }
 
       try {
-        const response = await axios.get("http://localhost:5000/api/player/profilepicture", {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/profilepicture`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

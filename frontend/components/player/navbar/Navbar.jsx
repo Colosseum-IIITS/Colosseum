@@ -13,7 +13,7 @@ const Navbar = () => {
     // Fetch the username from the API when the component mounts
     const fetchUsername = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/player/getUserName', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/getUserName`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

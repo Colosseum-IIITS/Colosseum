@@ -39,7 +39,7 @@ export default function ReportedTeams() {
   const handleReviewReport = async (reportId, status) => {
     try {
       const token = localStorage.getItem('user_jwt');
-      const response = await fetch(`http://localhost:5000/api/report/update-status/${reportId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/report/update-status/${reportId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

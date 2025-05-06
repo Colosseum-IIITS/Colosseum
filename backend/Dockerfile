@@ -1,18 +1,21 @@
 FROM node:18-alpine
 
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Create app directory
+WORKDIR /usr/src/app
 
 # Install dependencies
-RUN npm install
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Copy the rest of the backend code
+# Copy app source
 COPY . .
 
-# Expose the port the app runs on
+# Environment variable defaults
+ENV NODE_ENV=production
+ENV PORT=5000
+
+# Expose the port
 EXPOSE 5000
 
-# Command to run the application
+# Start the app
 CMD ["node", "app.js"]

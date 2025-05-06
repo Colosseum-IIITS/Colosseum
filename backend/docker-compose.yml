@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/colosseum
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
+      # Use Upstash Redis connection string from environment
+      - REDIS_URL=${REDIS_URL}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    volumes:
+      - ./logs:/usr/src/app/logs
+    # Add healthcheck for better orchestration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api-docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongo:
+    image: mongo:6
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    # Add authentication in production
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+    #   - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    # Add configuration for better performance
+    command: ["--wiredTigerCacheSizeGB", "1"]
+
+volumes:
+  mongo-data:

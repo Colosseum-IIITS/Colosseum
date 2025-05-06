@@ -20,3 +20,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+  # backend:
+  #   build: .
+  #   ports:
+  #     - "5000:5000"
+  #   # ... other configurations
+  #   # Ensure you have environment variables defined here or in an .env file
+  #   # e.g., environment:
+  #   #   - NODE_ENV=production
+  #   #   - PORT=5000
+  #   #   - MONGODB_URI=${MONGODB_URI}
+  #   #   - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+  #   #   - REDIS_URL=${REDIS_URL}

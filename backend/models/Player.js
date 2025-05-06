@@ -5,8 +5,8 @@ const playerSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePhoto: {
-    data: String, // Base64 string
-    contentType: String, // MIME type
+    data: String,
+    contentType: String,
   },
   team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   teamPayment: {
@@ -27,27 +27,22 @@ const playerSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-// Virtual field for tournaments won
 playerSchema.virtual('tournamentsWon').get(function () {
   return this.tournaments.filter(t => t.won).length;
 });
 
-// Method to check if a player can create a team
 playerSchema.methods.canCreateTeam = function() {
   return this.teamPayment.paid === true;
 };
 
-// Add indexes for frequently queried fields
-playerSchema.index({ username: 1 }); // For player search
-playerSchema.index({ email: 1 }); // For email lookups
-playerSchema.index({ team: 1 }); // For team lookups
-playerSchema.index({ banned: 1 }); // For ban status checks
-playerSchema.index({ 'tournaments.tournament': 1 }); // For tournament queries
-playerSchema.index({ following: 1 }); // For following organiser queries
-playerSchema.index({ username: 'text' }); // Text index for search functionality
-playerSchema.index({ 'tournaments.won': 1 }); // For win statistics
-playerSchema.index({ username: 1, banned: 1 }); // Compound index for player status checks
+// Indexes (skip duplicates)
+playerSchema.index({ team: 1 });
+playerSchema.index({ banned: 1 });
+playerSchema.index({ 'tournaments.tournament': 1 });
+playerSchema.index({ following: 1 });
+playerSchema.index({ username: 'text' });
+playerSchema.index({ 'tournaments.won': 1 });
+playerSchema.index({ username: 1, banned: 1 });
 
 const Player = mongoose.model('Player', playerSchema);
-
 module.exports = Player;

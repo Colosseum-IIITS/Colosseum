@@ -2197,7 +2197,6 @@
 ::1 - - [29/Apr/2025:07:55:48 +0000] "GET /api/organiser/tournament-prize-pool-averages HTTP/1.1" 304 - - 4.265 ms
 ::1 - - [29/Apr/2025:07:55:48 +0000] "GET /api/organiser/top-organisers HTTP/1.1" 304 - - 2.790 ms
 ::1 - - [29/Apr/2025:07:55:48 +0000] "GET /admin/dashboard HTTP/1.1" 200 185583 - 101.279 ms
-<<<<<<< HEAD
 ::1 - - [30/Apr/2025:10:21:23 +0000] "GET / HTTP/1.1" 304 - - 5.566 ms
 ::1 - - [30/Apr/2025:10:21:23 +0000] "GET /swagger-ui-init.js HTTP/1.1" 200 86923 - 0.902 ms
 ::1 - - [30/Apr/2025:10:21:23 +0000] "GET /swagger-ui.css HTTP/1.1" 200 152072 - 11.846 ms
@@ -2225,8 +2224,6 @@
 ::1 - - [30/Apr/2025:10:28:31 +0000] "GET /swagger-ui-bundle.js HTTP/1.1" 304 - - 3.262 ms
 ::1 - - [30/Apr/2025:10:28:31 +0000] "GET /swagger-ui-standalone-preset.js HTTP/1.1" 304 - - 2.992 ms
 ::1 - - [30/Apr/2025:10:28:32 +0000] "GET /favicon-32x32.png HTTP/1.1" 304 - - 0.589 ms
-=======
->>>>>>> parent of ccd5c65 (playerRoute)
 ::1 - - [06/May/2025:17:51:56 +0000] "GET / HTTP/1.1" 404 32 - 1.342 ms
 ::1 - - [06/May/2025:17:51:56 +0000] "GET /favicon.ico HTTP/1.1" 404 32 - 0.795 ms
 ::1 - - [06/May/2025:17:52:12 +0000] "GET /api-docs HTTP/1.1" 401 45 - 0.381 ms

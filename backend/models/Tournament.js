@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Organiser = require("../models/Organiser");
 
 const tournamentSchema = new mongoose.Schema(
   {
@@ -38,21 +37,19 @@ const tournamentSchema = new mongoose.Schema(
       },
     ],
   },
-  { 
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
-// Add indexes for frequently queried fields
-tournamentSchema.index({ tid: 1 }); // For tournament ID lookups
-tournamentSchema.index({ name: 1 }); // For tournament name searches
-tournamentSchema.index({ organiser: 1 }); // For organiser lookups
-tournamentSchema.index({ status: 1 }); // For status filtering
-tournamentSchema.index({ startDate: 1, endDate: 1 }); // For date range queries
-tournamentSchema.index({ 'teams': 1 }); // For team participation queries
-tournamentSchema.index({ name: 'text' }); // Text index for search functionality
-tournamentSchema.index({ organiser: 1, status: 1 }); // Compound index for organiser's tournament status
-tournamentSchema.index({ startDate: 1, endDate: 1, status: 1 }); // Compound index for active tournaments
+// Indexes
+tournamentSchema.index({ tid: 1 });
+tournamentSchema.index({ name: 1 });
+tournamentSchema.index({ name: 'text' });
+tournamentSchema.index({ organiser: 1 });
+tournamentSchema.index({ status: 1 });
+tournamentSchema.index({ startDate: 1, endDate: 1 });
+tournamentSchema.index({ teams: 1 });
+tournamentSchema.index({ organiser: 1, status: 1 });
+tournamentSchema.index({ startDate: 1, endDate: 1, status: 1 });
 
 const Tournament = mongoose.model("Tournament", tournamentSchema);
 module.exports = Tournament;

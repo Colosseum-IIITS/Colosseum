@@ -106,10 +106,10 @@ app.use('/b2b', b2bRoutes);
 
 // API documentation (disable in production or secure it)
 if (!isProduction) {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 } else {
   // In production, you might want to secure the API docs
-  app.use('/api-docs', authenticateUser, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  app.use('/', authenticateUser, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 }
 
 // Global error handler
@@ -132,8 +132,7 @@ app.use((req, res) => {
 });
 
 // MongoDB connection
-mongoose
-  .connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI, {
     // Modern MongoDB connection options (compatible with Mongoose 8+)
     // Add connection pool settings for production
     ...(isProduction ? {
@@ -143,12 +142,6 @@ mongoose
   })
   .then(() => console.log('Connected to MongoDB successfully'))
   .catch(err => console.error('Could not connect to MongoDB', err));
-
-// Start the server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} in ${NODE_ENV} mode`);
-});
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
@@ -160,4 +153,11 @@ process.on('SIGTERM', () => {
       process.exit(0);
     });
   });
+});
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} in ${NODE_ENV} mode`);
+  console.log(`Test server running at http://localhost:${PORT}`);
 });

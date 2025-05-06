@@ -8,11 +8,10 @@ const paymentSchema = new mongoose.Schema({
   stripePaymentId: { type: String },
 }, { timestamps: true });
 
-// Add indexes for payment lookups
 paymentSchema.index({ player: 1 });
 paymentSchema.index({ status: 1 });
 paymentSchema.index({ type: 1 });
-paymentSchema.index({ createdAt: -1 }); // For sorting by most recent
+paymentSchema.index({ createdAt: -1 });
 
 const Payment = mongoose.model('Payment', paymentSchema);
 module.exports = Payment;

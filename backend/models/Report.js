@@ -34,13 +34,13 @@ const reportSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add indexes for frequently queried fields
-reportSchema.index({ reportedBy: 1 }); // For reporter lookups
-reportSchema.index({ reportType: 1 }); // For report type filtering
-reportSchema.index({ status: 1 }); // For status filtering
-reportSchema.index({ createdAt: 1 }); // For date-based queries
-reportSchema.index({ reportType: 1, status: 1 }); // Compound index for report filtering
-reportSchema.index({ reportedBy: 1, reportType: 1 }); // Compound index for user reports
+// Indexes
+reportSchema.index({ reportedBy: 1 });
+reportSchema.index({ reportType: 1 });
+reportSchema.index({ status: 1 });
+reportSchema.index({ createdAt: 1 });
+reportSchema.index({ reportType: 1, status: 1 });
+reportSchema.index({ reportedBy: 1, reportType: 1 });
 
 const Report = mongoose.model("Report", reportSchema);
 module.exports = Report;

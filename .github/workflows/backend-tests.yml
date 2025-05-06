@@ -10,6 +10,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # Add MongoDB service
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
 
     strategy:
       matrix:
@@ -30,6 +37,17 @@ jobs:
       run: npm install
       # Using 'npm install' instead of 'npm ci' to handle package.json/lock file sync issues
       
+    - name: Install MongoDB Shell
+      run: |
+        wget -qO- https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+        sudo apt-get update
+        sudo apt-get install -y mongodb-mongosh
+    
+    - name: Verify MongoDB connection
+      run: |
+        mongosh --eval 'db.runCommand("ping").ok' localhost:27017/test --quiet
+    
     - name: Run tests
       run: npm test
       env:
@@ -37,9 +55,20 @@ jobs:
         STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
         EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
         EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        MONGO_URI: mongodb://localhost:27017/colosseum_test
         
     - name: Generate coverage report
       run: npm run test:coverage
+      env:
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'test_secret_key' }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        MONGO_URI: mongodb://localhost:27017/colosseum_test
       
     - name: Upload coverage report
       uses: actions/upload-artifact@v4

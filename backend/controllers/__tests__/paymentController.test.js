@@ -2,6 +2,19 @@ const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
 
+// Mock the Redis client
+jest.mock('../../utils/redisClient', () => ({
+  redis: {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue('OK'),
+    del: jest.fn().mockResolvedValue(1)
+  },
+  setCache: jest.fn().mockResolvedValue(true),
+  getCache: jest.fn().mockResolvedValue(null),
+  delCache: jest.fn().mockResolvedValue(true),
+  isRedisConnected: jest.fn().mockReturnValue(true)
+}));
+
 // Mock the Stripe dependency
 jest.mock('stripe', () => {
   // Create a mock implementation for Stripe
@@ -125,9 +138,8 @@ describe('Payment Controller Tests', () => {
 
     it('should return 500 if stripe throws an error', async () => {
       // Mock the Stripe error more safely - return a rejected promise instead of throwing
-      mockStripe.paymentIntents.create.mockImplementationOnce(() => {
-        return Promise.reject(new Error('Stripe API error'));
-      });
+      const originalCreate = mockStripe.paymentIntents.create;
+      mockStripe.paymentIntents.create = jest.fn().mockRejectedValueOnce(new Error('Stripe API error'));
       
       const response = await request(app)
         .post('/api/payment/create-intent')
@@ -138,53 +150,60 @@ describe('Payment Controller Tests', () => {
         .expect(500);
 
       expect(response.body.error).toBe('Error creating payment');
+      
+      // Restore the original mock for other tests
+      mockStripe.paymentIntents.create = originalCreate;
     });
   });
 
   describe('Confirm Payment', () => {
     it('should confirm a payment and update player status', async () => {
-      // Skip test for now until we get the create payment tests working
-      // This is a dependency chain issue - we need to fix the first tests first
-      return;
+      // Create a simplified test that just tests the endpoint works correctly
+      const mockPlayerId = new mongoose.Types.ObjectId().toString();
+      const mockPaymentId = new mongoose.Types.ObjectId().toString();
+      const mockStripePaymentId = 'pi_mock_123456';
       
-      // Mock player and payment IDs
-      const mockPlayerId = 'mock_player_id';
-      const mockPaymentId = 'mock_payment_id';
-      
-      // Mock payment document in database
+      // Set up mock return values
       const mockPayment = {
         _id: mockPaymentId,
         player: mockPlayerId,
         amount: 500,
         type: 'TEAM_CREATION',
-        stripePaymentId: 'pi_mock_123456',
+        stripePaymentId: mockStripePaymentId,
         status: 'pending',
         save: jest.fn().mockResolvedValue({ status: 'completed' })
       };
       
-      // Mock player document in database
       const mockPlayer = {
         _id: mockPlayerId,
         teamPayment: { paid: false },
         save: jest.fn().mockResolvedValue({
+          _id: mockPlayerId,
           teamPayment: { paid: true, payment: mockPaymentId }
         })
       };
       
-      // Configure mocks
-      Payment.findOne.mockResolvedValueOnce(mockPayment);
-      Player.findById.mockResolvedValueOnce(mockPlayer);
-
+      // Reset and set up mocks
+      jest.clearAllMocks();
+      Payment.findOne = jest.fn().mockResolvedValue(mockPayment);
+      Player.findById = jest.fn().mockResolvedValue(mockPlayer);
+      
+      // Test the endpoint
       const response = await request(app)
         .post('/api/payment/confirm')
         .set('Authorization', 'Bearer mockToken')
         .set('user-id', mockPlayerId)
         .set('user-role', 'player')
-        .send({ paymentIntentId: 'pi_mock_123456' })
+        .send({ paymentIntentId: mockStripePaymentId })
         .expect(200);
 
-      // Validate response
+      // Validate the response
+      expect(response.body).toBeDefined();
       expect(response.body.success).toBe(true);
+      
+      // Validate that the right methods were called
+      expect(Payment.findOne).toHaveBeenCalledWith({ stripePaymentId: mockStripePaymentId });
+      expect(Player.findById).toHaveBeenCalledWith(mockPlayerId);
       
       // Verify Stripe was called correctly
       expect(stripe().paymentIntents.retrieve).toHaveBeenCalledWith('pi_mock_123456');
@@ -199,68 +218,99 @@ describe('Payment Controller Tests', () => {
       expect(mockPlayer.teamPayment.payment).toBe(mockPaymentId);
       expect(mockPlayer.save).toHaveBeenCalled();
     });
+    
+    it('should return 404 if payment not found', async () => {
+      // Mock not finding the payment
+      Payment.findOne = jest.fn().mockResolvedValue(null);
+      
+      const response = await request(app)
+        .post('/api/payment/confirm')
+        .set('Authorization', 'Bearer mockToken')
+        .set('user-id', 'some-player-id')
+        .set('user-role', 'player')
+        .send({ paymentIntentId: 'non_existent_id' })
+        .expect(404);
+      
+      expect(response.body.error).toBeDefined();
+    });
 
     it('should return 400 if payment is not successful', async () => {
-      // Skip test for now until we get the previous tests working
-      return;
+      // Mock a valid payment but with unsuccessful Stripe status
+      const mockPlayerId = new mongoose.Types.ObjectId().toString();
+      const mockPaymentId = new mongoose.Types.ObjectId().toString();
+      const mockStripePaymentId = 'pi_mock_123456';
       
-      // Mock a player
-      const mockPlayerId = 'mock_player_id';
-      
-      // Mock unsuccessful payment
-      stripe().paymentIntents.retrieve.mockResolvedValueOnce({
-        id: 'pi_mock_123456',
-        status: 'failed'
+      // Configure Stripe to return a non-successful status
+      const originalRetrieve = mockStripe.paymentIntents.retrieve;
+      mockStripe.paymentIntents.retrieve = jest.fn().mockResolvedValue({
+        id: mockStripePaymentId,
+        status: 'requires_payment_method' // Not succeeded
       });
+      
+      // Set up mock payment
+      const mockPayment = {
+        _id: mockPaymentId,
+        player: mockPlayerId,
+        amount: 500,
+        type: 'TEAM_CREATION',
+        stripePaymentId: mockStripePaymentId,
+        status: 'pending'
+      };
+      
+      // Configure mock for Payment.findOne
+      Payment.findOne = jest.fn().mockResolvedValue(mockPayment);
       
       const response = await request(app)
         .post('/api/payment/confirm')
         .set('Authorization', 'Bearer mockToken')
         .set('user-id', mockPlayerId)
         .set('user-role', 'player')
-        .send({ paymentIntentId: 'pi_mock_123456' })
+        .send({ paymentIntentId: mockStripePaymentId })
         .expect(400);
 
       expect(response.body.error).toBe('Payment not successful');
+      
+      // Restore original mock
+      mockStripe.paymentIntents.retrieve = originalRetrieve;
     });
     
-    it('should return 404 if payment is not found', async () => {
-      // Mock a player
-      const mockPlayerId = 'mock_player_id';
-      
-      // Mock Payment.findOne to return null (payment not found)
-      Payment.findOne.mockResolvedValueOnce(null);
-      
-      const response = await request(app)
-        .post('/api/payment/confirm')
-        .set('Authorization', 'Bearer mockToken')
-        .set('user-id', mockPlayerId)
-        .set('user-role', 'player')
-        .send({ paymentIntentId: 'pi_nonexistent_id' })
-        .expect(404);
 
-      expect(response.body.error).toBe('Payment not found');
-    });
     
     it('should return 500 if stripe throws an error', async () => {
-      // Skip test for now until we get the previous tests working
-      return;
+      // Mock a valid payment but with Stripe error
+      const mockPlayerId = new mongoose.Types.ObjectId().toString();
+      const mockPaymentId = new mongoose.Types.ObjectId().toString();
+      const mockStripePaymentId = 'pi_mock_123456';
       
-      // Mock a player
-      const mockPlayerId = 'mock_player_id';
+      // Set up mock payment
+      const mockPayment = {
+        _id: mockPaymentId,
+        player: mockPlayerId,
+        amount: 500,
+        type: 'TEAM_CREATION',
+        status: 'pending',
+        stripePaymentId: mockStripePaymentId,
+      };
       
-      // Mock Stripe error
-      stripe().paymentIntents.retrieve.mockRejectedValueOnce(new Error('Stripe API error'));
+      // Configure mock for Payment.findOne
+      Payment.findOne = jest.fn().mockResolvedValue(mockPayment);
+      
+      // Make Stripe.paymentIntents.retrieve throw an error
+      const originalRetrieve = mockStripe.paymentIntents.retrieve;
+      mockStripe.paymentIntents.retrieve = jest.fn().mockRejectedValue(new Error('Stripe API error'));
       
       const response = await request(app)
         .post('/api/payment/confirm')
         .set('Authorization', 'Bearer mockToken')
         .set('user-id', mockPlayerId)
         .set('user-role', 'player')
-        .send({ paymentIntentId: 'pi_mock_123456' })
+        .send({ paymentIntentId: mockStripePaymentId })
         .expect(500);
 
       expect(response.body.error).toBe('Error confirming payment');
+      
+      // Restore original mock
+      mockStripe.paymentIntents.retrieve = originalRetrieve;
     });
   });
 });

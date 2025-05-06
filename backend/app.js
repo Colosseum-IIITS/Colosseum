@@ -127,19 +127,23 @@ mongoose.connect(process.env.MONGODB_URI, {
   .catch(err => console.error('Could not connect to MongoDB', err));
 
 // Handle graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM signal received: closing HTTP server');
-  server.close(() => {
+  server.close(async () => {
     console.log('HTTP server closed');
-    mongoose.connection.close(false, () => {
+    try {
+      await mongoose.connection.close();
       console.log('MongoDB connection closed');
       process.exit(0);
-    });
+    } catch (err) {
+      console.error('Error closing MongoDB connection', err);
+      process.exit(1);
+    }
   });
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} in ${NODE_ENV} mode`);
   console.log(`Test server running at http://localhost:${PORT}`);

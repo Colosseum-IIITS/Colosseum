@@ -4,7 +4,12 @@ import gsap from "gsap";
 import { useWindowScroll } from "react-use";
 import { useEffect, useRef, useState } from "react";
 
-const navItems = ["Player", "Organiser", "Admin"];
+const navItems = [
+  { name: "Player", href: "#features" },
+  { name: "Organiser", href: "#features" },
+  { name: "Admin", href: "#features" },
+  { name: "Documentation", href: "#features2" }, // Redirect to #features2
+];
 
 const NavBar = () => {
   // State for toggling audio and visual indicator
@@ -78,10 +83,10 @@ const NavBar = () => {
               {navItems.map((item, index) => (
                 <a
                   key={index}
-                  href="#features" // Updated to scroll to the Features section
+                  href={item.href} // Dynamically set href based on the item
                   className="nav-hover-btn"
                 >
-                  {item}
+                  {item.name}
                 </a>
               ))}
             </div>

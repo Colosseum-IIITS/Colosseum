@@ -45,7 +45,9 @@ exports.createPlayer = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         // Send confirmation email
@@ -112,7 +114,9 @@ exports.loginPlayer = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
+            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         res.status(200).json({ message: 'Login successful', token });
@@ -154,7 +158,9 @@ exports.createOrganiser = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         res.status(201).json({ message: 'Organiser registered successfully', token });
@@ -198,7 +204,9 @@ exports.loginOrganiser = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
+            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         res.status(200).json({ message: 'Login successful', token });
@@ -233,7 +241,9 @@ exports.createAdmin = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         res.status(201).json({ message: 'Admin registered successfully' });
@@ -269,7 +279,9 @@ exports.loginAdmin = async (req, res) => {
         res.cookie('user_jwt', token, {
             httpOnly: true,
             maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production' // Secure cookie in production
+            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/'
         });
 
         res.status(200).json({ message: 'Login successful', token });
@@ -277,4 +289,16 @@ exports.loginAdmin = async (req, res) => {
         console.error('Error during admin login:', error);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
     }
+};
+
+// Signout
+const signout = (req, res) => {
+    res.cookie('user_jwt', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        path: '/',
+        expires: new Date(0) // Expire immediately
+    });
+    res.status(200).json({ message: 'Signed out successfully' });
 };

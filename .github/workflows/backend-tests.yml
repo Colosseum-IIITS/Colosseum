@@ -10,6 +10,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # Add MongoDB service
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
 
     strategy:
       matrix:
@@ -30,6 +37,10 @@ jobs:
       run: npm install
       # Using 'npm install' instead of 'npm ci' to handle package.json/lock file sync issues
       
+    - name: Verify MongoDB connection
+      run: |
+        echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+    
     - name: Run tests
       run: npm test
       env:
@@ -37,9 +48,20 @@ jobs:
         STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
         EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
         EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        MONGO_URI: mongodb://localhost:27017/colosseum_test
         
     - name: Generate coverage report
       run: npm run test:coverage
+      env:
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'test_secret_key' }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        MONGO_URI: mongodb://localhost:27017/colosseum_test
       
     - name: Upload coverage report
       uses: actions/upload-artifact@v4

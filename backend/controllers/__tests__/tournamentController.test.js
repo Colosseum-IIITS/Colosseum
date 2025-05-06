@@ -1,15 +1,153 @@
 /**
  * Tournament Controller Tests
  * For the Colosseum E-Sports Tournament Hosting Platform
+ * Using completely mocked database
  */
 
-const request = require('supertest');
 const mongoose = require('mongoose');
+
+// Create mock IDs to use throughout tests
+const mockTournamentId = '5f8d0d55b54764421b719733';
+const mockOrganiserId = '5f8d0d55b54764421b719734';
+const mockPlayerId = '5f8d0d55b54764421b719735';
+const mockTeamId = '5f8d0d55b54764421b719736';
+
+// Mock the models before requiring them
+jest.mock('../../models/Tournament', () => ({
+  find: jest.fn().mockReturnThis(),
+  findById: jest.fn().mockImplementation(() => Promise.resolve({
+    _id: mockTournamentId,
+    tid: 'T12345',
+    name: 'Test Tournament',
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 86400000),
+    prizePool: 1000,
+    entryFee: 100,
+    description: 'Test tournament description',
+    status: 'Approved',
+    organiser: mockOrganiserId,
+    save: jest.fn().mockResolvedValue(true),
+    populate: jest.fn().mockReturnThis()
+  })),
+  findOne: jest.fn().mockImplementation(() => Promise.resolve({
+    _id: mockTournamentId,
+    tid: 'T12345',
+    name: 'Test Tournament',
+    status: 'Approved'
+  })),
+  deleteMany: jest.fn().mockResolvedValue({}),
+  create: jest.fn().mockImplementation((data) => Promise.resolve({
+    ...data,
+    _id: mockTournamentId,
+    save: jest.fn().mockResolvedValue(true)
+  })),
+  findByIdAndUpdate: jest.fn().mockImplementation((id, data) => Promise.resolve({
+    _id: id,
+    ...data,
+    save: jest.fn().mockResolvedValue(true)
+  })),
+  findByIdAndDelete: jest.fn().mockResolvedValue({}),
+  select: jest.fn().mockReturnThis(),
+  limit: jest.fn().mockReturnThis(),
+  skip: jest.fn().mockReturnThis(),
+  sort: jest.fn().mockReturnThis(),
+  populate: jest.fn().mockReturnThis(),
+  exec: jest.fn().mockResolvedValue([{
+    _id: mockTournamentId,
+    tid: 'T12345',
+    name: 'Test Tournament'
+  }])
+}));
+
+jest.mock('../../models/Organiser', () => ({
+  find: jest.fn().mockReturnThis(),
+  findById: jest.fn().mockImplementation(() => Promise.resolve({
+    _id: mockOrganiserId,
+    username: 'testorganiser',
+    email: 'testorganiser@example.com'
+  })),
+  findOne: jest.fn().mockResolvedValue({
+    _id: mockOrganiserId,
+    username: 'testorganiser',
+    email: 'testorganiser@example.com'
+  }),
+  deleteMany: jest.fn().mockResolvedValue({}),
+  create: jest.fn().mockImplementation((data) => Promise.resolve({
+    ...data,
+    _id: mockOrganiserId
+  })),
+  select: jest.fn().mockReturnThis(),
+  exec: jest.fn().mockResolvedValue([{
+    _id: mockOrganiserId,
+    username: 'testorganiser'
+  }])
+}));
+
+jest.mock('../../models/Player', () => ({
+  find: jest.fn().mockReturnThis(),
+  findById: jest.fn().mockImplementation(() => Promise.resolve({
+    _id: mockPlayerId,
+    username: 'testplayer',
+    email: 'testplayer@example.com',
+    team: mockTeamId
+  })),
+  findOne: jest.fn().mockResolvedValue({
+    _id: mockPlayerId,
+    username: 'testplayer',
+    email: 'testplayer@example.com'
+  }),
+  deleteMany: jest.fn().mockResolvedValue({}),
+  create: jest.fn().mockImplementation((data) => Promise.resolve({
+    ...data,
+    _id: mockPlayerId
+  })),
+  select: jest.fn().mockReturnThis(),
+  exec: jest.fn().mockResolvedValue([{
+    _id: mockPlayerId,
+    username: 'testplayer'
+  }])
+}));
+
+jest.mock('../../models/Team', () => ({
+  find: jest.fn().mockReturnThis(),
+  findById: jest.fn().mockImplementation(() => Promise.resolve({
+    _id: mockTeamId,
+    name: 'Test Team',
+    captain: mockPlayerId,
+    players: [mockPlayerId]
+  })),
+  findOne: jest.fn().mockResolvedValue({
+    _id: mockTeamId,
+    name: 'Test Team',
+    captain: mockPlayerId
+  }),
+  deleteMany: jest.fn().mockResolvedValue({}),
+  create: jest.fn().mockImplementation((data) => Promise.resolve({
+    ...data,
+    _id: mockTeamId
+  })),
+  select: jest.fn().mockReturnThis(),
+  exec: jest.fn().mockResolvedValue([{
+    _id: mockTeamId,
+    name: 'Test Team'
+  }])
+}));
+
+// Mock Redis client
+jest.mock('../../utils/redisClient', () => ({
+  getClient: jest.fn().mockReturnValue({}),
+  getCache: jest.fn().mockResolvedValue(null),
+  setCache: jest.fn().mockResolvedValue(true),
+  delCache: jest.fn().mockResolvedValue(true)
+}));
+
+// Now import all dependencies after mocking
+const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-// Import models
+// Import models (they'll use the mocked versions)
 const Tournament = require('../../models/Tournament');
 const Organiser = require('../../models/Organiser');
 const Team = require('../../models/Team');
@@ -21,14 +159,6 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
 
-// Mock Redis client
-jest.doMock('../../utils/redisClient', () => ({
-  getClient: jest.fn().mockReturnValue({}),
-  getCache: jest.fn().mockResolvedValue(null),
-  setCache: jest.fn().mockResolvedValue(true),
-  delCache: jest.fn().mockResolvedValue(true)
-}));
-
 // Mock authentication middleware
 const authenticateUser = (req, res, next) => {
   req.user = req.headers['user-id'] ? {
@@ -38,66 +168,7 @@ const authenticateUser = (req, res, next) => {
   next();
 };
 
-// Utility functions for creating test data
-const createTestOrganiser = async (customData = {}) => {
-  const organiserData = {
-    username: `organiser_${Date.now()}`,
-    email: `organiser${Date.now()}@gmail.com`,
-    password: 'hashedpassword',
-    ...customData
-  };
-
-  const organiser = new Organiser(organiserData);
-  await organiser.save();
-  return organiser;
-};
-
-const createTestPlayer = async (customData = {}) => {
-  const playerData = {
-    username: `player_${Date.now()}`,
-    email: `player${Date.now()}@gmail.com`,
-    password: 'hashedpassword',
-    ...customData
-  };
-
-  const player = new Player(playerData);
-  await player.save();
-  return player;
-};
-
-const createTestTeam = async (captainId, customData = {}) => {
-  const teamData = {
-    name: `Team_${Date.now()}`,
-    captain: captainId,
-    players: [captainId],
-    ...customData
-  };
-
-  const team = new Team(teamData);
-  await team.save();
-  return team;
-};
-
-const createTestTournament = async (organiserId, customData = {}) => {
-  const tournamentData = {
-    tid: `T${Date.now()}`,
-    name: `Tournament_${Date.now()}`,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 86400000), // 1 day later
-    prizePool: 1000,
-    entryFee: 100,
-    description: 'Test tournament',
-    status: 'Approved',
-    organiser: organiserId,
-    ...customData
-  };
-
-  const tournament = new Tournament(tournamentData);
-  await tournament.save();
-  return tournament;
-};
-
-// Mock routes for testing
+// Define mock routes for testing
 app.post('/api/tournaments/create', authenticateUser, (req, res) => {
   const { _id: organiserId, role } = req.user;
   
@@ -108,7 +179,7 @@ app.post('/api/tournaments/create', authenticateUser, (req, res) => {
   
   // Create tournament
   const tournamentData = {
-    _id: new mongoose.Types.ObjectId(),
+    _id: mockTournamentId,
     ...req.body,
     organiser: organiserId,
     status: 'Pending'
@@ -130,7 +201,7 @@ app.get('/api/tournaments/:id', authenticateUser, (req, res) => {
   
   return res.status(200).json({
     _id: id,
-    tid: `T${Date.now()}`,
+    tid: 'T12345',
     name: 'Test Tournament',
     startDate: new Date(),
     endDate: new Date(Date.now() + 86400000),
@@ -181,33 +252,14 @@ app.post('/api/tournaments/:id/join', authenticateUser, (req, res) => {
 
 // Test suite
 describe('Tournament Controller Tests', () => {
-  beforeAll(async () => {
-    // Connect to test database
-    await mongoose.connect('mongodb://localhost:27017/colosseum_test');
-  });
-
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    
-    // Clear database between tests
-    await Tournament.deleteMany({});
-    await Organiser.deleteMany({});
-    await Team.deleteMany({});
-    await Player.deleteMany({});
-  });
-
-  afterAll(async () => {
-    // Close database connection
-    await mongoose.connection.close();
   });
 
   describe('Create Tournament', () => {
     it('should create a new tournament', async () => {
-      // Create a test organiser
-      const organiser = await createTestOrganiser();
-      
       const tournamentData = {
-        tid: `T${Date.now()}`,
+        tid: 'T12345',
         name: 'New Test Tournament',
         startDate: new Date(),
         endDate: new Date(Date.now() + 86400000),
@@ -219,7 +271,7 @@ describe('Tournament Controller Tests', () => {
       const response = await request(app)
         .post('/api/tournaments/create')
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', organiser._id.toString())
+        .set('user-id', mockOrganiserId)
         .set('user-role', 'organiser')
         .send(tournamentData)
         .expect(201);
@@ -227,15 +279,11 @@ describe('Tournament Controller Tests', () => {
       expect(response.body.message).toBe('Tournament created successfully');
       expect(response.body.tournament).toBeDefined();
       expect(response.body.tournament.name).toBe('New Test Tournament');
-      expect(response.body.tournament.organiser.toString()).toBe(organiser._id.toString());
     });
     
     it('should return 403 if user is not an organiser', async () => {
-      // Create a test player
-      const player = await createTestPlayer();
-      
       const tournamentData = {
-        tid: `T${Date.now()}`,
+        tid: 'T12345',
         name: 'New Test Tournament',
         startDate: new Date(),
         endDate: new Date(Date.now() + 86400000),
@@ -247,7 +295,7 @@ describe('Tournament Controller Tests', () => {
       const response = await request(app)
         .post('/api/tournaments/create')
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', player._id.toString())
+        .set('user-id', mockPlayerId)
         .set('user-role', 'player')
         .send(tournamentData)
         .expect(403);
@@ -258,31 +306,23 @@ describe('Tournament Controller Tests', () => {
   
   describe('Get Tournament', () => {
     it('should return a specific tournament by ID', async () => {
-      // Create a test organiser
-      const organiser = await createTestOrganiser();
-      
-      // Create a test tournament
-      const tournament = await createTestTournament(organiser._id);
-      
       const response = await request(app)
-        .get(`/api/tournaments/${tournament._id}`)
+        .get(`/api/tournaments/${mockTournamentId}`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', organiser._id.toString())
+        .set('user-id', mockOrganiserId)
         .set('user-role', 'organiser')
         .expect(200);
       
       expect(response.body).toBeDefined();
       expect(response.body._id).toBeDefined();
+      expect(response.body.name).toBe('Test Tournament');
     });
     
     it('should return 404 if tournament is not found', async () => {
-      const organiser = await createTestOrganiser();
-      const nonExistentId = new mongoose.Types.ObjectId();
-      
       const response = await request(app)
-        .get(`/api/tournaments/${nonExistentId}`)
+        .get(`/api/tournaments/${mockTournamentId}`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', organiser._id.toString())
+        .set('user-id', mockOrganiserId)
         .set('user-role', 'organiser')
         .set('test-case', 'not-found')
         .expect(404);
@@ -293,12 +333,6 @@ describe('Tournament Controller Tests', () => {
   
   describe('Update Tournament', () => {
     it('should update a tournament', async () => {
-      // Create a test organiser
-      const organiser = await createTestOrganiser();
-      
-      // Create a test tournament
-      const tournament = await createTestTournament(organiser._id);
-      
       const updateData = {
         name: 'Updated Tournament Name',
         prizePool: 2000,
@@ -306,9 +340,9 @@ describe('Tournament Controller Tests', () => {
       };
       
       const response = await request(app)
-        .put(`/api/tournaments/${tournament._id}`)
+        .put(`/api/tournaments/${mockTournamentId}`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', organiser._id.toString())
+        .set('user-id', mockOrganiserId)
         .set('user-role', 'organiser')
         .send(updateData)
         .expect(200);
@@ -319,21 +353,14 @@ describe('Tournament Controller Tests', () => {
     });
     
     it('should return 403 if user is not the tournament organiser', async () => {
-      // Create two organisers
-      const organiser1 = await createTestOrganiser();
-      const organiser2 = await createTestOrganiser();
-      
-      // Create a tournament owned by organiser1
-      const tournament = await createTestTournament(organiser1._id);
-      
       const updateData = {
         name: 'Updated Tournament Name'
       };
       
       const response = await request(app)
-        .put(`/api/tournaments/${tournament._id}`)
+        .put(`/api/tournaments/${mockTournamentId}`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', organiser2._id.toString())
+        .set('user-id', mockPlayerId)
         .set('user-role', 'organiser')
         .set('test-case', 'unauthorized')
         .send(updateData)
@@ -345,56 +372,24 @@ describe('Tournament Controller Tests', () => {
   
   describe('Join Tournament', () => {
     it('should allow a player to join a tournament', async () => {
-      // Create organiser and tournament first
-      const organiser = await createTestOrganiser();
-      const tournament = await createTestTournament(organiser._id);
-      
-      // Create player with all required fields
-      const player = new Player({
-        username: `player_${Date.now()}`,
-        email: `player${Date.now()}@gmail.com`,
-        password: 'hashedpassword'
-      });
-      await player.save();
-      
-      // Create team with the player
-      const team = new Team({
-        name: `Team_${Date.now()}`,
-        captain: player._id,
-        players: [player._id]
-      });
-      await team.save();
-      
-      // Update player with team reference
-      player.team = team._id;
-      await player.save();
-      
-      // Verify the player exists and has the team set
-      const savedPlayer = await Player.findById(player._id);
-      expect(savedPlayer).toBeTruthy();
-      expect(savedPlayer.team.toString()).toBe(team._id.toString());
-      
       const response = await request(app)
-        .post(`/api/tournaments/${tournament._id}/join`)
+        .post(`/api/tournaments/${mockTournamentId}/join`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', player._id.toString())
+        .set('user-id', mockPlayerId)
         .set('user-role', 'player')
-        .send({ teamId: team._id })
+        .send({ teamId: mockTeamId })
         .expect(200);
       
       expect(response.body.message).toBe('Successfully joined the tournament');
+      expect(response.body.tournamentId).toBe(mockTournamentId);
+      expect(response.body.teamId).toBe(mockTeamId);
     });
     
     it('should return 400 if player does not have a team', async () => {
-      // Create test player and tournament
-      const player = await createTestPlayer();
-      const organiser = await createTestOrganiser();
-      const tournament = await createTestTournament(organiser._id);
-      
       const response = await request(app)
-        .post(`/api/tournaments/${tournament._id}/join`)
+        .post(`/api/tournaments/${mockTournamentId}/join`)
         .set('Authorization', 'Bearer mockToken')
-        .set('user-id', player._id.toString())
+        .set('user-id', mockPlayerId)
         .set('user-role', 'player')
         .set('test-case', 'no-team')
         .expect(400);

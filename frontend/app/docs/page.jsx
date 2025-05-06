@@ -92,45 +92,50 @@ const ApiDocs = () => {
   };
 
   return (
-    <div className="p-8 font-sans">
-      <h1 className="text-4xl font-bold mb-8">📘 API Documentation</h1>
+    <div className="min-h-screen bg-black text-white p-8 font-sans flex flex-col items-center">
+      <h1 className="text-4xl font-bold mb-8 text-center">API Documentation</h1>
 
-      {apiRoutes.map((section, index) => (
-        <div key={index} className="mb-12">
-          <h2 className="text-2xl font-semibold text-blue-600 mb-4">{section.group}</h2>
-          <p className="text-gray-700 mb-2">
-            Base URL:{' '}
-            <code className="bg-gray-100 px-2 py-1 rounded">{section.basePath}</code>
-          </p>
-          <div className="space-y-4 mt-4">
-            {section.routes.map((route, idx) => {
-              const routeKey = `${section.basePath}${route.path}`;
-              return (
-                <div
-                  key={idx}
-                  className="border border-gray-200 rounded p-4 shadow-sm cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleRouteClick(section.basePath, route)}
-                >
-                  <p className="text-sm font-mono text-green-600">{route.method}</p>
-                  <p className="text-lg font-medium">{route.path}</p>
-                  <p className="text-gray-600 mt-1">{route.description}</p>
-                  {responses[routeKey] && (
-                    <div className="mt-4 bg-gray-100 p-4 rounded">
-                      {loading[routeKey] ? (
-                        <p className="text-blue-500">Loading...</p>
-                      ) : (
-                        <pre className="text-sm text-gray-800">
-                          {JSON.stringify(responses[routeKey], null, 2)}
-                        </pre>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+      {/* Warning Message */}
+      <div className="bg-red-800 border-l-4 border-red-600 text-red-300 p-4 mb-8 rounded shadow-lg w-full max-w-3xl">
+        <p className="font-medium text-center">
+           You can hit 15 API calls from a particular IP in a span of 10 minutes.
+        </p>
+      </div>
+
+      <div className="w-full max-w-3xl space-y-6">
+        {apiRoutes.map((section, index) => (
+          <div key={index} className="bg-gray-900 rounded-lg p-6 shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4">{section.group}</h2>
+            <div className="space-y-4">
+              {section.routes.map((route, idx) => {
+                const routeKey = `${section.basePath}${route.path}`;
+                return (
+                  <div
+                    key={idx}
+                    className="border border-gray-700 rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-800 transition-all duration-300 bg-gray-900"
+                    onClick={() => handleRouteClick(section.basePath, route)}
+                  >
+                    <p className="text-sm font-mono text-gray-400">{route.method}</p>
+                    <p className="text-lg font-medium">{route.path}</p>
+                    <p className="text-gray-400 mt-1">{route.description}</p>
+                    {responses[routeKey] && (
+                      <div className="mt-4 bg-gray-800 p-4 rounded-lg">
+                        {loading[routeKey] ? (
+                          <p className="text-gray-400">Loading...</p>
+                        ) : (
+                          <pre className="text-sm text-gray-300">
+                            {JSON.stringify(responses[routeKey], null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

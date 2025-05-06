@@ -100,7 +100,7 @@ const PlayerProfile = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="w-[70%] mt-[20px] mx-auto">
+      <div className="w-[91%] mt-[20px] mx-auto">
         <Navbar /> {/* Navbar at the top */}
       </div>
       <main className="flex-grow container mx-auto px-6 py-12">

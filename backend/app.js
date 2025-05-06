@@ -10,7 +10,6 @@ const morgan = require('morgan');
 const cors = require('cors');
 const rfs = require("rotating-file-stream");
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 
 // Import routes
 const playerRoutes = require('./routes/playerRoutes');
@@ -23,7 +22,6 @@ const adminRoutes = require('./routes/adminRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const b2cRoutes = require('./externalApis/b2c/routes');
 const b2bRoutes = require('./externalApis/b2b/routes');
-
 
 const app = express();
 
@@ -58,18 +56,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// Rate limiting
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again after 15 minutes',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-
-// Apply rate limiting to API routes
-app.use('/api/', apiLimiter);
 
 // Configure logging based on environment
 let morganFormat;
@@ -112,12 +98,10 @@ if (!isProduction) {
   app.use('/', authenticateUser, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 }
 
-// Global error handler
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || 'Something went wrong';
-  
-  // Don't expose sensitive error details in production
+
   const errorResponse = isProduction 
     ? { message } 
     : { message, stack: err.stack, details: err };
@@ -126,7 +110,6 @@ app.use((err, req, res, next) => {
   res.status(status).json(errorResponse);
 });
 
-// 404 handler - should be after all defined routes
 app.use((req, res) => {
   res.status(404).json({ message: 'Resource not found' });
 });

@@ -21,7 +21,7 @@ const Dashboard = () => {
   // Fetch CSRF token once when dashboard loads
   // useEffect(() => {
   //   console.log('Dashboard - Fetching CSRF token');
-  //   fetch('http://localhost:5000/auth/csrfToken', {
+  //   fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/csrfToken`, {
   //     credentials: 'include',
   //     cache: 'no-store'
   //   })

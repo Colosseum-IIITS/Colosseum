@@ -37,7 +37,7 @@ export function TopOrganisersChart() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/organiser/top-organisers');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/top-organisers`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

@@ -10,7 +10,7 @@ const OrganiserItem = ({ organiser }) => {
     const token = localStorage.getItem('user_jwt');
     
     try {
-      const response = await fetch('http://localhost:5000/api/player/unFollowOrganiser', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/unFollowOrganiser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

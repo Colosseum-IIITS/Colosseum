@@ -26,7 +26,7 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
   const [csrfToken,setCsrfToken] = useState('');
 
   useEffect(() => {
-        fetch('http://localhost:5000/auth/csrfToken', { credentials: 'include' })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/csrfToken`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => setCsrfToken(data.csrfToken))
             .catch(error => console.error('Error fetching CSRF token:', error));
@@ -56,7 +56,7 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/tournament/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ const OrganiserNavbar = ({ handleOpenDialog }) => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/organiser/getOrganiserName", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/getOrganiserName`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

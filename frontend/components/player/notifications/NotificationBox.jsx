@@ -10,7 +10,7 @@ const NotificationDropdown = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/tournament/notifications', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/notifications`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ export default function BanHistory() {
   // Fetch Ban History from the backend API
   const fetchBanHistory = async () => {
     try {
-      const response = await fetch('http://localhost:5000/admin/banhistory');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/admin/banhistory`);
       if (!response.ok) {
         throw new Error('Failed to fetch ban history');
       }
@@ -42,9 +42,9 @@ export default function BanHistory() {
     try {
       let apiUrl = '';
       if (entityType === 'Organiser') {
-        apiUrl = `http://localhost:5000/admin/unban/organiser/${bannedEntityId}`;
+        apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/admin/unban/organiser/${bannedEntityId}`;
       } else if (entityType === 'Player') {
-        apiUrl = `http://localhost:5000/admin/unban/player/${bannedEntityId}`;
+        apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/admin/unban/player/${bannedEntityId}`;
       }
 
       const response = await fetch(apiUrl, {

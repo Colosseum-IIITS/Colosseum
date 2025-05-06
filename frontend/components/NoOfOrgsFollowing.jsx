@@ -12,7 +12,7 @@ const NoOfOrgsFollowing = () => {
   useEffect(() => {
     const fetchFollowedOrganisers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/player/followedOrg', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/followedOrg`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`, // Fetch with authorization token
           },

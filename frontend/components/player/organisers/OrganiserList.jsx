@@ -10,7 +10,7 @@ const OrganiserList = () => {
     const fetchFollowedOrganisers = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:5000/api/player/followedOrg", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/followedOrg`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

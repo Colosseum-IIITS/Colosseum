@@ -43,7 +43,7 @@ function AuthPageContent() {
     setErrorMessage(""); // Reset error message before each submit
 
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -156,7 +156,7 @@ function AuthPageContent() {
           </div>
 
           <div className="mt-4 text-center">
-            <Button variant="link" onClick={() => router.push("http://localhost:3000/")}>
+            <Button variant="link" onClick={() => router.push("/")}>
               Back to Role Selection
             </Button>
           </div>

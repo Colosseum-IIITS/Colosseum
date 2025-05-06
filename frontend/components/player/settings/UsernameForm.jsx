@@ -18,7 +18,7 @@ const   UsernameForm = () => {
     const username = e.target.username.value.trim();
 
     try {
-      const response = await fetch('http://localhost:5000/api/player/updateUsername', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/updateUsername`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

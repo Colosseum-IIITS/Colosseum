@@ -31,7 +31,7 @@ export default function CheckoutForm({ amount, type }) {
       }
 
       // Create payment intent
-      const intentResponse = await fetch('http://localhost:5000/api/payment/create-payment-intent', {
+      const intentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/payment/create-payment-intent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function CheckoutForm({ amount, type }) {
       }
 
       // Confirm payment with backend
-      const confirmResponse = await fetch('http://localhost:5000/api/payment/confirm-payment', {
+      const confirmResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/payment/confirm-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

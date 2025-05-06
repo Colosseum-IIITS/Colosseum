@@ -21,7 +21,7 @@ const SearchBar = () => {
       return;
     }
 
-    const baseUrl = 'http://localhost:5000'
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
     let actionUrl = '';
     let updatedSearchTerm = searchTerm;
 

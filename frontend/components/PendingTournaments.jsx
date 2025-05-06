@@ -24,7 +24,7 @@ export default function PendingTournament() {
   const handleApproveTournament = async (tournamentId) => {
     setApprovingIds((prev) => [...prev, tournamentId]);
     try {
-      const response = await fetch(`http://localhost:5000/admin/approve/tournament/${tournamentId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/admin/approve/tournament/${tournamentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

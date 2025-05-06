@@ -19,10 +19,10 @@ const SearchProf = () => {
     // Determine the type of search based on the first character
     let searchUrl = '';
     if (searchTerm.startsWith('-')) {
-      searchUrl = `http://localhost:5000/api/player/searchPlayer?searchTerm=${searchTerm.slice(1)}`;
+      searchUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/searchPlayer?searchTerm=${searchTerm.slice(1)}`;
     } else if (searchTerm.startsWith('>')) {
       // Updated to the correct route for teams
-      searchUrl = `http://localhost:5000/api/player/TeamName?searchTerm=${searchTerm.slice(1)}`;
+      searchUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/TeamName?searchTerm=${searchTerm.slice(1)}`;
     } else {
       alert("Invalid search format. Use '>' for teams and '-' for players");
       return;

@@ -24,7 +24,7 @@ export function TournamentPrizePoolChart() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/organiser/tournament-prize-pool-averages')
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/tournament-prize-pool-averages`)
         if (!response.ok) {
           throw new Error('Failed to fetch data')
         }

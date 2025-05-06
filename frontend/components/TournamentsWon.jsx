@@ -22,7 +22,7 @@ const TournamentsWon = () => {
 
     const fetchTournamentsWon = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/player/tournamentsWon', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/tournamentsWon`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

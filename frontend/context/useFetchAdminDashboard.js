@@ -8,7 +8,7 @@ const useFetchAdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/admin/dashboard'); // Your API endpoint here
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/admin/dashboard`); // Your API endpoint here
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
         }

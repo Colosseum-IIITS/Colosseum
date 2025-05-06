@@ -33,7 +33,7 @@ const TeamDashboard = () => {
         }
 
         console.log('Fetching user profile...');
-        const profileResponse = await fetch('http://localhost:5000/api/player/profile', {
+        const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/player/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -68,7 +68,7 @@ const TeamDashboard = () => {
   const fetchTeamData = async (token) => {
     try {
       console.log('Fetching team data...');
-      const response = await fetch('http://localhost:5000/api/team/dashboard', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/dashboard`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -101,7 +101,7 @@ const TeamDashboard = () => {
 
   const handleRemovePlayer = async (playerId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/team/remove/${playerId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/remove/${playerId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_jwt')}`,
@@ -148,7 +148,7 @@ const TeamDashboard = () => {
       }
 
       console.log('Creating team with name:', teamName);
-      const response = await fetch('http://localhost:5000/api/team/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ const TeamDashboard = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/team/leave', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/leave`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -217,7 +217,7 @@ const TeamDashboard = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/team/updateTeamName', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/team/updateTeamName`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

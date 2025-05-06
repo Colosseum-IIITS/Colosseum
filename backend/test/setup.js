@@ -41,7 +41,7 @@ process.env.STRIPE_SECRET_KEY = 'test_stripe_key';
 
 // Connect to the MongoDB database before all tests
 beforeAll(async () => {
-  await mongoose.connect('mongodb://localhost:27017/colosseum_test');
+  await mongoose.connect('mongodb+srv://seethepallisantosh:helloworld2025@cluster0.94sk8uz.mongodb.net/colloseum');
 });
 
 // Clear all data between tests

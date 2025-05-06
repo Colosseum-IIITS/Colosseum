@@ -51,24 +51,32 @@ jobs:
     - name: Run tests
       run: npm test
       env:
-        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'test_secret_key' }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
-        EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
-        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'projectK' }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_51R0qHKRw9Dgc53hC6vsqvVfzBFdhRMunzD53k793pBruT5kNUkX6SzYEDJ3kPtByKUd3Wk8AgD5gJqtFxJYGbXlV00M2mQ0Ecv' }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER || 'ritwikkarthikeya.k22@iiits.in' }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'pkmzadnddqomigii' }}
         ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'projectK' }}
+        AUTH_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN_SECRET || 'projectK' }}
+        NODE_ENV: test
+        API_BASE_URL: http://localhost:5000
         MONGO_URI: mongodb://localhost:27017/colosseum_test
+        PORT: 5000
         
     - name: Generate coverage report
       run: npm run test:coverage
       env:
-        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'test_secret_key' }}
-        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'test_stripe_key' }}
-        EMAIL_USER: ${{ secrets.EMAIL_USER || 'test@example.com' }}
-        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'test_password' }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'projectK' }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_51R0qHKRw9Dgc53hC6vsqvVfzBFdhRMunzD53k793pBruT5kNUkX6SzYEDJ3kPtByKUd3Wk8AgD5gJqtFxJYGbXlV00M2mQ0Ecv' }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER || 'ritwikkarthikeya.k22@iiits.in' }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS || 'pkmzadnddqomigii' }}
         ADMIN_CODE: ${{ secrets.ADMIN_CODE || 'testadmincode' }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET || 'testsecret' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'projectK' }}
+        AUTH_TOKEN_SECRET: ${{ secrets.AUTH_TOKEN_SECRET || 'projectK' }}
+        NODE_ENV: test
+        API_BASE_URL: http://localhost:5000
         MONGO_URI: mongodb://localhost:27017/colosseum_test
+        PORT: 5000
       
     - name: Upload coverage report
       uses: actions/upload-artifact@v4

@@ -49,9 +49,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -59,11 +57,17 @@ app.use(cors({
       callback(null, false);
     }
   },
-  credentials: true,                  // Allow cookies to be sent
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'Origin', 'Accept'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Origin',
+    'Accept',
+    'Cache-Control'
+  ],
   exposedHeaders: ['Set-Cookie', 'Date', 'ETag'],
-  maxAge: 86400                       // Cache preflight requests for 24 hours
+  maxAge: 86400
 }));
 
 // Configure logging based on environment

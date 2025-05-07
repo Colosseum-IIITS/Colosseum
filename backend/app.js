@@ -29,18 +29,40 @@ const app = express();
 const NODE_ENV = process.env.NODE_ENV || "development";
 const isProduction = NODE_ENV === "production";
 
-// Security headers
-app.use(helmet());
+// Security headers - relaxed for cross-domain cookies
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false,
+  })
+);
 
-// CORS configuration
+// CORS configuration - updated for cross-domain authentication
+const allowedOrigins = [
+  'http://localhost:3000',            // Local frontend
+  'https://colosseum-zeta.vercel.app', // Deployed frontend
+  'https://colosseum-git-main-vihaans-projects.vercel.app',
+  'https://colosseum-phi.vercel.app',
+  // Add any other frontend domains here
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000', // Local development
-    'https://colosseum-zeta.vercel.app' // Deployed frontend
-  ],
-  credentials: true, // Allow cookies to be sent
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log(`Origin ${origin} not allowed by CORS`);
+      callback(null, false);
+    }
+  },
+  credentials: true,                  // Allow cookies to be sent
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'Origin', 'Accept'],
+  exposedHeaders: ['Set-Cookie', 'Date', 'ETag'],
+  maxAge: 86400                       // Cache preflight requests for 24 hours
 }));
 
 // Configure logging based on environment

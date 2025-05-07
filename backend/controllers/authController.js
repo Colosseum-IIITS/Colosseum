@@ -40,20 +40,31 @@ exports.createPlayer = async (req, res) => {
 
         await player.save();
 
-        const token = jwt.sign({ id: player._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: player._id, role: 'player' }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
 
+        // Set cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
         // Send confirmation email
         await sendConfirmationEmail(email, username);
 
-        res.status(201).json({ message: 'Player registered successfully', token });
+        // Return the token in the response body for localStorage
+        res.status(201).json({ 
+            message: 'Player registered successfully', 
+            token,
+            user: {
+                id: player._id,
+                username: player.username,
+                email: player.email,
+                role: 'player'
+            }
+        });
     } catch (error) {
         console.error('Error during player creation:', error.message);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
@@ -105,26 +116,37 @@ exports.loginPlayer = async (req, res) => {
 
         // Create a JWT token with the player's ID and role as 'player'
         const token = jwt.sign(
-            { id: player._id, role: 'player' }, // Add role as 'player' to the payload
+            { id: player._id, role: 'player' },
             process.env.JWT_SECRET_KEY,
-            { expiresIn: '1h' }
+            { expiresIn: '24h' }
         );
 
-        // Set the token as an HttpOnly cookie (for secure storage)
+        // Set the token as an HttpOnly cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
-        res.status(200).json({ message: 'Login successful', token });
+        // Return the token in the response body for localStorage
+        res.status(200).json({ 
+            message: 'Login successful', 
+            token,
+            user: {
+                id: player._id,
+                username: player.username,
+                email: player.email,
+                role: 'player'
+            }
+        });
     } catch (error) {
         console.error('Error during player login:', error);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
     }
 };
+
 // Register a new organiser
 exports.createOrganiser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -153,17 +175,28 @@ exports.createOrganiser = async (req, res) => {
 
         await organiser.save();
 
-        const token = jwt.sign({ id: organiser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: organiser._id, role: 'organiser' }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
 
+        // Set cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
-        res.status(201).json({ message: 'Organiser registered successfully', token });
+        // Return the token in the response body for localStorage
+        res.status(201).json({ 
+            message: 'Organiser registered successfully', 
+            token,
+            user: {
+                id: organiser._id,
+                username: organiser.username,
+                email: organiser.email,
+                role: 'organiser'
+            }
+        });
     } catch (error) {
         console.error('Error during organiser creation:', error);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
@@ -171,7 +204,6 @@ exports.createOrganiser = async (req, res) => {
 };
 
 // Organiser login
-
 exports.loginOrganiser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -195,21 +227,31 @@ exports.loginOrganiser = async (req, res) => {
 
         // Create a JWT token with the organiser's ID and role
         const token = jwt.sign(
-            { id: organiser._id, role: 'organiser' }, // Add role as 'organiser' to the payload
+            { id: organiser._id, role: 'organiser' },
             process.env.JWT_SECRET_KEY,
-            { expiresIn: '1h' }
+            { expiresIn: '24h' }
         );
 
-        // Set the token as an HttpOnly cookie (for secure storage)
+        // Set the token as an HttpOnly cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
-        res.status(200).json({ message: 'Login successful', token });
+        // Return the token in the response body for localStorage
+        res.status(200).json({ 
+            message: 'Login successful', 
+            token,
+            user: {
+                id: organiser._id,
+                username: organiser.username,
+                email: organiser.email,
+                role: 'organiser'
+            }
+        });
     } catch (error) {
         console.error('Error during organiser login:', error);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
@@ -236,17 +278,28 @@ exports.createAdmin = async (req, res) => {
         });
 
         await newAdmin.save();
-        const token = jwt.sign({ id: newAdmin._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: newAdmin._id, role: 'admin' }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
 
+        // Set cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
-        res.status(201).json({ message: 'Admin registered successfully' });
+        // Return the token in the response body for localStorage
+        res.status(201).json({ 
+            message: 'Admin registered successfully',
+            token,
+            user: {
+                id: newAdmin._id,
+                username: newAdmin.username,
+                email: newAdmin.email,
+                role: 'admin'
+            }
+        });
     } catch (error) {
         console.error('Error creating admin:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -270,21 +323,31 @@ exports.loginAdmin = async (req, res) => {
 
         // Create a JWT token with the user ID and role
         const token = jwt.sign(
-            { id: admin._id, role: 'admin' }, // Add role as 'admin' to the payload
+            { id: admin._id, role: 'admin' },
             process.env.JWT_SECRET_KEY,
-            { expiresIn: '1h' }
+            { expiresIn: '24h' }
         );
 
-        // Set the token as an HttpOnly cookie (for secure storage)
+        // Set the token as an HttpOnly cookie with SameSite=None for cross-domain
         res.cookie('user_jwt', token, {
             httpOnly: true,
-            maxAge: 3600000, // 1 hour
-            secure: process.env.NODE_ENV === 'production', // Secure cookie in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 86400000, // 24 hours
+            secure: true, // Always use secure cookies for cross-domain
+            sameSite: 'None', // Required for cross-domain cookies
             path: '/'
         });
 
-        res.status(200).json({ message: 'Login successful', token });
+        // Return the token in the response body for localStorage
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: admin._id,
+                username: admin.username,
+                email: admin.email,
+                role: 'admin'
+            }
+        });
     } catch (error) {
         console.error('Error during admin login:', error);
         res.status(500).json({ statusCode: 500, errorMessage: 'Internal Server Error' });
@@ -292,11 +355,11 @@ exports.loginAdmin = async (req, res) => {
 };
 
 // Signout
-const signout = (req, res) => {
+exports.signout = (req, res) => {
     res.cookie('user_jwt', '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: true,
+        sameSite: 'None',
         path: '/',
         expires: new Date(0) // Expire immediately
     });

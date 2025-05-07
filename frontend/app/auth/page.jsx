@@ -52,7 +52,7 @@ function AuthPageContent() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        credentials: "include", // For cross-origin cookie handling
+        // Removed credentials: "include" as it causes issues in cross-domain scenarios
       });
 
       console.log("Response status:", res.status);
@@ -62,26 +62,36 @@ function AuthPageContent() {
       console.log("Response data:", responseData);
 
       if (res.ok) {
-        // Store auth info in localStorage for immediate use
+        // Always use token-based auth for cross-domain deployment
+        // Store all necessary auth info in localStorage
         if (responseData.token) {
           localStorage.setItem("token", responseData.token);
           localStorage.setItem("userRole", role);
           localStorage.setItem("isAuthenticated", "true");
-          console.log("Token stored in localStorage");
+          
+          // Store any additional user data if available
+          if (responseData.user) {
+            localStorage.setItem("userData", JSON.stringify(responseData.user));
+          }
+          
+          console.log("Auth data stored in localStorage");
+        } else {
+          console.error("No token received in the response");
+          setErrorMessage("Authentication error. No token received.");
+          setLoading(false);
+          return;
         }
 
         console.log(`Redirecting to ${role} dashboard`);
 
-        // Force a slight delay to ensure cookies and localStorage are set before redirect
-        setTimeout(() => {
-          if (role === "player") {
-            router.push("/player/home");
-          } else if (role === "admin") {
-            router.push("/admin/user-management");
-          } else {
-            router.push("/org/dashboard");
-          }
-        }, 300);
+        // Redirect to the appropriate dashboard
+        if (role === "player") {
+          router.push("/player/home");
+        } else if (role === "admin") {
+          router.push("/admin/user-management");
+        } else {
+          router.push("/org/dashboard");
+        }
       } else {
         console.error("Error response:", responseData);
         setErrorMessage(responseData.errorMessage || "Something went wrong.");

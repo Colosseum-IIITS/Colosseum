@@ -38,36 +38,53 @@ function AuthPageContent() {
 
   const handleSubmit = async (data) => {
     const endpoint = `/auth/${role}/${isSignUp ? "signup" : "signin"}`;
-
+    
     setLoading(true);
     setErrorMessage(""); // Reset error message before each submit
-
+    
+    console.log(`Attempting to ${isSignUp ? "sign up" : "sign in"} as ${role}`);
+    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`);
+    
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
-        credentials: "include", // Added for cross-origin cookie handling
+        credentials: "include", // For cross-origin cookie handling
       });
-
+      
+      console.log("Response status:", res.status);
+      console.log("Response headers:", [...res.headers.entries()]);
+      
+      const responseData = await res.json();
+      console.log("Response data:", responseData);
+      
       if (res.ok) {
-        const responseData = await res.json();
-
-        // Save token in localStorage if present
+        // Store auth info in localStorage for immediate use
         if (responseData.token) {
           localStorage.setItem("token", responseData.token);
+          localStorage.setItem("userRole", role);
+          localStorage.setItem("isAuthenticated", "true");
+          console.log("Token stored in localStorage");
         }
         
-        if (role === "player") {
-          router.push("/player/home");
-        } else if( role == "admin") {
-          router.push("/admin/user-management");
-        } else {
-          router.push("/org/dashboard");
-        }
+        console.log(`Redirecting to ${role} dashboard`);
+        
+        // Force a slight delay to ensure cookies and localStorage are set before redirect
+        setTimeout(() => {
+          if (role === "player") {
+            router.push("/player/home");
+          } else if (role === "admin") {
+            router.push("/admin/user-management");
+          } else {
+            router.push("/org/dashboard");
+          }
+        }, 300);
       } else {
-        const errorData = await res.json();
-        setErrorMessage(errorData.errorMessage || "Something went wrong.");
+        console.error("Error response:", responseData);
+        setErrorMessage(responseData.errorMessage || "Something went wrong.");
       }
     } catch (error) {
       console.error("Error during submission:", error);

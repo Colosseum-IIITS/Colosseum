@@ -65,6 +65,9 @@ export const apiRequest = async (endpoint, options = {}) => {
     options.headers['Authorization'] = `Bearer ${token}`;
   }
   
+  // Always include credentials to allow cookies to be sent
+  options.credentials = 'include';
+  
   const url = `${getApiUrl()}${endpoint}`;
   console.log(`Making API request to: ${url}`);
   

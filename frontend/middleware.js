@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 // Set a secret key directly for verifying JWT tokens
-// WARNING: In production, this should be set through environment variables properly
 const JWT_SECRET = process.env.JWT_SECRET_KEY || 'fallback-secret-only-for-development';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
@@ -21,9 +20,9 @@ export async function middleware(req) {
     return NextResponse.next();
   }
 
-  // Look for authentication in either the 'user_jwt' cookie or a token cookie
+  // Look for authentication in any available cookie
   const userJwtCookie = req.cookies.get('user_jwt')?.value;
-  const tokenCookie = req.cookies.get('token')?.value; // Also try 'token' as your backend might use this name
+  const tokenCookie = req.cookies.get('token')?.value;
   
   // Try to extract token from Authorization header as fallback
   const authHeader = req.headers.get('authorization');
@@ -47,15 +46,28 @@ export async function middleware(req) {
       return NextResponse.next();
     }
     
-    return NextResponse.redirect(new URL('/', req.url));
+    // Create the response
+    const response = NextResponse.redirect(new URL('/', req.url));
+    
+    // Set a cookie that the client can read to know auth failed
+    // This will trigger useAuth in the client to clear localStorage
+    response.cookies.set('auth_failed', '1', { 
+      path: '/',
+      maxAge: 10 // Short-lived cookie
+    });
+    
+    return response;
   }
   
   try {
+    // Get route prefix (/admin, /org, /player)
+    const routePrefix = '/' + pathname.split('/')[1];
+    
     // Attempt to verify the token
     const { payload } = await jwtVerify(token, secret);
-    const { role } = payload;
+    const userRole = payload.role;
     
-    console.log(`JWT verification succeeded. User role: ${role}`);
+    console.log(`JWT verification succeeded. User role: ${userRole}`);
     
     // Define roles allowed for specific routes
     const roleAccess = {
@@ -64,26 +76,37 @@ export async function middleware(req) {
       '/player': ['player', 'admin']
     };
     
-    // Get route prefix (/admin, /org, /player)
-    const routePrefix = '/' + pathname.split('/')[1];
     const allowedRoles = roleAccess[routePrefix] || [];
     
-    if (!allowedRoles.includes(role)) {
-      console.log(`Access denied: User role ${role} not authorized for ${routePrefix}`);
+    if (!allowedRoles.includes(userRole)) {
+      console.log(`Access denied: User role ${userRole} not authorized for ${routePrefix}`);
       return NextResponse.redirect(new URL('/no-access', req.url));
     }
     
     // Clone the request and set role headers for downstream components
     const requestHeaders = new Headers(req.headers);
-    requestHeaders.set('x-user-role', role);
+    requestHeaders.set('x-user-role', userRole);
+    requestHeaders.set('x-user-id', payload.id);
     
-    // Allow the request to proceed
-    return NextResponse.next({
+    // Create response that continues the request
+    const response = NextResponse.next({
       request: {
         headers: requestHeaders
       }
     });
     
+    // If we didn't have the token in a cookie but it was valid,
+    // set it in a cookie so future requests can use it
+    if (!userJwtCookie && !tokenCookie && token) {
+      response.cookies.set('token', token, {
+        path: '/',
+        maxAge: 86400, // 1 day
+        httpOnly: false, // Allow JavaScript access
+        sameSite: 'lax',
+      });
+    }
+    
+    return response;
   } catch (error) {
     console.error('JWT verification failed:', error);
     
@@ -92,7 +115,16 @@ export async function middleware(req) {
       return NextResponse.next();
     }
     
-    return NextResponse.redirect(new URL('/', req.url));
+    // Create the response
+    const response = NextResponse.redirect(new URL('/', req.url));
+    
+    // Set a cookie that the client can read to know auth failed
+    response.cookies.set('auth_failed', '1', { 
+      path: '/',
+      maxAge: 10 // Short-lived cookie
+    });
+    
+    return response;
   }
 }
 

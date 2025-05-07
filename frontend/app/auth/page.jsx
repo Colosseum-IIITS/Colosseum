@@ -52,7 +52,7 @@ function AuthPageContent() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        // Removed credentials: "include" as it causes issues in cross-domain scenarios
+        credentials: "include", // Re-enabling credentials to handle cookies properly
       });
 
       console.log("Response status:", res.status);

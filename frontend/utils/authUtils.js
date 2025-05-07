@@ -102,22 +102,42 @@ export const apiRequest = async (endpoint, options = {}) => {
  */
 export const logout = async (callback) => {
   try {
-    // Call logout endpoint if needed
-    await apiRequest('/auth/logout', { method: 'POST' });
+    // Call the signout endpoint - using the correct endpoint name
+    await apiRequest('/auth/signout', { 
+      method: 'POST',
+      // Don't use the token in this request to avoid 401 errors if token is invalid
+      headers: { 'Content-Type': 'application/json' }
+    });
   } catch (error) {
     console.error('Logout API call failed:', error);
+    // Continue with logout process even if API call fails
   } finally {
-    // Clear localStorage data regardless of API call success
+    // Clear ALL localStorage data related to authentication
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userData');
     
+    // Clear any cookies that might be present
+    document.cookie = 'user_jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    
+    // Force clear localStorage if needed with a more aggressive approach
+    try {
+      // Alternative approach to ensure token is cleared
+      localStorage.setItem('token', '');
+      localStorage.setItem('isAuthenticated', 'false');
+      
+      console.log('Logout successful, auth data cleared');
+    } catch (e) {
+      console.error('Error clearing localStorage:', e);
+    }
+    
     // Execute callback if provided
     if (callback && typeof callback === 'function') {
       callback();
     } else if (typeof window !== 'undefined') {
-      // Default redirect to home
+      // Force page reload to clear any in-memory state
       window.location.href = '/';
     }
   }

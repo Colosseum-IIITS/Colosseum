@@ -45,6 +45,7 @@ const allowedOrigins = [
   'https://colosseum-phi.vercel.app',
   'https://amazing-marcelline-vihaan-that-7f7a6fb0.koyeb.app',
   // Add any other frontend domains here
+  
 ];
 
 app.use(cors({

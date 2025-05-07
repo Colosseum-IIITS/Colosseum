@@ -14,6 +14,7 @@
 - [License](#license)
 
 ## Features
+#new feATURES
 
 - **Player Registration & Login**: Players can register, log in, and participate in tournaments.
 - **Tournament Creation**: Organizers can create and manage tournaments.

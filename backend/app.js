@@ -61,7 +61,18 @@ app.use(cors({
   },
   credentials: true,                  // Allow cookies to be sent
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'Origin', 'Accept'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-CSRF-Token',
+    'Origin',
+    'Accept',
+    'cache-control',
+    'x-requested-with',
+    'pragma',           // Added pragma header
+    'if-none-match',
+    'if-modified-since'
+  ],
   exposedHeaders: ['Set-Cookie', 'Date', 'ETag'],
   maxAge: 86400                       // Cache preflight requests for 24 hours
 }));

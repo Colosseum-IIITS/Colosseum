@@ -100,12 +100,12 @@ app.use("/b2c", b2cRoutes);
 app.use("/b2b", b2bRoutes);
 
 // API documentation (disable in production or secure it)
-if (!isProduction) {
+// if (!isProduction) {
   app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-} else {
-  // In production, you might want to secure the API docs
-  app.use("/", authenticateUser, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-}
+// } else {
+//   // In production, you might want to secure the API docs
+//   app.use("/", authenticateUser, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// }
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;

@@ -38,13 +38,13 @@ function AuthPageContent() {
 
   const handleSubmit = async (data) => {
     const endpoint = `/auth/${role}/${isSignUp ? "signup" : "signin"}`;
-    
+
     setLoading(true);
     setErrorMessage(""); // Reset error message before each submit
-    
+
     console.log(`Attempting to ${isSignUp ? "sign up" : "sign in"} as ${role}`);
     console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`);
-    
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
         method: "POST",
@@ -54,13 +54,13 @@ function AuthPageContent() {
         body: JSON.stringify(data),
         credentials: "include", // For cross-origin cookie handling
       });
-      
+
       console.log("Response status:", res.status);
       console.log("Response headers:", [...res.headers.entries()]);
-      
+
       const responseData = await res.json();
       console.log("Response data:", responseData);
-      
+
       if (res.ok) {
         // Store auth info in localStorage for immediate use
         if (responseData.token) {
@@ -69,9 +69,9 @@ function AuthPageContent() {
           localStorage.setItem("isAuthenticated", "true");
           console.log("Token stored in localStorage");
         }
-        
+
         console.log(`Redirecting to ${role} dashboard`);
-        
+
         // Force a slight delay to ensure cookies and localStorage are set before redirect
         setTimeout(() => {
           if (role === "player") {

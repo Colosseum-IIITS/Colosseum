@@ -33,39 +33,15 @@ const isProduction = NODE_ENV === "production";
 app.use(helmet());
 
 // CORS configuration
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "http://localhost:3000",
-        "https://localhost:3000",
-        process.env.FRONTEND_URL,
-      ];
-      // Remove any undefined or null values
-      const validOrigins = allowedOrigins.filter((o) => o);
-
-      // Log for debugging
-      console.log(`[CORS] Request origin: ${origin}`);
-      console.log(`[CORS] Allowed origins: ${JSON.stringify(validOrigins)}`);
-      console.log(
-        `[CORS] process.env.FRONTEND_URL: ${process.env.FRONTEND_URL}`,
-      );
-
-      if (!origin || validOrigins.includes(origin)) {
-        console.log(
-          `[CORS] Allowing origin: ${origin || "server-to-server or same-origin"}`,
-        );
-        callback(null, true);
-      } else {
-        console.log(`[CORS] Blocking origin: ${origin}`);
-        callback(new Error("Not allowed by CORS")); // This will cause a 500 response for the preflight if origin is not allowed
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"], // Added X-CSRF-Token as it's a common header
-  }),
-);
+app.use(cors({
+  origin: [
+    'http://localhost:3000', // Local development
+    'https://colosseum-zeta.vercel.app' // Deployed frontend
+  ],
+  credentials: true, // Allow cookies to be sent
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+}));
 
 // Configure logging based on environment
 let morganFormat;

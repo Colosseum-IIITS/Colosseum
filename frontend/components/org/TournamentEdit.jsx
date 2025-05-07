@@ -27,7 +27,7 @@ const TournamentEdit = ({ tournamentId }) => {
         const fetchTournament = async () => {
             try {
                 const token = localStorage.getItem('user_jwt');
-                const response = await fetch(`http://localhost:5000/api/tournament/${tournamentId}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/${tournamentId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const handleBanTeam = async (teamId) => {
             return;
         }
 
-        const response = await fetch('http://localhost:5000/api/organiser/banTeam', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/banTeam`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const handleUpdatePoints = async (e) => {
     try {
         const token = localStorage.getItem('user_jwt');
 
-        const response = await fetch(`http://localhost:5000/api/tournament/updateTable`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/updateTable`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ const handleDeclareWinner = async (e) => {
 
     try {
         const token = localStorage.getItem('user_jwt');
-        const response = await fetch('http://localhost:5000/api/tournament/updateWinner', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/tournament/updateWinner`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

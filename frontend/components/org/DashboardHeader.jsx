@@ -22,7 +22,7 @@ const DashboardHeader = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/organiser/getOrganiserName', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/organiser/getOrganiserName`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

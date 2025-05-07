@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 const apiRoutes = [
   {
     group: 'B2B (Business-to-Business)',
-    basePath: 'http://localhost:5000/b2b',
+    basePath: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/b2b`,
     routes: [
       {
         method: 'GET',
@@ -30,7 +30,7 @@ const apiRoutes = [
   },
   {
     group: 'B2C (Business-to-Consumer)',
-    basePath: 'http://localhost:5000/b2c',
+    basePath: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/b2c`,
     routes: [
       {
         method: 'GET',

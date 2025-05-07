@@ -39,12 +39,13 @@ app.use(
 
 // CORS configuration - updated for cross-domain authentication
 const allowedOrigins = [
-  'http://localhost:3000',            // Local frontend
-  'https://colosseum-zeta.vercel.app', // Deployed frontend
+  'http://localhost:3000',                                // Local frontend
+  'https://colosseum-zeta.vercel.app',                    // Deployed frontend
   'https://colosseum-git-main-vihaans-projects.vercel.app',
   'https://colosseum-phi.vercel.app',
   'https://amazing-marcelline-vihaan-that-7f7a6fb0.koyeb.app',
   // Add any other frontend domains here
+  
 ];
 
 app.use(cors({

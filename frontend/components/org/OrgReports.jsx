@@ -46,7 +46,7 @@ const ReportFormDialog = ({ open, onOpenChange }) => {
       };
 
   
-      const response = await fetch(`http://localhost:5000/api/report/OreportO2A`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/report/OreportO2A`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

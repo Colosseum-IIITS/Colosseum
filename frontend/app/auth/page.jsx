@@ -47,7 +47,7 @@ function AuthPageContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-        credentials: "include",
+        credentials: "include", // Added for cross-origin cookie handling
       });
 
       if (res.ok) {

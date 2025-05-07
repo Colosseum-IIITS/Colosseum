@@ -19,9 +19,21 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
-  // Add CORS headers to API routes
+  
+  // Enhanced CORS headers for all routes
   async headers() {
     return [
+      {
+        // Apply to all routes
+        source: '/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,HEAD,OPTIONS,POST,PUT,DELETE,PATCH' },
+          { key: 'Access-Control-Allow-Headers', value: 'Origin, X-Requested-With, Content-Type, Accept, Authorization' },
+        ],
+      },
+      // Keep existing API routes CORS configuration
       {
         source: '/api/:path*',
         headers: [
@@ -53,8 +65,20 @@ const nextConfig = {
     ];
   },
   
-  // Enable webpack 5 and optimize the build
-  webpack(config) {
+  // Enable webpack 5 and optimize the build with devServer options for CORS
+  webpack(config, { dev, isServer }) {
+    // Add devServer configuration for development mode
+    if (dev && !isServer) {
+      config.devServer = {
+        ...(config.devServer || {}),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT,DELETE,PATCH",
+          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        }
+      };
+    }
     return config;
   },
 };

@@ -23,18 +23,23 @@ function AuthLoading() {
 function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get("role");
+const searchRole = searchParams.get("role");
+const role = searchRole || localStorage.getItem("loginRole");
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
   const [errorMessage, setErrorMessage] = useState(""); // To show error messages
   const form = useForm();
 
-  useEffect(() => {
-    if (!role) {
-      router.push("/");
-    }
-  }, [role, router]);
+useEffect(() => {
+  const storedRole = localStorage.getItem("loginRole");
+  
+  if (role) {
+    localStorage.setItem("loginRole", role); // remember current role
+  } else if (!storedRole) {
+    router.push("/"); // only redirect if truly no role anywhere
+  }
+}, [role, router]);
 
   const handleSubmit = async (data) => {
     const endpoint = `/auth/${role}/${isSignUp ? "signup" : "signin"}`;

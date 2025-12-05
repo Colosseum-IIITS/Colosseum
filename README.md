@@ -289,13 +289,13 @@ A comprehensive view of all platform processes organized by actor responsibility
 Detailed flowcharts for each major process in the platform:
 
 #### 4.1 Authentication Process
-![Authentication Flow](diagrams/Screenshot%20from%202025-12-05%2011-38-37.png)
+![Authentication Flow](diagrams/process-flow-auth.png)
 
 #### 4.2 Tournament Creation & Approval Flow
-![Tournament Flow](diagrams/Screenshot%20from%202025-12-05%2011-39-02.png)
+![Tournament Flow](diagrams/process-flow-tournament.png)
 
 #### 4.3 Team Creation & Payment Flow
-![Team Creation Flow](diagrams/Screenshot%20from%202025-12-05%2011-39-11.png)
+![Team Creation Flow](diagrams/process-flow-team.png)
 
 ---
 

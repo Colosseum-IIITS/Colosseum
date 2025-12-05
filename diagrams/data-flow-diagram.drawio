@@ -1,0 +1,443 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" etag="colosseum-dataflow-v2" type="device">
+  <diagram id="data-flow-diagram" name="Data Flow Diagram - Colosseum Platform (Level 1)">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Colosseum E-Sports Platform - Data Flow Diagram (Level 1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== EXTERNAL ENTITIES =============== -->
+        <!-- Player Actor -->
+        <mxCell id="player-entity" value="Player" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Organiser Actor -->
+        <mxCell id="organiser-entity" value="Organiser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin Actor -->
+        <mxCell id="admin-entity" value="Admin" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- External: Stripe -->
+        <mxCell id="stripe-entity" value="Stripe&#xa;Payment API" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1480" y="200" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- External: Email Service -->
+        <mxCell id="email-entity" value="Email Service&#xa;(Nodemailer)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1480" y="500" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== MAIN CENTRAL PROCESS =============== -->
+        <mxCell id="main-process" value="0.0&#xa;Colosseum&#xa;E-Sports&#xa;Platform" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="700" y="480" width="200" height="160" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== SUB-PROCESSES =============== -->
+        <!-- 1.0 Authentication -->
+        <mxCell id="auth-process" value="1.0&#xa;Authentication&#xa;System&#xa;(JWT/bcrypt)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="120" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 2.0 Tournament Management -->
+        <mxCell id="tournament-process" value="2.0&#xa;Tournament&#xa;Management" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="480" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 3.0 Team Management -->
+        <mxCell id="team-process" value="3.0&#xa;Team&#xa;Management" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="300" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 4.0 Payment Processing -->
+        <mxCell id="payment-process" value="4.0&#xa;Payment&#xa;Processing" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="200" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 5.0 Notification System -->
+        <mxCell id="notification-process" value="5.0&#xa;Notification&#xa;System" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="480" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 6.0 Admin Control -->
+        <mxCell id="admin-process" value="6.0&#xa;Admin Control&#xa;&amp; Dashboard" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="760" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 7.0 Caching Layer -->
+        <mxCell id="cache-process" value="7.0&#xa;Caching&#xa;Layer" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="760" width="150" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- 8.0 Reporting System - NEW -->
+        <mxCell id="report-process" value="8.0&#xa;Reporting&#xa;System" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="280" y="640" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- 9.0 Rankings System - NEW -->
+        <mxCell id="rankings-process" value="9.0&#xa;Rankings&#xa;System" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="640" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== DATA STORES =============== -->
+        <mxCell id="db-player" value="D1 | Players" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-organiser" value="D2 | Organisers" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="130" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-admin" value="D3 | Admins" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="890" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-tournament" value="D4 | Tournaments" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1080" width="140" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-team" value="D5 | Teams" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="730" y="1080" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-payment" value="D6 | Payments" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-redis" value="D7 | Redis Cache" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="1080" width="140" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- NEW Data Stores -->
+        <mxCell id="db-report" value="D8 | Reports" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1080" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-banhistory" value="D9 | BanHistory" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1080" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== DATA FLOWS =============== -->
+        
+        <!-- Player → Auth -->
+        <mxCell id="flow-player-auth" value="Registration Data&#xa;(username, email, password)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="player-entity" target="auth-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Auth → Player (JWT) -->
+        <mxCell id="flow-auth-player" value="JWT Token" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="auth-process" target="player-entity">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="175" />
+              <mxPoint x="220" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Player → Team -->
+        <mxCell id="flow-player-team" value="Team Creation/&#xa;Join Request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="player-entity" target="team-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Player → Tournament -->
+        <mxCell id="flow-player-tourney" value="Tournament&#xa;Registration" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="player-entity" target="tournament-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="400" />
+              <mxPoint x="200" y="400" />
+              <mxPoint x="200" y="535" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Player → Report - NEW -->
+        <mxCell id="flow-player-report" value="Report Team/&#xa;Organiser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="player-entity" target="report-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="230" />
+              <mxPoint x="180" y="690" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Organiser → Auth -->
+        <mxCell id="flow-org-auth" value="Organiser&#xa;Credentials" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="organiser-entity" target="auth-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="175" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Organiser → Tournament -->
+        <mxCell id="flow-org-tourney" value="Tournament Data&#xa;(create, update, points)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="organiser-entity" target="tournament-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Tournament → Organiser -->
+        <mxCell id="flow-tourney-org" value="Revenue&#xa;Analytics" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="tournament-process" target="organiser-entity">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Organiser → Report - NEW -->
+        <mxCell id="flow-org-report" value="Report&#xa;Organiser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="organiser-entity" target="report-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="530" />
+              <mxPoint x="200" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Admin → Auth -->
+        <mxCell id="flow-admin-auth" value="Admin&#xa;Credentials" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="admin-entity" target="auth-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="100" y="175" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Admin → Admin Process -->
+        <mxCell id="flow-admin-ctrl" value="Ban/Unban/Approve&#xa;Commands" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="admin-entity" target="admin-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin Process → Admin -->
+        <mxCell id="flow-ctrl-admin" value="Dashboard&#xa;Statistics" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="admin-process" target="admin-entity">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="850" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Report → Admin - NEW -->
+        <mxCell id="flow-report-admin" value="Reports&#xa;for Review" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="report-process" target="admin-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Payment → Stripe -->
+        <mxCell id="flow-payment-stripe" value="Payment Intent" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="payment-process" target="stripe-entity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Stripe → Payment -->
+        <mxCell id="flow-stripe-payment" value="Payment&#xa;Confirmation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="stripe-entity" target="payment-process">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1420" y="210" />
+              <mxPoint x="1420" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Notification → Email -->
+        <mxCell id="flow-notif-email" value="Email Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="notification-process" target="email-entity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== DATABASE FLOWS =============== -->
+        
+        <!-- Auth → DB Player -->
+        <mxCell id="flow-auth-dbplayer" value="Store/Fetch&#xa;Player" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="auth-process" target="db-player">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Auth → DB Organiser -->
+        <mxCell id="flow-auth-dborg" value="Store/Fetch&#xa;Organiser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="auth-process" target="db-organiser">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="175" />
+              <mxPoint x="500" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Auth → DB Admin -->
+        <mxCell id="flow-auth-dbadmin" value="Fetch&#xa;Admin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="auth-process" target="db-admin">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="175" />
+              <mxPoint x="500" y="60" />
+              <mxPoint x="950" y="60" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Tournament → DB Tournament -->
+        <mxCell id="flow-tourney-dbtourney" value="CRUD&#xa;Tournaments" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="tournament-process" target="db-tournament">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="355" y="1000" />
+              <mxPoint x="630" y="1000" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Team → DB Team -->
+        <mxCell id="flow-team-dbteam" value="CRUD&#xa;Teams" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="team-process" target="db-team">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="355" />
+              <mxPoint x="500" y="1040" />
+              <mxPoint x="790" y="1040" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Payment → DB Payment -->
+        <mxCell id="flow-pay-dbpay" value="Store&#xa;Payment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="payment-process" target="db-payment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1225" y="140" />
+              <mxPoint x="1110" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Report → DB Report - NEW -->
+        <mxCell id="flow-report-dbreport" value="Store/Fetch&#xa;Reports" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="report-process" target="db-report">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="355" y="1020" />
+              <mxPoint x="940" y="1020" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Admin → DB BanHistory - NEW -->
+        <mxCell id="flow-admin-dbban" value="Ban/Unban&#xa;Records" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="admin-process" target="db-banhistory">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="355" y="960" />
+              <mxPoint x="1080" y="960" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Cache → DB Redis -->
+        <mxCell id="flow-cache-redis" value="Cache Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="cache-process" target="db-redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Rankings → Cache - NEW -->
+        <mxCell id="flow-rankings-cache" value="Update&#xa;Rankings Cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=10;" edge="1" parent="1" source="rankings-process" target="cache-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== INTERNAL PROCESS CONNECTIONS =============== -->
+        
+        <!-- Main → Payment -->
+        <mxCell id="flow-main-pay" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="main-process" target="payment-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Main → Notification -->
+        <mxCell id="flow-main-notif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="main-process" target="notification-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Main → Cache -->
+        <mxCell id="flow-main-cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="main-process" target="cache-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Tournament → Main -->
+        <mxCell id="flow-tourney-main" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="tournament-process" target="main-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Team → Main -->
+        <mxCell id="flow-team-main" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="team-process" target="main-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin → Main -->
+        <mxCell id="flow-admin-main" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="admin-process" target="main-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Main → Rankings -->
+        <mxCell id="flow-main-rankings" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="main-process" target="rankings-process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- =============== LEGEND =============== -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="800" width="220" height="280" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="810" width="220" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="850" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1-text" value="External Entity" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="850" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg2" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="880" width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2-text" value="Process" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="880" width="130" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg3" value="" style="shape=partialRectangle;whiteSpace=wrap;html=1;left=1;right=0;top=0;bottom=0;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="915" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3-text" value="Data Store" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="915" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="945" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4-text" value="External System" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="945" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg5" value="───►" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="975" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5-text" value="Data Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="975" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg6" value="- - -►" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="1005" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6-text" value="Response/Internal" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="1005" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="leg7" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="1035" width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg7-text" value="Central Process" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="1035" width="130" height="25" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

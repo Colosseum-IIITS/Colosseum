@@ -1,0 +1,352 @@
+<mxfile host="65bd71144e">
+    <diagram id="process-flow-diagram" name="Process Flow Diagram - Colosseum Platform">
+        <mxGraphModel dx="1824" dy="2756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="2800" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Colosseum E-Sports Platform - Process Flow Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="20" width="800" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-section-header" value="1. AUTHENTICATION PROCESS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="90" width="1920" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="start" value="START" style="ellipse;whiteSpace=wrap;html=1;fillColor=#00ff00;strokeColor=#006600;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="160" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="visit-page" value="User visits&#xa;Login/Register Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="260" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-start-visit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="start" target="visit-page" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="enter-creds" value="Enter Credentials&#xa;(email, password)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="360" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-visit-creds" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="visit-page" target="enter-creds" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-new-user" value="New User?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="85" y="460" width="130" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-creds-dec" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="enter-creds" target="dec-new-user" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="validate-unique" value="Validate Unique&#xa;Email/Username" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="480" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dec-new-yes" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" parent="1" source="dec-new-user" target="validate-unique" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="hash-password" value="Hash Password&#xa;(bcrypt)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="570" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-valid-hash" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="validate-unique" target="hash-password" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="store-db" value="Store User&#xa;in Database" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="660" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-hash-store" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="hash-password" target="store-db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="send-email" value="Send Welcome Email&#xa;(Nodemailer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="770" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-store-email" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="store-db" target="send-email" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gen-jwt-new" value="Generate JWT Token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="860" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-email-jwt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="send-email" target="gen-jwt-new" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="validate-creds" value="Validate Credentials&#xa;Against DB Hash" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="620" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dec-existing" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" parent="1" source="dec-new-user" target="validate-creds" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-valid-creds" value="Valid&#xa;Credentials?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="85" y="720" width="130" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-valid-dec" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="validate-creds" target="dec-valid-creds" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gen-jwt-existing" value="Generate JWT Token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="860" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dec-yes" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" parent="1" source="dec-valid-creds" target="gen-jwt-existing" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="error-invalid" value="Return Error:&#xa;Invalid Credentials" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="960" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dec-no" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;dashed=1;" parent="1" source="dec-valid-creds" target="error-invalid" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="40" y="770"/>
+                            <mxPoint x="40" y="990"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="store-token" value="Store Token&#xa;(Cookie/LocalStorage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="960" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-jwt-new-store" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="gen-jwt-new" target="store-token" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-jwt-existing-store" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="gen-jwt-existing" target="store-token" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="150" y="950"/>
+                            <mxPoint x="260" y="950"/>
+                            <mxPoint x="260" y="990"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="redirect-dashboard" value="Redirect to&#xa;Role Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="1050" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-store-redirect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="store-token" target="redirect-dashboard" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-end" value="Auth&#xa;Complete" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="1140" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-redirect-end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" parent="1" source="redirect-dashboard" target="auth-end" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="tourney-section-header" value="2. TOURNAMENT CREATION &amp; APPROVAL FLOW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="1250" width="1920" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="tourney-start" value="Organiser Logged In" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="1320" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="click-create" value="Click&#xa;&quot;Create Tournament&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="1410" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-tstart-click" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="tourney-start" target="click-create">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="fill-form" value="Fill Tournament Form&#xa;(tid, name, dates,&#xa;entryFee, prizePool)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="1500" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-click-fill" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="click-create" target="fill-form">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-valid-tid" value="Valid&#xa;Tournament&#xa;ID?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="525" y="1600" width="110" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-fill-dectid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="fill-form" target="dec-valid-tid">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="error-tid" value="Error: TID&#xa;Already Exists" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="1620" width="110" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-tid-error" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;dashed=1;" edge="1" parent="1" source="dec-valid-tid" target="error-tid">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-valid-dates" value="Start Date&#xa;&lt; End Date?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="525" y="1730" width="110" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-tid-dates" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-valid-tid" target="dec-valid-dates">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="error-dates" value="Error: Invalid&#xa;Date Range" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="1750" width="110" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dates-error" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;dashed=1;" edge="1" parent="1" source="dec-valid-dates" target="error-dates">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="save-tourney" value="Save Tournament&#xa;status = &quot;Pending&quot;" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="1860" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dates-save" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-valid-dates" target="save-tourney">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="link-organiser" value="Link to Organiser&#xa;tournaments[] array" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="1970" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-save-link" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="save-tourney" target="link-organiser">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="notify-followers" value="Notify All Followers&#xa;(Pub-Sub: Push to&#xa;notifications[])" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="2060" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-link-notify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="link-organiser" target="notify-followers">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="invalidate-cache" value="Invalidate&#xa;Organiser Cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="2160" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-notify-cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="notify-followers" target="invalidate-cache">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin-dashboard" value="Tournament Appears&#xa;in Admin Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="1970" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-cache-admin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="invalidate-cache" target="admin-dashboard">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="680" y="2190"/>
+                            <mxPoint x="680" y="2000"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="admin-review-tourney" value="Admin Reviews&#xa;Tournament Details" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="2060" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-dash-review" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="admin-dashboard" target="admin-review-tourney">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-approve" value="Approve?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="735" y="2150" width="110" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-review-dec" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="admin-review-tourney" target="dec-approve">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="update-approved" value="Update Status&#xa;to &quot;Approved&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="920" y="2170" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-approve-yes" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-approve" target="update-approved">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="invalidate-tourney-cache" value="Invalidate&#xa;Tournament Cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="920" y="2260" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-approved-cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="update-approved" target="invalidate-tourney-cache">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="visible-players" value="Tournament Visible&#xa;to Players" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="920" y="2350" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-cache-visible" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="invalidate-tourney-cache" target="visible-players">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="reject-tourney" value="Update Status&#xa;to &quot;Rejected&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="2280" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-reject-no" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-approve" target="reject-tourney">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="notify-organiser" value="Notify Organiser&#xa;of Rejection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="720" y="2370" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-reject-notify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="reject-tourney" target="notify-organiser">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="tourney-end" value="Tournament&#xa;Process Complete" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="800" y="2460" width="120" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-visible-end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="visible-players" target="tourney-end">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="990" y="2495"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arr-notify-end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="notify-organiser" target="tourney-end">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="790" y="2495"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="team-section-header" value="3. TEAM CREATION &amp; PAYMENT FLOW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="2580" width="1920" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="team-start" value="Player Logged In" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="2650" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="click-create-team" value="Click&#xa;&quot;Create Team&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="2740" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-teamstart-click" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="team-start" target="click-create-team">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-payment-req" value="Payment&#xa;Required?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="105" y="2830" width="110" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-click-paydec" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="click-create-team" target="dec-payment-req">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="redirect-stripe" value="Redirect to&#xa;Stripe Checkout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="2850" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-paydec-stripe" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-payment-req" target="redirect-stripe">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="stripe-process" value="Stripe Processes&#xa;Payment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="2940" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-stripe-process" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="redirect-stripe" target="stripe-process">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dec-pay-success" value="Payment&#xa;Successful?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="310" y="3030" width="110" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-process-dec" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="stripe-process" target="dec-pay-success">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="save-payment" value="Save Payment Record&#xa;(paymentIntentId,&#xa;amount, status)" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="315" y="3160" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-paysuccess-save" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-pay-success" target="save-payment">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="error-payment" value="Error: Payment&#xa;Failed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="470" y="3050" width="110" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-payfail-error" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;dashed=1;" edge="1" parent="1" source="dec-pay-success" target="error-payment">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="enter-team-details" value="Enter Team Details&#xa;(teamName, game,&#xa;description)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="295" y="3280" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-save-details" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="save-payment" target="enter-team-details">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-nopay-details" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;fontSize=11;fontStyle=1;" edge="1" parent="1" source="dec-payment-req" target="enter-team-details">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="160" y="2960"/>
+                            <mxPoint x="260" y="2960"/>
+                            <mxPoint x="260" y="3315"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="create-team-db" value="Create Team&#xa;in Database" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="315" y="3380" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-details-create" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="enter-team-details" target="create-team-db">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="set-captain" value="Set Player as&#xa;Team Captain" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="295" y="3490" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-create-captain" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="create-team-db" target="set-captain">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="link-player-team" value="Link Player to Team&#xa;(currentTeam,&#xa;teamHistory[])" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="295" y="3580" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-captain-link" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="set-captain" target="link-player-team">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="invalidate-player-cache" value="Invalidate&#xa;Player Cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="295" y="3680" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-link-cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="link-player-team" target="invalidate-player-cache">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="team-end" value="Team&#xa;Created" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+                    <mxGeometry x="315" y="3770" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arr-cache-teamend" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="invalidate-player-cache" target="team-end">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

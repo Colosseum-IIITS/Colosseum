@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: "node",
-  testMatch: ["**/__tests__/**/*.test.js"],
+  testMatch: ["**/__tests__/**/*.test.js", "**/test/**/*.test.js"],
   testTimeout: 60000, // Increase global timeout to 60 seconds
   verbose: true,
   setupFilesAfterEnv: ['./test/setup.js'],

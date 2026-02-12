@@ -1,6 +1,43 @@
 // swaggerDocs.js
 
 module.exports = {
+    ApiKey: {
+        type: 'object',
+        required: ['key', 'name', 'partnerId', 'expiresAt'],
+        properties: {
+            key: { type: 'string', description: 'The API key value' },
+            name: { type: 'string', description: 'Name of the API key' },
+            partnerId: { type: 'string', description: 'ID of the partner who owns this key' },
+            permissions: { 
+                type: 'array', 
+                items: { type: 'string' },
+                description: 'Permissions granted to this API key'
+            },
+            createdAt: { type: 'string', format: 'date-time', description: 'When the key was created' },
+            expiresAt: { type: 'string', format: 'date-time', description: 'When the key expires' },
+            lastUsed: { type: 'string', format: 'date-time', description: 'When the key was last used' },
+            active: { type: 'boolean', description: 'Whether the key is active' }
+        }
+    },
+    Webhook: {
+        type: 'object',
+        required: ['url', 'events', 'apiKey'],
+        properties: {
+            url: { type: 'string', description: 'The URL where webhook events will be sent' },
+            events: { 
+                type: 'array', 
+                items: { 
+                    type: 'string',
+                    enum: ['tournament.created', 'tournament.updated', 'tournament.completed', 'team.joined']
+                },
+                description: 'Events to subscribe to'
+            },
+            apiKey: { type: 'string', description: 'API key associated with this webhook' },
+            createdAt: { type: 'string', format: 'date-time', description: 'When the webhook was created' },
+            lastTriggered: { type: 'string', format: 'date-time', description: 'When the webhook was last triggered' },
+            active: { type: 'boolean', description: 'Whether the webhook is active' }
+        }
+    },
     Admin: {
         type: 'object',
         required: ['username', 'email', 'password'],

@@ -1,7 +1,7 @@
 import React from 'react'
-import { TopOrganisersChart } from '@/components/TopOrganisersByTournaments'
-import { TournamentPrizePoolChart } from '@/components/PrizePoolChart'
-import { TournamentStatsCards } from '@/components/TournamentStatsCards'
+import { TopOrganisersChart } from '@/components/org/analytics/TopOrganisersByTournaments'
+import { TournamentPrizePoolChart } from '@/components/org/analytics/PrizePoolChart'
+import { TournamentStatsCards } from '@/components/org/tournaments/TournamentStatsCards'
 
 const page = () => {
   return (

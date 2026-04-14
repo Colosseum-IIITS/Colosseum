@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState } from "react"
-import { ActiveTournaments } from "@/components/ActiveTournaments"
-import { CompletedTournaments } from "@/components/CompletedTournaments"
+import { ActiveTournaments } from "@/components/org/tournaments/ActiveTournaments"
+import { CompletedTournaments } from "@/components/org/tournaments/CompletedTournaments"
 import { Button } from "@/components/ui/button"
-import PendingTournament from "@/components/PendingTournaments"
+import PendingTournament from "@/components/org/tournaments/PendingTournaments"
 import useFetchAdminDashboard from "@/context/useFetchAdminDashboard"
 import { useAdminDashboard } from "@/context/AdminDashboardContext"
 

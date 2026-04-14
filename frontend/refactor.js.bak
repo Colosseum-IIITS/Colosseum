@@ -1,0 +1,141 @@
+const fs = require('fs');
+const path = require('path');
+
+const projectRoot = '/Users/santosh/Documents/grind/projects/mern/Colleseum/Colosseum/frontend';
+
+function collectFiles(dir, exts, results = []) {
+  if (!fs.existsSync(dir)) return;
+  for (const item of fs.readdirSync(dir)) {
+    const itemPath = path.join(dir, item);
+    if (fs.statSync(itemPath).isDirectory()) {
+      if (item !== 'node_modules' && item !== '.next') {
+        collectFiles(itemPath, exts, results);
+      }
+    } else if (exts.includes(path.extname(itemPath))) {
+      results.push(itemPath);
+    }
+  }
+  return results;
+}
+
+const orgDir = path.join(projectRoot, 'components', 'org');
+const playerDir = path.join(projectRoot, 'components', 'player');
+
+const orgGroupings = {
+  'tournaments': [
+    'ActiveTournaments',
+    'CompletedTournaments',
+    'PendingTournaments',
+    'TournamentsSection',
+    'CreateTournOrg',
+    'TournamentEdit',
+    'TournamentStatsCards'
+  ],
+  'analytics': [
+    'OrgStats',
+    'RevenueGraph',
+    'PrizePoolChart',
+    'RegistrationsOverTime',
+    'TopOrganisersByTournaments'
+  ],
+  'layout': [
+    'NavOrg',
+    'DashboardHeader',
+    'OrganiserDropdown'
+  ],
+  'management': [
+    'OrgReports',
+    'ReportedTeams',
+    'UpdateDetails'
+  ]
+};
+
+const moveMap = [];
+
+for (const [folder, files] of Object.entries(orgGroupings)) {
+  const folderPath = path.join(orgDir, folder);
+  if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
+  
+  for (const file of files) {
+    const oldPath = path.join(orgDir, file + '.jsx');
+    if (fs.existsSync(oldPath)) {
+      moveMap.push({
+        name: file,
+        regexRef: new RegExp(`@/components/org/${file}(?!\\w)`, 'g'),
+        newRef: `@/components/org/${folder}/${file}`
+      });
+      // Handle relative imports like import from './NavOrg'
+      moveMap.push({
+        name: file,
+        regexRef: new RegExp(`\['"\\]\\.\/${file}\['"\\]`, 'g'),
+        newRef: `'../${folder}/${file}'`
+      });
+      fs.renameSync(oldPath, path.join(folderPath, file + '.jsx'));
+    }
+  }
+}
+
+// player groupings
+const playerGroupings = {
+  'stats': [
+    'PlayerRanking',
+    'PlayerResults',
+    'WinPercentage'
+  ],
+  'tournaments': [
+    'TournamentsPlayed',
+    'TournamentsWon'
+  ],
+  'profile': [
+    'PlayerDetails',
+    'FollowedOrganisers',
+    'NoOfOrgsFollowing',
+    'searchProf'
+  ]
+};
+
+for (const [folder, files] of Object.entries(playerGroupings)) {
+  const folderPath = path.join(playerDir, folder);
+  if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
+  for (const file of files) {
+    const oldPath = path.join(playerDir, file + '.jsx');
+    const oldPathJs = path.join(playerDir, file + '.js');
+    if (fs.existsSync(oldPath)) {
+      moveMap.push({
+        name: file,
+        regexRef: new RegExp(`@/components/player/${file}(?!\\w)`, 'g'),
+        newRef: `@/components/player/${folder}/${file}`
+      });
+      fs.renameSync(oldPath, path.join(folderPath, file + '.jsx'));
+    } else if (fs.existsSync(oldPathJs)) {
+      moveMap.push({
+        name: file,
+        regexRef: new RegExp(`@/components/player/${file}(?!\\w)`, 'g'),
+        newRef: `@/components/player/${folder}/${file}`
+      });
+      fs.renameSync(oldPathJs, path.join(folderPath, file + '.js'));
+    }
+  }
+}
+
+const allJsxFiles = collectFiles(projectRoot, ['.jsx', '.js']);
+
+let updateCount = 0;
+for (const file of allJsxFiles) {
+  let content = fs.readFileSync(file, 'utf8');
+  let changed = false;
+  
+  for (const mapping of moveMap) {
+    if (content.match(mapping.regexRef)) {
+      content = content.replace(mapping.regexRef, mapping.newRef);
+      changed = true;
+    }
+  }
+  
+  if (changed) {
+    fs.writeFileSync(file, content);
+    updateCount++;
+  }
+}
+
+console.log(`Re-organized files and updated references in ${updateCount} files.`);

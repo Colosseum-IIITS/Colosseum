@@ -1,12 +1,12 @@
 'use client'
-import Hero from "@/components/Hero"
-import About from "@/components/About"
-import NavBar from "@/components/Navbar"
-import Features from "@/components/Features"
+import Hero from "@/components/landing/Hero"
+import About from "@/components/landing/About"
+import NavBar from "@/components/layout/Navbar"
+import Features from "@/components/landing/Features"
 
-import Contact from "@/components/Contact"
-import Footer from "@/components/Footer"
-import CanvasCursor from "@/components/CanvasCursor"
+import Contact from "@/components/landing/Contact"
+import Footer from "@/components/landing/Footer"
+import CanvasCursor from "@/components/landing/CanvasCursor"
 
 import { useRouter } from "next/navigation"
 

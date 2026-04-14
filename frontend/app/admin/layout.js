@@ -1,6 +1,6 @@
 'use client';
 import { useState } from "react";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/layout/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,8 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ModeToggle } from "@/components/mode-toggle";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/providers/mode-toggle";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export default function RootLayout({ children }) {
   const [activeMain, setActiveMain] = useState("");

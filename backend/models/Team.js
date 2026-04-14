@@ -10,7 +10,6 @@ const teamSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Indexes
-teamSchema.index({ name: 1 });
 teamSchema.index({ captain: 1 });
 teamSchema.index({ players: 1 });
 teamSchema.index({ tournaments: 1 });

@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AdminDashboardProvider } from "@/context/AdminDashboardContext";
 import { BanProvider } from "@/context/BanContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -23,7 +23,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

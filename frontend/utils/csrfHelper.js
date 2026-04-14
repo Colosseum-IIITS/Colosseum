@@ -7,7 +7,7 @@
 export const fetchCsrfToken = async () => {
   try {
     console.log('Fetching CSRF token from server...');
-    const response = await fetch('http://localhost:5000/auth/csrfToken', {
+    const response = await fetch('http://localhost:5002/auth/csrfToken', {
       credentials: 'include',
     });
     

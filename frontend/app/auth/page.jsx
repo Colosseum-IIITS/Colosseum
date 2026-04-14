@@ -48,10 +48,10 @@ useEffect(() => {
     setErrorMessage(""); // Reset error message before each submit
 
     console.log(`Attempting to ${isSignUp ? "sign up" : "sign in"} as ${role}`);
-    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`);
+    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002'}${endpoint}`);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002'}${endpoint}`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

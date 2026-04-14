@@ -42,7 +42,6 @@ const tournamentSchema = new mongoose.Schema(
 
 // Indexes
 tournamentSchema.index({ tid: 1 });
-tournamentSchema.index({ name: 1 });
 tournamentSchema.index({ name: 'text' });
 tournamentSchema.index({ organiser: 1 });
 tournamentSchema.index({ status: 1 });

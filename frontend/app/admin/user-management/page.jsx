@@ -1,6 +1,6 @@
 
 // app/admin/page.jsx
-import AdminPanel from '@/components/AdminPanel'
+import AdminPanel from '@/components/admin/AdminPanel'
 
 export default function AdminPage() {
   return (

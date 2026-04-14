@@ -11,7 +11,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    # Add MongoDB service
+    # Add MongoDB servicex
     services:
       mongodb:
         image: mongo:6.0

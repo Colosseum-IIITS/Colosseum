@@ -7,12 +7,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 
 // Organiser Components
-import TournamentsSection from '@/components/org/TournamentsSection';
-import OrganiserReport from '@/components/org/OrgReports';
-import RevenueGraph from '@/components/org/RevenueGraph'
-import OrganiserStats from '@/components/org/OrgStats';
-import ReportedTeams from '@/components/org/ReportedTeams';
-import OrganiserNavbar from '@/components/org/NavOrg';
+import TournamentsSection from '@/components/org/tournaments/TournamentsSection';
+import OrganiserReport from '@/components/org/management/OrgReports';
+import RevenueGraph from '@/components/org/analytics/RevenueGraph'
+import OrganiserStats from '@/components/org/analytics/OrgStats';
+import ReportedTeams from '@/components/org/management/ReportedTeams';
+import OrganiserNavbar from '@/components/org/layout/NavOrg';
 
 const Dashboard = () => {
   const [isReportDialogOpen, setReportDialogOpen] = useState(false);
@@ -21,7 +21,7 @@ const Dashboard = () => {
   // Fetch CSRF token once when dashboard loads
   // useEffect(() => {
   //   console.log('Dashboard - Fetching CSRF token');
-  //   fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/csrfToken`, {
+  //   fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002'}/auth/csrfToken`, {
   //     credentials: 'include',
   //     cache: 'no-store'
   //   })
